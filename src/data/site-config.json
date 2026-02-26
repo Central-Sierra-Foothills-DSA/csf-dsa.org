@@ -1,0 +1,16 @@
+{
+  "orgName": "Central Sierra Foothills DSA",
+  "orgNameShort": "CSF DSA",
+  "tagline": "Building power for working people in the Sierra foothills",
+  "counties": ["Placer", "El Dorado", "Nevada", "Sierra"],
+  "social": {
+    "instagram": "https://www.instagram.com/csfdsa/",
+    "facebook": "https://www.facebook.com/csfdsa"
+  },
+  "calendarEmbedUrl": "",
+  "interestFormUrl": "",
+  "mailingListUrl": "",
+  "donateUrl": "",
+  "joinDsaUrl": "https://dsausa.org/join",
+  "contactEmail": ""
+}

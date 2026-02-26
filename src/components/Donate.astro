@@ -1,0 +1,32 @@
+---
+import config from '../data/site-config.json';
+const hasDonateUrl = !!config.donateUrl;
+---
+<section id="donate" class="py-20 sm:py-28 bg-warm-gray">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <p class="text-dsa-red font-semibold tracking-widest uppercase text-sm mb-3">Support Our Work</p>
+    <h2 class="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl mb-6">
+      Donate to CSF DSA
+    </h2>
+    <p class="text-lg text-charcoal/60 max-w-2xl mx-auto mb-10 leading-relaxed">
+      Your contribution directly supports our organizing work — from political education events
+      to mutual aid projects to electoral campaigns. Every dollar helps us build a stronger,
+      more democratic community in the Sierra foothills.
+    </p>
+
+    {hasDonateUrl ? (
+      <a
+        href={config.donateUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-block px-10 py-4 bg-dsa-red hover:bg-dsa-red-dark text-white font-semibold rounded-lg text-lg transition-colors"
+      >
+        Make a Donation
+      </a>
+    ) : (
+      <div class="inline-block px-10 py-4 bg-charcoal/10 rounded-lg">
+        <p class="text-charcoal/50 font-medium">Donation link coming soon</p>
+      </div>
+    )}
+  </div>
+</section>

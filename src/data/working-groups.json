@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Electoral Politics",
+    "description": "Endorsing and supporting candidates and ballot measures that advance democratic socialist values in our communities.",
+    "icon": "ballot"
+  },
+  {
+    "name": "Mutual Aid",
+    "description": "Building networks of care and material support to meet our neighbors' immediate needs.",
+    "icon": "hands"
+  },
+  {
+    "name": "Labor Solidarity",
+    "description": "Standing with workers organizing for better wages, conditions, and union representation.",
+    "icon": "fist"
+  },
+  {
+    "name": "Political Education",
+    "description": "Hosting reading groups, workshops, and discussions to deepen our understanding of socialism and organizing.",
+    "icon": "book"
+  }
+]
