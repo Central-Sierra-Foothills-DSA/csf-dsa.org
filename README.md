@@ -37,13 +37,17 @@ current. If the fetch fails, the committed `events.json` is used as a fallback.
 
 ## Deploy
 
-`.github/workflows/deploy.yml` builds on push to `main`, daily at 7 AM Pacific, and on
-demand, then deploys to GitHub Pages. One-time setup: repo Settings → Pages → Source:
-"GitHub Actions", and add the custom domain.
+Not wired up yet. CI (`.github/workflows/ci.yml`) builds `main` and every PR but
+does not publish. When a host is chosen, add a deploy job there and a daily
+`schedule` trigger so the events list stays current.
 
-To host on S3 or CloudFront instead:
+Note: GitHub Pages requires a public repo on the org's current (free) GitHub plan.
+Cloudflare Pages or Netlify work with a private repo.
+
+To build and host the output anywhere static:
 
 ```bash
 npm run build
+# upload dist/ to your host, e.g.
 aws s3 sync dist/ s3://YOUR-BUCKET --delete
 ```

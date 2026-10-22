@@ -51,8 +51,7 @@ Body text in Markdown. Keep it to what a new member needs to know and how to get
 ## Events
 
 Events are not edited here. Add them in Solidarity Tech and they appear on the site
-within a day (the site rebuilds every morning). To force an update, a maintainer can
-run the "Build and deploy" workflow from the Actions tab.
+the next time it is built and published.
 
 ## Review and merge
 
