@@ -1,0 +1,63 @@
+---
+import site from '../data/site.json';
+import branches from '../data/branches.json';
+import SectionHeading from './SectionHeading.astro';
+import { upcomingEvents, formatLongDate, formatTime } from '../lib/events';
+
+const upcoming = upcomingEvents(new Date());
+function nextMeeting(keywords: string[]) {
+  const kw = keywords.map((k) => k.toLowerCase());
+  return upcoming.find((e) => {
+    const t = e.title.toLowerCase();
+    return /branch/.test(t) && kw.some((k) => t.includes(k.toLowerCase()));
+  });
+}
+---
+<section id="branches" class="py-20 sm:py-28 bg-cream">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <SectionHeading eyebrow="Branches" title="Four counties, four branches. Find the one near you." lede="Our chapter covers a lot of ground, so we organize locally. Each branch meets monthly and runs its own projects. Show up to whichever is closest." />
+
+    <div class="mt-12 grid sm:grid-cols-2 gap-5">
+      {branches.map((b) => {
+        const next = nextMeeting(b.calendarKeywords);
+        return (
+          <article class="group bg-white rounded-xl p-6 sm:p-7 ring-1 ring-ink/5 shadow-sm hover:shadow-md hover:ring-red/30 transition-all">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="font-display font-extrabold text-2xl leading-tight">{b.name}</h3>
+                <p class="text-sm text-stone mt-1">{b.area}</p>
+              </div>
+              <span class="shrink-0 w-10 h-10 rounded-full bg-red-tint text-red flex items-center justify-center" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+              </span>
+            </div>
+            <dl class="mt-5 space-y-3 text-sm">
+              <div class="flex gap-3">
+                <dt class="w-14 shrink-0 font-semibold text-ink/60">Meets</dt>
+                <dd class="text-ink/85">{b.meets}</dd>
+              </div>
+              <div class="flex gap-3">
+                <dt class="w-14 shrink-0 font-semibold text-ink/60">Where</dt>
+                <dd class="text-ink/85">{b.venue}</dd>
+              </div>
+            </dl>
+            <div class="mt-5 pt-5 border-t border-ink/5">
+              {next ? (
+                <a href={next.url ?? '#events'} target={next.url ? '_blank' : undefined} rel={next.url ? 'noopener' : undefined} class="inline-flex items-center gap-2 text-sm font-semibold text-red-deep hover:text-red">
+                  <span class="inline-block w-2 h-2 rounded-full bg-red animate-pulse" aria-hidden="true"></span>
+                  Next: {formatLongDate(next.start)}, {formatTime(next.start)}
+                </a>
+              ) : (
+                <a href={site.links.fullCalendar} target="_blank" rel="noopener" class="text-sm font-semibold text-stone hover:text-red-deep">Next date on the full calendar →</a>
+              )}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <p class="mt-8 text-stone">
+      Don't see a branch near you? Email <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-deep hover:text-red underline underline-offset-4">{site.contactEmail}</a> and we'll help you start one.
+    </p>
+  </div>
+</section>

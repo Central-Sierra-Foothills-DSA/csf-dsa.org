@@ -1,64 +1,49 @@
-# Central Sierra Foothills DSA Website
+# csf-dsa.org
 
-Static website for the Central Sierra Foothills CA Local Chapter of Democratic Socialists of America, serving Placer, El Dorado, Nevada, and Sierra counties.
+Website for Central Sierra Foothills DSA, the Democratic Socialists of America chapter
+serving Placer, Nevada, El Dorado, and Sierra counties in California.
 
-Built with [Astro](https://astro.build/) and [Tailwind CSS](https://tailwindcss.com/). Outputs pure static HTML for hosting on S3 or any static host.
+Built with [Astro](https://astro.build/) and [Tailwind CSS](https://tailwindcss.com/).
+Outputs plain static HTML.
 
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) 18 or later
-- npm (comes with Node.js)
-
-## Getting Started
+## Develop
 
 ```bash
 npm install
 npm run dev
 ```
 
-The dev server starts at **http://localhost:4321** with hot reload.
+Dev server runs at http://localhost:4321 with hot reload.
 
-## Scripts
+| Command                | What it does                                                  |
+|------------------------|---------------------------------------------------------------|
+| `npm run dev`          | Local dev server                                              |
+| `npm run build`        | Fetch events from Solidarity Tech, then build to `dist/`      |
+| `npm run preview`      | Serve the built site locally                                  |
+| `npm run fetch-events` | Only refresh `src/data/events.json`                           |
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start local dev server with hot reload |
-| `npm run build` | Build static site to `dist/` |
-| `npm run preview` | Preview the built site locally |
+## Editing content
 
-## Editing Content
+See [CONTRIBUTING.md](CONTRIBUTING.md). Most content is JSON in `src/data/` or
+Markdown in `src/content/campaigns/`. AI agents should read [CLAUDE.md](CLAUDE.md).
 
-Most content that changes regularly lives in **`src/data/`**:
+## How the calendar works
 
-- **`site-config.json`** — Social media links, contact info, calendar embed URL, external form links. Update these when accounts or URLs change.
-- **`working-groups.json`** — List of working groups displayed on the site. Add/remove entries to update the grid.
+The chapter manages events in [Solidarity Tech](https://solidarity.tech), which has no
+public events API. `scripts/fetch-events.mjs` scrapes the events JSON embedded in the
+chapter's Solidarity Tech homepage and writes `src/data/events.json`. The build runs
+this script first. A daily GitHub Actions schedule rebuilds the site so the list stays
+current. If the fetch fails, the committed `events.json` is used as a fallback.
 
-To edit section copy (hero tagline, about text, etc.), modify the corresponding component in **`src/components/`**.
+## Deploy
 
-## Adding a New Page
+`.github/workflows/deploy.yml` builds on push to `main`, daily at 7 AM Pacific, and on
+demand, then deploys to GitHub Pages. One-time setup: repo Settings → Pages → Source:
+"GitHub Actions", and add the custom domain.
 
-Create a new `.astro` file in `src/pages/`. For example, `src/pages/about.astro` becomes `/about` on the site. Use the Base layout:
-
-```astro
----
-import Base from '../layouts/Base.astro';
----
-<Base title="About — CSF DSA">
-  <main>
-    <!-- page content -->
-  </main>
-</Base>
-```
-
-## Logo
-
-Place your chapter logo at **`public/images/logo.svg`** (or `.png`). The Nav component will pick it up automatically. Until a logo file is added, the site displays a text-based logo.
-
-## Deploy to S3
+To host on S3 or CloudFront instead:
 
 ```bash
 npm run build
-aws s3 sync dist/ s3://YOUR-BUCKET-NAME --delete
+aws s3 sync dist/ s3://YOUR-BUCKET --delete
 ```
-
-For HTTPS, put a CloudFront distribution in front of the S3 bucket and point your domain at it.

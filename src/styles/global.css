@@ -1,29 +1,60 @@
 @import "tailwindcss";
 
 @theme {
-  --color-dsa-red: #ec1f27;
-  --color-dsa-red-dark: #c9191f;
-  --color-dsa-red-light: #fee2e2;
-  --color-charcoal: #1a1a2e;
-  --color-charcoal-light: #2d2d44;
-  --color-warm-white: #faf9f6;
-  --color-warm-gray: #f0eeeb;
-  --color-sierra-gold: #d4a843;
-  --color-sierra-gold-dark: #b8922e;
-  --font-family-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-family-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-red: #ec1f27;
+  --color-red-deep: #b5121a;
+  --color-red-tint: #fde8e9;
+  --color-ink: #16161d;
+  --color-ink-soft: #26262f;
+  --color-cream: #faf6ef;
+  --color-sand: #f0e9dc;
+  --color-stone: #6b6a72;
+  --color-pine: #234d3a;
+  --color-gold: #d9a441;
+
+  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 
 body {
-  font-family: var(--font-family-body);
-  color: var(--color-charcoal);
-  background-color: var(--color-warm-white);
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background-color: var(--color-cream);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-family-heading);
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
+
+p { text-wrap: pretty; }
+
+:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+/* Rendered Markdown (campaign bodies) */
+.prose-chapter > * + * { margin-top: 0.9em; }
+.prose-chapter ul { list-style: disc; padding-left: 1.25rem; }
+.prose-chapter li + li { margin-top: 0.35em; }
+.prose-chapter a { color: var(--color-red-deep); text-decoration: underline; text-underline-offset: 3px; }
+.prose-chapter a:hover { color: var(--color-red); }
+.prose-chapter code { font-family: ui-monospace, monospace; font-size: 0.9em; background: var(--color-sand); padding: 0.1em 0.35em; border-radius: 0.25rem; }
+.prose-chapter strong { color: var(--color-ink); }
+
+/* Details/summary used for campaign expanders */
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] .chevron { transform: rotate(180deg); }

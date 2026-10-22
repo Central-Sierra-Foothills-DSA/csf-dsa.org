@@ -1,22 +1,14 @@
 [
   {
-    "name": "Electoral Politics",
-    "description": "Endorsing and supporting candidates and ballot measures that advance democratic socialist values in our communities.",
-    "icon": "ballot"
-  },
-  {
-    "name": "Mutual Aid",
-    "description": "Building networks of care and material support to meet our neighbors' immediate needs.",
-    "icon": "hands"
-  },
-  {
-    "name": "Labor Solidarity",
-    "description": "Standing with workers organizing for better wages, conditions, and union representation.",
-    "icon": "fist"
+    "name": "Membership Outreach",
+    "description": "Tabling, phone banks, and one-on-one conversations that bring new people into the chapter and keep members engaged."
   },
   {
     "name": "Political Education",
-    "description": "Hosting reading groups, workshops, and discussions to deepen our understanding of socialism and organizing.",
-    "icon": "book"
+    "description": "Reading groups, trainings, and discussions that deepen our shared understanding of socialism and organizing."
+  },
+  {
+    "name": "Electoral",
+    "description": "Runs the chapter's endorsement process and supports endorsed candidates and ballot measures with volunteer power."
   }
 ]

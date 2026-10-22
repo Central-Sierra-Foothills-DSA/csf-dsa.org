@@ -1,0 +1,34 @@
+[
+  {
+    "slug": "auburn",
+    "name": "Auburn",
+    "area": "Auburn, Colfax, Foresthill & the I-80 corridor",
+    "meets": "Monthly, 6:30 PM. In person with a Zoom option.",
+    "venue": "BriarPatch Food Co-op community room, 2505 Bell Rd, Auburn",
+    "calendarKeywords": ["Auburn"]
+  },
+  {
+    "slug": "grass-valley-nevada-city",
+    "name": "Grass Valley / Nevada City",
+    "area": "Western Nevada County",
+    "meets": "First Thursday of the month, 6–8 PM. Hybrid. Socializing from 6:00, agenda kicks off at 6:30.",
+    "venue": "Location rotates between BriarPatch Grass Valley and Madelyn Helling Library. Check the calendar.",
+    "calendarKeywords": ["GV/NC", "GV NC", "Grass Valley", "Nevada City"]
+  },
+  {
+    "slug": "placerville",
+    "name": "Placerville",
+    "area": "El Dorado County",
+    "meets": "Monthly. Check the calendar for the next date.",
+    "venue": "Placerville Food Co-op, 535 Placerville Dr, Placerville",
+    "calendarKeywords": ["Placerville"]
+  },
+  {
+    "slug": "roseville",
+    "name": "Roseville",
+    "area": "South Placer: Roseville, Rocklin, Lincoln",
+    "meets": "Newly organized branch. Check the calendar for the next meeting.",
+    "venue": "Shady Coffee & Tea, 325 Douglas Blvd, Roseville",
+    "calendarKeywords": ["Roseville"]
+  }
+]

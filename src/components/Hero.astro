@@ -1,46 +1,56 @@
 ---
-import config from '../data/site-config.json';
+import { Image } from 'astro:assets';
+import site from '../data/site.json';
+import bridge from '../assets/photos/foresthill-bridge.jpg';
+import { upcomingEvents, formatLongDate, formatTime, shortLocation } from '../lib/events';
+
+const next = upcomingEvents(new Date(), 1)[0];
 ---
-<section class="relative min-h-screen flex items-center justify-center bg-charcoal text-white overflow-hidden">
-  <div class="absolute inset-0 opacity-10">
-    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 20% 50%, var(--color-dsa-red) 0%, transparent 50%), radial-gradient(circle at 80% 20%, var(--color-sierra-gold) 0%, transparent 40%);"></div>
-  </div>
+<section class="relative isolate bg-ink text-cream overflow-hidden">
+  <Image
+    src={bridge}
+    alt="The Foresthill Bridge spanning the North Fork of the American River near Auburn, California"
+    widths={[800, 1200, 1920]}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    class="absolute inset-0 -z-20 w-full h-full object-cover object-[center_40%]"
+  />
+  <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink via-ink/80 to-ink/30" aria-hidden="true"></div>
+  <div class="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-ink to-transparent" aria-hidden="true"></div>
 
-  <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16">
-    <p class="text-dsa-red font-semibold tracking-widest uppercase text-sm mb-4">Democratic Socialists of America</p>
-
-    <h1 class="font-heading font-bold text-5xl sm:text-6xl lg:text-7xl leading-tight mb-6">
-      Central Sierra<br />
-      <span class="text-dsa-red">Foothills</span> DSA
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 sm:pt-32 sm:pb-36 lg:pt-40 lg:pb-44">
+    <p class="flex items-center gap-3 text-gold font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm mb-6">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-red" aria-hidden="true"></span>
+      Democratic Socialists of America
+    </p>
+    <h1 class="font-display font-black text-5xl sm:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] max-w-4xl">
+      {site.tagline}
     </h1>
-
-    <p class="text-xl sm:text-2xl text-white/70 max-w-2xl mx-auto mb-4 leading-relaxed">
-      {config.tagline}
+    <p class="mt-7 text-lg sm:text-xl text-cream/80 max-w-2xl leading-relaxed">
+      {site.intro}
     </p>
 
-    <p class="text-base text-white/50 mb-10">
-      Serving {config.counties.join(', ')} counties
-    </p>
-
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a
-        href="#get-involved"
-        class="px-8 py-4 bg-dsa-red hover:bg-dsa-red-dark text-white font-semibold rounded-lg text-lg transition-colors"
-      >
-        Get Involved
+    <div class="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+      <a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-7 py-4 bg-red hover:bg-red-deep text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
+        Join the chapter
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12" /></svg>
       </a>
-      <a
-        href="#about"
-        class="px-8 py-4 border-2 border-white/30 hover:border-white/60 text-white font-semibold rounded-lg text-lg transition-colors"
-      >
-        Learn More
+      <a href="#events" class="inline-flex items-center justify-center px-7 py-4 border-2 border-cream/30 hover:border-cream/70 hover:bg-white/5 text-cream font-semibold rounded-md text-base sm:text-lg transition-colors">
+        See upcoming events
       </a>
     </div>
   </div>
 
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-    <svg class="w-6 h-6 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-    </svg>
-  </div>
+  {next && (
+    <a href={next.url ?? '#events'} target={next.url ? '_blank' : undefined} rel={next.url ? 'noopener' : undefined}
+       class="group relative block border-t border-white/10 bg-ink/70 backdrop-blur-sm hover:bg-ink transition-colors">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+        <span class="text-gold font-semibold tracking-[0.18em] uppercase text-xs">Next up</span>
+        <span class="font-semibold text-cream group-hover:underline underline-offset-4">{next.title}</span>
+        <span class="text-cream/70">{formatLongDate(next.start)} · {formatTime(next.start)}</span>
+        {shortLocation(next) && <span class="text-cream/50">· {shortLocation(next)}</span>}
+      </div>
+    </a>
+  )}
 </section>
