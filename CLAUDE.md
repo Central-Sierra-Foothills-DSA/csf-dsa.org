@@ -15,6 +15,8 @@ A static site built with Astro 5 and Tailwind CSS 4. No backend, no database.
 |--------------------------|----------------------------------------|---------------------------------------------|
 | `/`                      | `src/pages/index.astro`                | Home: starting points, next events, wins, news, branches, campaigns |
 | `/new-members/`          | `src/pages/new-members.astro`          | New member guide and FAQ                    |
+| `/member-resources/`     | `src/pages/member-resources/index.astro` | Orientation for new members, conduct, link to the printable packet |
+| `/member-resources/packet/` | `src/pages/member-resources/packet.astro` | Print layout of the new member packet (source of the PDF; not linked, `noindex`) |
 | `/about/`                | `src/pages/about/index.astro`          | Who we are, structure, roles, how we decide |
 | `/about/bylaws/`         | `src/pages/about/bylaws.md`            | Full text of the chapter bylaws             |
 | `/branches/`             | `src/pages/branches/index.astro`       | Branch map, cards, closest-branch lookup    |
@@ -41,6 +43,7 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | Headline numbers on the home page | `src/data/wins.json`                              |
 | Working groups                   | `src/data/working-groups.json`                     |
 | Allied organizations             | `src/data/partners.json` (`name`, optional `url` and `blurb`). The section on `/about/` appears once this has entries. |
+| New member guide and packet text | `src/data/member-guide.json`, then `npm run packet` (see below) |
 | Glossary terms, quotes           | `src/data/glossary.json`, `src/data/quotes.json`   |
 | Further-reading links            | `src/data/resources.json`                          |
 | Towns in the closest-branch list | `src/data/towns.json`                              |
@@ -84,6 +87,16 @@ The site follows the DSA Design Guide: https://design.dsausa.org
 - National logo: use `dsa-national-circle.png` (main logo on a DSA Red circle), or
   the all-white or all-black version placed directly on the background. Never
   recolor, stretch, or crop it, and leave at least 20% clear space around it.
+
+## The new member packet PDF
+
+`public/files/csf-dsa-new-member-packet.pdf` is generated, not hand-made. Its text comes
+from `src/data/member-guide.json`, the same file the `/member-resources/` page uses, and
+its layout is `src/pages/member-resources/packet.astro` (US Letter, `src/layouts/Print.astro`).
+To update it: edit the JSON or the layout, start `npm run dev`, then run `npm run packet`
+in a second terminal. The script prints the page to PDF with headless Chrome or Edge
+(set `CHROME_PATH` if it can't find one). Open `/member-resources/packet/` in a browser
+to preview the layout. Commit the regenerated PDF with the change. CI does not rebuild it.
 
 ## Events are generated, don't hand-edit them
 
