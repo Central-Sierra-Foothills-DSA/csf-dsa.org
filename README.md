@@ -38,16 +38,21 @@ current. If the fetch fails, the committed `events.json` is used as a fallback.
 ## Deploy
 
 `.github/workflows/deploy.yml` builds the site and publishes it to GitHub Pages on
-every push to `main`, once a day, and on demand. `.github/workflows/ci.yml` builds
-every pull request so a broken change is caught before it merges.
+every push to `main`, once a day, and on demand. It also publishes a preview page for
+each open pull request at `/pr-preview/pr-<number>/` and comments on the pull request
+with the link. See [CONTRIBUTING.md](CONTRIBUTING.md) for who gets a preview.
+
+`.github/workflows/ci.yml` builds every pull request so a broken change is caught
+before it merges.
 
 One-time setup: repo Settings → Pages → Source: **GitHub Actions**. Do not use
 "Deploy from a branch". That makes GitHub build the repo as a Jekyll site, which fails.
+The repo also needs a label named `preview`.
 
 The site is currently served from a project path
-(`https://central-sierra-foothills-dsa.github.io/csf-dsa.org/`), so the workflow sets
-`BASE_PATH=/csf-dsa.org`. When the custom domain moves to GitHub Pages, set
-`SITE_URL=https://csf-dsa.org` and remove `BASE_PATH` in the workflow.
+(`https://central-sierra-foothills-dsa.github.io/csf-dsa.org/`). When the custom domain
+moves to GitHub Pages, set `SITE_URL` to `https://csf-dsa.org` and `SITE_BASE` to an
+empty string at the top of the workflow.
 
 To build and host the output anywhere else:
 

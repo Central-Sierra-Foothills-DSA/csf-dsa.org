@@ -1,12 +1,47 @@
-# Builds the site and publishes it to GitHub Pages.
+# Builds the site and publishes it to GitHub Pages, together with a preview
+# page for every open pull request.
 #
-# Runs on every push to main, once a day (events are fetched from Solidarity
-# Tech at build time, so a daily rebuild keeps the events list fresh), and on
-# demand from the Actions tab.
+#   Live site:   https://central-sierra-foothills-dsa.github.io/csf-dsa.org/
+#   PR preview:  https://central-sierra-foothills-dsa.github.io/csf-dsa.org/pr-preview/pr-<number>/
+#
+# GitHub Pages serves one bundle per repo, so every run rebuilds main plus each
+# open pull request that is allowed a preview, and publishes them together.
+# When a pull request is merged or closed, the next run drops its preview.
+#
+# Runs on every push to main, once a day (events come from Solidarity Tech at
+# build time, so a daily rebuild keeps the list fresh), on demand, and whenever
+# a pull request is opened, updated, closed, or given the `preview` label.
 #
 # Requires: repo Settings -> Pages -> Source set to "GitHub Actions".
-# With the "Deploy from a branch" source, GitHub tries to build this repo as a
-# Jekyll site instead, and that build fails on the Astro source files.
+#
+# ---------------------------------------------------------------------------
+# Who gets a preview
+#
+#   - Pull requests from a branch in this repo, or from an org member or
+#     collaborator: automatically.
+#   - Pull requests from anyone else: only after a maintainer adds the
+#     `preview` label. If the author then pushes new commits, the label is
+#     removed and a maintainer has to look again and re-add it.
+#
+# Why the gate: a preview puts whatever the pull request contains on the
+# chapter's own web address. A maintainer should glance at an outside
+# contributor's changes before that happens.
+#
+# ---------------------------------------------------------------------------
+# Safety notes for whoever edits this file
+#
+# This workflow uses `pull_request_target`, which runs with this repo's
+# permissions even for pull requests from forks. To keep that safe:
+#
+#   - Pull request code is only ever checked out and run in `build-previews`,
+#     which has a read-only token, no secrets, and no shared cache.
+#   - The jobs that can publish or comment never check out or run pull
+#     request code. They only move finished files around.
+#   - The main build is fingerprinted, and `deploy` checks the fingerprint, so
+#     a preview build cannot swap in a different main site.
+#
+# Do not add secrets, a cache, or write permissions to `build-previews`, and
+# do not check out pull request code in any other job.
 name: Deploy
 
 on:
@@ -15,21 +50,78 @@ on:
   schedule:
     - cron: '0 14 * * *' # daily, 6 AM Pacific in winter, 7 AM in summer
   workflow_dispatch:
+  pull_request_target:
+    types: [opened, reopened, synchronize, closed, labeled, unlabeled]
 
+# Default for every job: read-only. Jobs that need more ask for it below.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  # Where the site is served from. When csf-dsa.org is pointed at GitHub Pages,
+  # set SITE_URL to https://csf-dsa.org and SITE_BASE to an empty string.
+  SITE_URL: https://central-sierra-foothills-dsa.github.io
+  SITE_BASE: /csf-dsa.org
+  PREVIEW_LABEL: preview
+
 jobs:
-  build:
+  # Work out which open pull requests get a preview this run.
+  plan:
+    # Label events only matter when the label is the preview label.
+    if: >-
+      github.event_name != 'pull_request_target'
+      || (github.event.action != 'labeled' && github.event.action != 'unlabeled')
+      || github.event.label.name == 'preview'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # to remove the preview label, see below
+    outputs:
+      previews: ${{ steps.list.outputs.previews }}
+      count: ${{ steps.list.outputs.count }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Withdraw approval when an outside contributor pushes new commits
+        if: github.event_name == 'pull_request_target' && github.event.action == 'synchronize'
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          ASSOCIATION: ${{ github.event.pull_request.author_association }}
+        run: |
+          case "$ASSOCIATION" in OWNER|MEMBER|COLLABORATOR) exit 0 ;; esac
+          if [ "$HEAD_REPO" = "$REPO" ]; then exit 0; fi
+          gh api -X DELETE "repos/$REPO/issues/$PR/labels/$PREVIEW_LABEL" >/dev/null 2>&1 || true
+
+      - name: List pull requests that get a preview
+        id: list
+        run: |
+          previews=$(gh api "repos/$REPO/pulls?state=open&per_page=100" | jq -c --arg repo "$REPO" --arg label "$PREVIEW_LABEL" '
+            [ .[]
+              | select(
+                  (.head.repo.full_name == $repo)
+                  or (.author_association | IN("OWNER", "MEMBER", "COLLABORATOR"))
+                  or any(.labels[]; .name == $label)
+                )
+              | { number: .number }
+            ]')
+          echo "previews=$previews" >> "$GITHUB_OUTPUT"
+          echo "count=$(echo "$previews" | jq 'length')" >> "$GITHUB_OUTPUT"
+          echo "Previews this run: $previews"
+
+  # Build the live site from main. This job runs trusted code only.
+  build-main:
+    needs: plan
+    runs-on: ubuntu-latest
+    outputs:
+      sha256: ${{ steps.pack.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@v4 # main, even when a pull request triggered the run
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -37,22 +129,146 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          # The site is served from https://central-sierra-foothills-dsa.github.io/csf-dsa.org/
-          # When csf-dsa.org is pointed at GitHub Pages, change these to:
-          #   SITE_URL: https://csf-dsa.org
-          # and delete the BASE_PATH line.
-          SITE_URL: https://central-sierra-foothills-dsa.github.io
-          BASE_PATH: /csf-dsa.org
-      - uses: actions/upload-pages-artifact@v3
+          BASE_PATH: ${{ env.SITE_BASE || '/' }}
+      - name: Pack and fingerprint the build
+        id: pack
+        run: |
+          tar -cf site-main.tar -C dist .
+          echo "sha256=$(sha256sum site-main.tar | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
         with:
-          path: dist
+          name: site-main
+          path: site-main.tar
+          retention-days: 1
 
-  deploy:
-    needs: build
+  # Build each pull request. This is the only job that runs pull request code,
+  # so it gets a read-only token, no secrets, and no cache.
+  build-previews:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false # one broken pull request must not block the others
+      matrix:
+        pr: ${{ fromJSON(needs.plan.outputs.previews) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ matrix.pr.number }}/head
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build
+        env:
+          BASE_PATH: ${{ env.SITE_BASE }}/pr-preview/pr-${{ matrix.pr.number }}
+          PUBLIC_PREVIEW_PR: ${{ matrix.pr.number }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview-pr-${{ matrix.pr.number }}
+          path: dist
+          retention-days: 1
+
+  # Put main and the previews together and publish. Never runs pull request
+  # code: it only unpacks finished files into place.
+  deploy:
+    needs: [plan, build-main, build-previews]
+    # Publish whenever main built, even if a preview build failed or was skipped.
+    if: always() && needs.plan.result == 'success' && needs.build-main.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site-main
+          path: incoming/main
+      - name: Check the main build is the one build-main produced
+        env:
+          EXPECTED: ${{ needs.build-main.outputs.sha256 }}
+        run: echo "$EXPECTED  incoming/main/site-main.tar" | sha256sum -c -
+      - uses: actions/download-artifact@v4
+        if: needs.plan.outputs.count != '0'
+        continue-on-error: true # no previews built is fine
+        with:
+          pattern: preview-pr-*
+          path: incoming/previews
+      - name: Assemble the site
+        env:
+          PREVIEWS: ${{ needs.plan.outputs.previews }}
+        run: |
+          mkdir -p site
+          tar -xf incoming/main/site-main.tar -C site
+          for n in $(echo "$PREVIEWS" | jq -r '.[].number'); do
+            src="incoming/previews/preview-pr-$n"
+            if [ -d "$src" ]; then
+              mkdir -p "site/pr-preview/pr-$n"
+              cp -R "$src"/. "site/pr-preview/pr-$n/"
+              echo "Added preview for pull request $n"
+            else
+              echo "No build for pull request $n (its build failed)"
+            fi
+          done
+          find site -type l -delete
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # Tell the pull request where its preview is. Never runs pull request code.
+  comment:
+    needs: [plan, build-previews, deploy]
+    if: >-
+      always()
+      && github.event_name == 'pull_request_target'
+      && github.event.action != 'closed'
+      && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+      PREVIEWS: ${{ needs.plan.outputs.previews }}
+      DEPLOY_RESULT: ${{ needs.deploy.result }}
+    steps:
+      - name: Post or update the preview comment
+        run: |
+          marker='<!-- pr-preview -->'
+          url="$SITE_URL$SITE_BASE/pr-preview/pr-$PR/"
+          run_url="$GITHUB_SERVER_URL/$REPO/actions/runs/$GITHUB_RUN_ID"
+
+          allowed=$(echo "$PREVIEWS" | jq --argjson n "$PR" 'any(.[]; .number == $n)')
+          built=$(gh api "repos/$REPO/actions/runs/$GITHUB_RUN_ID/artifacts?per_page=100" --jq "any(.artifacts[]; .name == \"preview-pr-$PR\")")
+
+          if [ "$allowed" != "true" ]; then
+            body="$marker
+          **Thanks for the pull request!** A preview page isn't published automatically for first-time and outside contributors.
+
+          Maintainers: look over the changes, then add the \`$PREVIEW_LABEL\` label to publish a preview. The label comes off again if new commits are pushed."
+          elif [ "$built" = "true" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            body="$marker
+          **Preview ready:** $url
+
+          This is a copy of the site with this pull request's changes, so you can click around before it's merged. It updates when new commits are pushed and is removed when the pull request is merged or closed. It can take a minute to appear."
+          else
+            body="$marker
+          **The preview could not be built.** The site did not build with these changes, so there is nothing to preview yet. [See the build log]($run_url) for the error."
+          fi
+
+          existing=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --jq "[.[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$marker\")))][0].id // empty")
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$existing" -f body="$body" >/dev/null
+          else
+            gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$body" >/dev/null
+          fi

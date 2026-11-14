@@ -87,7 +87,31 @@ Add an entry to `src/data/partners.json`:
 Events are not edited here. Add them in Solidarity Tech and they appear on the site
 the next time it is built and published.
 
+## Preview pages for pull requests
+
+Every pull request can get its own copy of the site, so reviewers can click through
+the change before it is merged:
+
+```
+https://central-sierra-foothills-dsa.github.io/csf-dsa.org/pr-preview/pr-<number>/
+```
+
+A bot comments on the pull request with the link. The preview has a banner at the top
+saying which pull request it is, updates when new commits are pushed, and disappears
+when the pull request is merged or closed.
+
+- **Org members and collaborators** get a preview automatically.
+- **Everyone else** gets one after a maintainer looks over the changes and adds the
+  `preview` label. If new commits are pushed, the label comes off and a maintainer
+  needs to look again. This is because a preview puts the pull request's content on
+  the chapter's own web address.
+
+If the bot says the preview could not be built, the site does not build with your
+changes. The comment links to the log with the error.
+
 ## Review and merge
 
 Maintainers in the chapter's tech group review PRs. Content changes need one approval.
-Anything touching deploy configuration or `scripts/` needs a maintainer who understands it.
+Anything touching deploy configuration (`.github/workflows/`) or `scripts/` needs a
+maintainer who understands it. Read the safety notes at the top of
+`.github/workflows/deploy.yml` before changing that file.

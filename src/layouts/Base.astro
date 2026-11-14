@@ -16,6 +16,10 @@ const { title: pageTitle, description = site.intro } = Astro.props;
 const title = pageTitle ? `${pageTitle} — ${site.orgName}` : `${site.orgName} — Democratic Socialists of America`;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Set by the deploy workflow when this build is a pull request preview.
+// Previews get a banner and are hidden from search engines.
+const previewPr = import.meta.env.PUBLIC_PREVIEW_PR as string | undefined;
 const ogImage = new URL(`${base}/images/og.png`, Astro.site ?? 'https://csf-dsa.org').href;
 ---
 <!doctype html>
@@ -26,6 +30,7 @@ const ogImage = new URL(`${base}/images/og.png`, Astro.site ?? 'https://csf-dsa.
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    {previewPr && <meta name="robots" content="noindex, nofollow" />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -40,6 +45,14 @@ const ogImage = new URL(`${base}/images/og.png`, Astro.site ?? 'https://csf-dsa.
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-red focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:font-semibold">
       Skip to content
     </a>
+    {previewPr && (
+      <div class="bg-black-1 text-white text-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="font-bold uppercase tracking-wider text-[0.7rem] px-2 py-0.5 rounded-sm bg-white text-black">Preview</span>
+          <span>This is a preview of <a href={`${site.links.github}/pull/${previewPr}`} class="font-semibold underline underline-offset-4 hover:text-red-3">pull request #{previewPr}</a>, not the live site.</span>
+        </div>
+      </div>
+    )}
     <Nav />
     <main id="main" class="flex-1">
       <slot />
