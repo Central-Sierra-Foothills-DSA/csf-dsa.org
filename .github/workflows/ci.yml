@@ -1,13 +1,8 @@
-# Makes sure main and every pull request still build.
-#
-# Deployment is not wired up yet. When it is, add a deploy job here (GitHub
-# Pages, Cloudflare Pages, Netlify, or an S3 sync) plus a daily `schedule`
-# trigger so the events list, which is fetched at build time, stays fresh.
+# Makes sure every pull request still builds before it is merged.
+# Pushes to main are built (and published) by deploy.yml.
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
   workflow_dispatch:
 

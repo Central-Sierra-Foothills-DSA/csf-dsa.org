@@ -37,14 +37,19 @@ current. If the fetch fails, the committed `events.json` is used as a fallback.
 
 ## Deploy
 
-Not wired up yet. CI (`.github/workflows/ci.yml`) builds `main` and every PR but
-does not publish. When a host is chosen, add a deploy job there and a daily
-`schedule` trigger so the events list stays current.
+`.github/workflows/deploy.yml` builds the site and publishes it to GitHub Pages on
+every push to `main`, once a day, and on demand. `.github/workflows/ci.yml` builds
+every pull request so a broken change is caught before it merges.
 
-Note: GitHub Pages requires a public repo on the org's current (free) GitHub plan.
-Cloudflare Pages or Netlify work with a private repo.
+One-time setup: repo Settings → Pages → Source: **GitHub Actions**. Do not use
+"Deploy from a branch". That makes GitHub build the repo as a Jekyll site, which fails.
 
-To build and host the output anywhere static:
+The site is currently served from a project path
+(`https://central-sierra-foothills-dsa.github.io/csf-dsa.org/`), so the workflow sets
+`BASE_PATH=/csf-dsa.org`. When the custom domain moves to GitHub Pages, set
+`SITE_URL=https://csf-dsa.org` and remove `BASE_PATH` in the workflow.
+
+To build and host the output anywhere else:
 
 ```bash
 npm run build

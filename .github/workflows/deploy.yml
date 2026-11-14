@@ -1,0 +1,58 @@
+# Builds the site and publishes it to GitHub Pages.
+#
+# Runs on every push to main, once a day (events are fetched from Solidarity
+# Tech at build time, so a daily rebuild keeps the events list fresh), and on
+# demand from the Actions tab.
+#
+# Requires: repo Settings -> Pages -> Source set to "GitHub Actions".
+# With the "Deploy from a branch" source, GitHub tries to build this repo as a
+# Jekyll site instead, and that build fails on the Astro source files.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 14 * * *' # daily, 6 AM Pacific in winter, 7 AM in summer
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          # The site is served from https://central-sierra-foothills-dsa.github.io/csf-dsa.org/
+          # When csf-dsa.org is pointed at GitHub Pages, change these to:
+          #   SITE_URL: https://csf-dsa.org
+          # and delete the BASE_PATH line.
+          SITE_URL: https://central-sierra-foothills-dsa.github.io
+          BASE_PATH: /csf-dsa.org
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
