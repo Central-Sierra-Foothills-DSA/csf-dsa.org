@@ -1,0 +1,209 @@
+{
+  "_comment": "Shared text for /member-resources/ and the printable packet (/member-resources/packet/). Edit here, then run `npm run packet` to rebuild the PDF.",
+
+  "welcome": [
+    "The Central Sierra Foothills chapter of the Democratic Socialists of America brings together people across our region who believe ordinary people deserve a real voice in our economy, our communities, and our democracy.",
+    "Whether you're brand new to organizing or have years of experience, you belong here."
+  ],
+  "towns": ["Roseville", "Rocklin", "Auburn", "Colfax", "Grass Valley", "Nevada City", "Placerville", "El Dorado Hills", "Truckee", "Tahoe"],
+  "region": "Because the region is so big, we depend on shared leadership and on members taking part where they live.",
+  "goal": "Build people-powered movements that make life better in our communities, while working toward a more democratic and equal society.",
+
+  "democraticSocialism": {
+    "intro": "New to socialism? You're in good company. Many of our members started right where you are, and we're all learning together. At its core, democratic socialism is a simple idea: everyday people deserve real power over the systems that shape their lives.",
+    "points": [
+      "Democracy shouldn't stop at the ballot box. It should reach into our workplaces and our economy too.",
+      "Working people deserve a real say in the decisions that affect their jobs, communities, and futures.",
+      "Healthcare, housing, education, and dignity are basic human needs, not privileges for people who can afford them."
+    ],
+    "outro": "This isn't about having all the answers. It's about building something better, together. You don't need to know everything right away. Learning happens by taking part."
+  },
+
+  "readMore": [
+    { "label": "What is democratic socialism?", "url": "https://www.dsausa.org/about-us/what-is-democratic-socialism/" },
+    { "label": "DSA history", "url": "https://www.dsausa.org/about-us/history/" },
+    { "label": "DSA constitution", "url": "https://www.dsausa.org/about-us/constitution/" },
+    { "label": "Democratic Left magazine", "url": "https://democraticleft.dsausa.org/" }
+  ],
+
+  "membership": [
+    {
+      "title": "Join DSA and pay dues",
+      "body": "Membership runs through DSA National. Dues are what make you a voting member, because DSA is run by its members. There are monthly and yearly options, and reduced rates if money is tight."
+    },
+    {
+      "title": "Stay active, at your own level",
+      "body": "Come to meetings when you can, take part in organizing, and keep in touch with the people you work with. Showing up now and then is better than burning out."
+    },
+    {
+      "title": "Pitch in on shared work",
+      "body": "DSA has no paid staff here. Everything the chapter does, from tabling to campaigns, happens because members volunteer. We succeed when everyone helps a little."
+    }
+  ],
+
+  "structure": {
+    "branches": "Branches are local groups organized around a town or area. Each one runs its own meetings and local work, and its chair sits on the chapter's steering committee.",
+    "workingGroups": "Working groups take on one kind of work for the whole chapter, across county lines. Some run all year. Others form for a single campaign or action and wrap up when it's done.",
+    "steering": "The steering committee is the chapter's five elected officers plus the chair of each branch. It carries out what members decide and answers to the membership.",
+    "encourage": "You're encouraged, but not required, to join at least one working group that fits your interests and your schedule."
+  },
+
+  "participation": {
+    "intro": [
+      "Jobs, families, and everyday life are real, and most of us are juggling the same things. This isn't a list of requirements. It's what taking part looks like when you have room for it.",
+      "What makes it work is open communication. The more we know about your time and energy, the better we can match you with work that feels worthwhile and doesn't wear you out."
+    ],
+    "hopes": [
+      "Come to general meetings when your schedule allows.",
+      "Give a heads-up when you can't make something you signed up for.",
+      "Help with at least one organizing effort.",
+      "Share the work, so no one person carries too much of it."
+    ],
+    "fromUs": "Support as you grow politically, clear ways to get involved, and respect for your time. We're not just building an organization that holds meetings. We're building a community."
+  },
+
+  "tools": [
+    { "name": "Chapter Slack", "body": "Where the work happens between meetings. New members get an invite by email. Didn't get one? Email us.", "siteLink": "slackWorkspace", "label": "Open Slack" },
+    { "name": "Chapter email list", "body": "Meeting notices and action alerts. Fill out the chapter form to get on it.", "siteLink": "joinChapterForm", "label": "Chapter sign-up form" },
+    { "name": "Events calendar", "body": "Every branch meeting, social, and action in one list.", "path": "/events/", "label": "See upcoming events" },
+    { "name": "DSA National calendar", "body": "Trainings and calls open to members across the country.", "url": "https://www.dsausa.org/calendar/", "label": "National calendar" },
+    { "name": "DSA National newsletter", "body": "News and campaigns from the national organization.", "url": "https://www.dsausa.org/get-updates-from-dsa/", "label": "Get national updates" }
+  ],
+
+  "standards": {
+    "intro": "We come from different backgrounds and political views, and that makes us stronger. We won't always agree, and that's okay. What matters is how we treat each other while we work toward shared goals.",
+    "communication": [
+      "Be kind, respectful, and mindful of other people's time.",
+      "Assume good faith.",
+      "Critique ideas, not people.",
+      "Listen, and leave room for others to speak. Before you jump in, ask yourself \"Why am I talking?\"",
+      "Disagree without hostility."
+    ],
+    "harassment": [
+      "Harassment and discrimination are not tolerated. That includes targeting anyone for their race or ethnicity, gender identity or expression, sexual orientation, disability, religion or non-religion, age, immigration status, economic background, or any other part of who they are.",
+      "This applies everywhere we organize: meetings, Slack, email, social media, events, actions, and one-on-one conversations."
+    ],
+    "harassmentPolicyUrl": "https://www.dsausa.org/search/harassment",
+    "conflict": "Conflict happens in any group. Our aim is resolution, learning, and repair, not punishment.",
+    "steps": [
+      { "title": "Talk it through", "body": "If it feels safe, start by talking with the person directly and respectfully. Many problems are misunderstandings." },
+      { "title": "Ask for help", "body": "If talking directly isn't comfortable or doesn't work, reach out to your branch chair or email the chapter at" },
+      { "title": "Work toward repair", "body": "Leadership will listen to everyone involved and can help with a facilitated conversation. Concerns are handled fairly and kept as private as possible." }
+    ],
+    "closing": "Solidarity begins with how we treat one another."
+  },
+
+  "workbook": {
+    "intro": "This part is optional, but we hope you'll try it. Work through it at your own pace. There are no right or wrong answers. It helps you connect the ideas of democratic socialism to your own town, and start thinking like an organizer.",
+    "sections": [
+      {
+        "title": "What is democratic socialism?",
+        "sample": "What does democracy mean to you outside of elections?",
+        "reading": [
+          { "label": "What is democratic socialism?", "url": "https://www.dsausa.org/about-us/what-is-democratic-socialism/" },
+          { "label": "Democratic Left", "url": "https://democraticleft.dsausa.org/" },
+          { "label": "Washington Socialist", "url": "https://washingtonsocialist.mdcdsa.org/" },
+          { "label": "Midwest Socialist", "url": "https://midwestsocialist.com/" },
+          { "label": "DSA discussion forum", "url": "https://discussion.dsausa.org" }
+        ],
+        "questions": [
+          { "q": "What issues in your community moved you to join or explore DSA?", "options": ["Housing costs", "Healthcare access", "Wages and jobs", "Climate and wildfire", "Education", "Something else"], "lines": 2 },
+          { "q": "Before reading, what did you think \"socialism\" meant?", "lines": 3 },
+          { "q": "After reading, what surprised you or felt familiar?", "lines": 3 },
+          { "q": "What does democracy mean to you outside of elections?", "lines": 3 }
+        ]
+      },
+      {
+        "title": "Movements and history",
+        "sample": "What traditions in foothill towns already look like solidarity?",
+        "reading": [
+          { "label": "DSA history", "url": "https://www.dsausa.org/about-us/history/" }
+        ],
+        "questions": [
+          { "q": "What historical movement or moment stands out to you most? Why?", "lines": 5 },
+          { "q": "What traditions in foothill towns already look like solidarity?", "examples": "Volunteer fire departments, mutual aid during wildfires, community fundraisers, union activity.", "lines": 3 },
+          { "q": "What lessons from past movements seem useful today?", "lines": 4 }
+        ]
+      },
+      {
+        "title": "The economy around you",
+        "sample": "Where do you see economic stress in your community?",
+        "intro": "Think about your town or the nearest city.",
+        "questions": [
+          { "q": "Who are the biggest employers in your area?", "lines": 2 },
+          { "q": "Who owns most of the housing locally?", "options": ["Local residents", "Investors", "Short-term rental owners", "Corporations", "Not sure"], "lines": 3 },
+          { "q": "Where do you see economic stress in your community?", "examples": "Long commutes, service workers struggling, rising rent, insurance costs.", "lines": 4 },
+          { "q": "Who benefits most from economic growth here?", "lines": 4 }
+        ]
+      },
+      {
+        "title": "Power and organizing",
+        "sample": "What local issue would you most want to change?",
+        "questions": [
+          { "q": "Which institutions make decisions that affect your community?", "examples": "City council, county supervisors, school boards, major employers, local media.", "lines": 4 },
+          { "q": "Which of these feels most approachable, or easiest to influence? Why?", "lines": 3 },
+          { "q": "What local issue would you most want to change?", "lines": 5 },
+          { "q": "Who else probably cares about this issue?", "lines": 3 }
+        ]
+      },
+      {
+        "title": "Organizing in small and rural communities",
+        "sample": "How could you explain DSA values in everyday language?",
+        "intro": "Living in foothill communities brings its own organizing challenges.",
+        "questions": [
+          { "q": "What political attitudes do you run into most often locally?", "lines": 2 },
+          { "q": "What worries might your neighbors have about socialism?", "lines": 4 },
+          { "q": "How would you explain DSA values in everyday language? Try two or three sentences.", "lines": 5 },
+          { "q": "What strengths do small communities have that cities sometimes lack?", "lines": 5 }
+        ]
+      },
+      {
+        "title": "Solidarity and community",
+        "sample": "What skills or experience could you bring?",
+        "questions": [
+          { "q": "What local groups or organizations already help people?", "lines": 4 },
+          { "q": "Where could DSA work alongside other local groups (Indivisible, mutual aid networks, and others) instead of competing with them?", "lines": 5 },
+          { "q": "What skills or experience could you bring?", "options": ["Organizing", "Design and media", "Talking to people", "Event planning", "Research", "Logistics", "Childcare or community care", "Something else"], "lines": 2 }
+        ]
+      },
+      {
+        "title": "Your organizer path",
+        "sample": "What is one action you feel ready to try?",
+        "intro": "This section helps you move from learning to action.",
+        "questions": [
+          { "q": "How much time can you realistically give each month?", "options": ["1 to 2 hours", "3 to 5 hours", "6 to 10 hours", "It varies"], "lines": 0 },
+          { "q": "Which kinds of work interest you most?", "options": ["Political education", "Mutual aid", "Labor organizing", "Electoral work", "Communications and media", "Community outreach", "Something else"], "lines": 1 },
+          { "q": "One action you feel ready to try:", "lines": 2 },
+          { "q": "What support would help you take part more comfortably?", "lines": 2 }
+        ]
+      },
+      {
+        "title": "Building a political home",
+        "sample": "What does success look like for our region in five years?",
+        "questions": [
+          { "q": "What would make this organization feel welcoming and sustainable to you?", "lines": 5 },
+          { "q": "What does success look like for our region in five years?", "lines": 5 },
+          { "q": "What kind of organizer do you hope to become?", "lines": 4 }
+        ]
+      }
+    ],
+    "reflection": {
+      "intro": "Turn your notes into a starting point for conversations with other members. There are no right answers, and sharing is always optional.",
+      "prompts": [
+        { "title": "One idea that stayed with me", "q": "What idea or realization stuck with you most?" },
+        { "title": "One thing I see differently now", "q": "Did anything change how you think about your community, politics, or organizing?" },
+        { "title": "One question I'd like to discuss", "q": "Something you're curious about, unsure of, or want to explore further." },
+        { "title": "One local issue we should talk about more", "q": "What challenge or opportunity feels especially important in foothill communities? This is an observation, not a commitment." }
+      ]
+    },
+    "share": "When you're done, bring something you wrote to a meeting introduction, a new member orientation, or a one-on-one with another member. Sharing is always optional. Curiosity is enough."
+  },
+
+  "nextSteps": [
+    "Come to a meeting",
+    "Join a working group",
+    "Share one idea or question",
+    "Take part in one event or action",
+    "Join the chapter Slack"
+  ]
+}
