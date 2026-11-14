@@ -135,10 +135,16 @@ npm run preview    # serve dist/ at http://localhost:4321
 
 A PR should build cleanly. CI runs `npm run build` on every PR.
 
+Each pull request can get a preview page at `/pr-preview/pr-<number>/` on the live
+site. A bot comments with the link. See CONTRIBUTING.md for who gets one automatically.
+The preview banner in `src/layouts/Base.astro` is switched on by `PUBLIC_PREVIEW_PR`.
+
 ## Don't
 
 - Don't add a CMS, backend, or analytics without discussing in an issue first.
 - Don't commit secrets. There are none needed.
+- Don't loosen `.github/workflows/deploy.yml`. It runs pull request code in one
+  sandboxed job only. Read the safety notes at the top of that file first.
 - Don't invent chapter facts (meeting times, venues, endorsements). If something
   is unknown, say "check the calendar" and link to it.
 - Don't publish members' names, photos, or contact details without their say-so.
