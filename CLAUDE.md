@@ -22,7 +22,26 @@ A single-page static site built with Astro 5 and Tailwind CSS 4. No backend, no 
 | Page order                       | `src/pages/index.astro`                            |
 | Colors, fonts, global CSS        | `src/styles/global.css` (Tailwind `@theme` block)  |
 | Photos                           | `src/assets/photos/` (imported with `astro:assets`)|
-| Logo, favicon                    | `public/images/logo.png`, `public/favicon.svg`     |
+| Logos                            | `src/assets/logos/` (chapter badge, national logo) |
+| Fonts                            | `src/assets/fonts/` (Manifold DSA, self-hosted)    |
+| Favicon, share image             | `public/favicon.svg`, `public/images/og.png`       |
+
+## Brand
+
+The site follows the DSA Design Guide: https://design.dsausa.org
+
+- Palette is DSA Red, DSA Black, and white. Tokens: `red` (#EC1F27) with tints
+  `red-1` to `red-4`, `black` (#231F20) with tints `black-1` to `black-4`, `white`.
+  Two additions that are not guide values: `red-dark` (hover states, small red text
+  on white) and `mist` (light section background). Don't introduce other hues.
+- Lean on red. Use `red-dark`, not `red`, for small red text on white; use `red-2`
+  or `red-3` for red text on black. Check contrast.
+- Font is Manifold DSA for all text, weights 400 to 900. No other typefaces.
+  Manifold DSA is licensed for DSA business only: keep it out of non-DSA projects.
+- Chapter badge: `csf-dsa-white.png` on dark or red, `csf-dsa-black.png` on light.
+- National logo: use `dsa-national-circle.png` (main logo on a DSA Red circle), or
+  the all-white or all-black version placed directly on the background. Never
+  recolor, stretch, or crop it, and leave at least 20% clear space around it.
 
 ## Events are generated, don't hand-edit them
 
@@ -38,8 +57,6 @@ Events are managed in Solidarity Tech, not here. If the scrape breaks, fix the s
 - Keep the site static. No client-side frameworks, no runtime fetches. The only
   JavaScript is the mobile menu toggle in `Nav.astro`.
 - Tailwind utilities inline in components; shared tokens in `global.css` `@theme`.
-  Colors: `red`, `red-deep`, `ink`, `cream`, `sand`, `stone`, `pine`, `gold`.
-  Fonts: `font-display` (Archivo) for headings, body is Inter.
 - Links off-site get `target="_blank" rel="noopener"`.
 - Images go through `<Image>` from `astro:assets` with `widths` and `sizes` set.
 - Keep accessibility: alt text on images, visible focus states, semantic headings.

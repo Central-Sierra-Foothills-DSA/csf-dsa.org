@@ -1,15 +1,15 @@
 ---
 import resources from '../data/resources.json';
 ---
-<section id="resources" class="py-14 bg-sand border-t border-ink/5">
+<section id="resources" class="py-14 bg-mist border-t border-black/5">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-xs font-semibold tracking-[0.18em] uppercase text-stone">Further reading</h2>
+    <h2 class="text-xs font-semibold tracking-[0.18em] uppercase text-black-2">Further reading</h2>
     <ul class="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {resources.map((r) => (
         <li>
-          <a href={r.href} target="_blank" rel="noopener" class="group block h-full p-5 bg-white rounded-lg ring-1 ring-ink/5 hover:ring-red/40 hover:shadow-md transition-all">
-            <span class="font-display font-bold text-lg group-hover:text-red-deep">{r.label} <span aria-hidden="true">↗</span></span>
-            <p class="mt-1 text-sm text-stone leading-relaxed">{r.blurb}</p>
+          <a href={r.href} target="_blank" rel="noopener" class="group block h-full p-5 bg-white rounded-lg ring-1 ring-black/5 hover:ring-red/40 hover:shadow-md transition-all">
+            <span class="font-display font-bold text-lg group-hover:text-red-dark">{r.label} <span aria-hidden="true">↗</span></span>
+            <p class="mt-1 text-sm text-black-2 leading-relaxed">{r.blurb}</p>
           </a>
         </li>
       ))}

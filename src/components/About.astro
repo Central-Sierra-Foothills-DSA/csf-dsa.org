@@ -5,12 +5,12 @@ import groups from '../data/working-groups.json';
 import map from '../assets/photos/chapter-map.jpg';
 import SectionHeading from './SectionHeading.astro';
 ---
-<section id="about" class="py-20 sm:py-28 bg-cream">
+<section id="about" class="py-20 sm:py-28 bg-white">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
       <div class="lg:col-span-6">
         <SectionHeading eyebrow="Who we are" title="A socialist chapter for the foothills, from the valley floor to the Sierra crest." />
-        <div class="mt-8 space-y-5 text-lg leading-relaxed text-ink/80">
+        <div class="mt-8 space-y-5 text-lg leading-relaxed text-black/80">
           <p>
             We are the Central Sierra Foothills chapter of the Democratic Socialists of America, the largest socialist organization in the United States.
             We're members, neighbors, and coworkers organizing where we live: in the towns along Highway 49, I-80, and Highway 50.
@@ -23,20 +23,20 @@ import SectionHeading from './SectionHeading.astro';
 
         <ul class="mt-8 flex flex-wrap gap-2" aria-label="Counties we organize in">
           {site.counties.map((c) => (
-            <li class="px-3.5 py-1.5 rounded-full bg-sand text-ink text-sm font-medium border border-ink/5">{c} County</li>
+            <li class="px-3.5 py-1.5 rounded-full bg-mist text-black text-sm font-medium border border-black/5">{c} County</li>
           ))}
         </ul>
 
-        <a href={site.links.dsaNational} target="_blank" rel="noopener" class="mt-8 inline-flex items-center gap-2 text-red-deep hover:text-red font-semibold underline underline-offset-4 decoration-2 decoration-red/30 hover:decoration-red transition-colors">
+        <a href={site.links.dsaNational} target="_blank" rel="noopener" class="mt-8 inline-flex items-center gap-2 text-red-dark hover:text-red font-semibold underline underline-offset-4 decoration-2 decoration-red/30 hover:decoration-red transition-colors">
           What is DSA? Read more at dsausa.org
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M8 7h9v9" /></svg>
         </a>
       </div>
 
       <div class="lg:col-span-6">
-        <figure class="rounded-xl overflow-hidden shadow-lg ring-1 ring-ink/10 bg-white">
+        <figure class="rounded-xl overflow-hidden shadow-lg ring-1 ring-black/10 bg-white">
           <Image src={map} alt="Map of the Central Sierra Foothills DSA chapter area covering Placer, Nevada, El Dorado, and Sierra counties" widths={[600, 900, 1500]} sizes="(min-width: 1024px) 560px, 100vw" class="w-full h-auto" />
-          <figcaption class="px-4 py-3 text-xs text-stone border-t border-ink/5">Our chapter covers four counties, from Roseville to Lake Tahoe.</figcaption>
+          <figcaption class="px-4 py-3 text-xs text-black-2 border-t border-black/5">Our chapter covers four counties, from Roseville to Lake Tahoe.</figcaption>
         </figure>
       </div>
     </div>
@@ -45,10 +45,10 @@ import SectionHeading from './SectionHeading.astro';
       {groups.map((g) => (
         <div class="relative pl-5 border-l-4 border-red">
           <h3 class="font-display font-bold text-xl mb-2">{g.name}</h3>
-          <p class="text-stone leading-relaxed">{g.description}</p>
+          <p class="text-black-2 leading-relaxed">{g.description}</p>
         </div>
       ))}
     </div>
-    <p class="mt-6 text-sm text-stone">Working groups are open to all members. Ask about them at any branch meeting.</p>
+    <p class="mt-6 text-sm text-black-2">Working groups are open to all members. Ask about them at any branch meeting.</p>
   </div>
 </section>

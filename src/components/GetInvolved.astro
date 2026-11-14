@@ -26,7 +26,7 @@ const steps = [
   },
 ];
 ---
-<section id="get-involved" class="py-20 sm:py-28 bg-cream">
+<section id="get-involved" class="py-20 sm:py-28 bg-white">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
       <div class="lg:col-span-7">
@@ -37,8 +37,8 @@ const steps = [
               <span class="shrink-0 w-11 h-11 rounded-full bg-red text-white font-display font-black text-lg flex items-center justify-center" aria-hidden="true">{s.n}</span>
               <div>
                 <h3 class="font-display font-bold text-xl sm:text-2xl leading-tight">{s.title}</h3>
-                <p class="mt-2 text-ink/75 leading-relaxed">{s.body}</p>
-                <a href={s.cta.href} target={s.cta.internal ? undefined : '_blank'} rel={s.cta.internal ? undefined : 'noopener'} class="mt-3 inline-flex items-center gap-1.5 font-semibold text-red-deep hover:text-red underline underline-offset-4 decoration-2 decoration-red/30 hover:decoration-red transition-colors">
+                <p class="mt-2 text-black/75 leading-relaxed">{s.body}</p>
+                <a href={s.cta.href} target={s.cta.internal ? undefined : '_blank'} rel={s.cta.internal ? undefined : 'noopener'} class="mt-3 inline-flex items-center gap-1.5 font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2 decoration-red/30 hover:decoration-red transition-colors">
                   {s.cta.label}
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12" /></svg>
                 </a>
@@ -47,29 +47,29 @@ const steps = [
           ))}
         </ol>
 
-        <div class="mt-12 p-6 rounded-xl bg-sand ring-1 ring-ink/5">
+        <div class="mt-12 p-6 rounded-xl bg-mist ring-1 ring-black/5">
           <h3 class="font-display font-bold text-lg">Questions? Reach out.</h3>
           <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-            <a href={`mailto:${site.contactEmail}`} class="inline-flex items-center gap-2 font-semibold hover:text-red-deep">
+            <a href={`mailto:${site.contactEmail}`} class="inline-flex items-center gap-2 font-semibold hover:text-red-dark">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
               {site.contactEmail}
             </a>
-            <a href={site.social.instagram} target="_blank" rel="noopener" class="inline-flex items-center gap-2 font-semibold hover:text-red-deep">
+            <a href={site.social.instagram} target="_blank" rel="noopener" class="inline-flex items-center gap-2 font-semibold hover:text-red-dark">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
               Instagram
             </a>
-            <a href={site.social.facebook} target="_blank" rel="noopener" class="inline-flex items-center gap-2 font-semibold hover:text-red-deep">
+            <a href={site.social.facebook} target="_blank" rel="noopener" class="inline-flex items-center gap-2 font-semibold hover:text-red-dark">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385h-3.047v-3.47h3.047v-2.642c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953h-1.514c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385c5.738-.9 10.126-5.864 10.126-11.854z"/></svg>
               Facebook
             </a>
           </div>
-          <p class="mt-3 text-xs text-stone">Members get an invite to the chapter Slack after joining.</p>
+          <p class="mt-3 text-xs text-black-2">Members get an invite to the chapter Slack after joining.</p>
         </div>
       </div>
 
       <div class="lg:col-span-5 grid grid-cols-2 gap-4 lg:gap-5 lg:pt-12">
-        <Image src={tabling} alt="A chapter member talking with passersby at an outdoor tabling event" widths={[400, 720]} sizes="(min-width: 1024px) 240px, 50vw" class="col-span-2 w-full h-64 sm:h-80 object-cover rounded-xl shadow-md ring-1 ring-ink/10" />
-        <Image src={stickers} alt="DSA rose stickers spread across a red tablecloth" widths={[400, 720, 1080]} sizes="(min-width: 1024px) 480px, 100vw" class="col-span-2 w-full h-52 sm:h-64 object-cover rounded-xl shadow-md ring-1 ring-ink/10" />
+        <Image src={tabling} alt="A chapter member talking with passersby at an outdoor tabling event" widths={[400, 720]} sizes="(min-width: 1024px) 240px, 50vw" class="col-span-2 w-full h-64 sm:h-80 object-cover rounded-xl shadow-md ring-1 ring-black/10" />
+        <Image src={stickers} alt="DSA rose stickers spread across a red tablecloth" widths={[400, 720, 1080]} sizes="(min-width: 1024px) 480px, 100vw" class="col-span-2 w-full h-52 sm:h-64 object-cover rounded-xl shadow-md ring-1 ring-black/10" />
       </div>
     </div>
   </div>

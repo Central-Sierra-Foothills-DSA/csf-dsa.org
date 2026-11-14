@@ -6,7 +6,7 @@ import { upcomingEvents, formatLongDate, formatTime, shortLocation } from '../li
 
 const next = upcomingEvents(new Date(), 1)[0];
 ---
-<section class="relative isolate bg-ink text-cream overflow-hidden">
+<section class="relative isolate bg-black text-white overflow-hidden">
   <Image
     src={bridge}
     alt="The Foresthill Bridge spanning the North Fork of the American River near Auburn, California"
@@ -16,27 +16,27 @@ const next = upcomingEvents(new Date(), 1)[0];
     fetchpriority="high"
     class="absolute inset-0 -z-20 w-full h-full object-cover object-[center_40%]"
   />
-  <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink via-ink/80 to-ink/30" aria-hidden="true"></div>
-  <div class="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-ink to-transparent" aria-hidden="true"></div>
+  <div class="absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/80 to-black/30" aria-hidden="true"></div>
+  <div class="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-black to-transparent" aria-hidden="true"></div>
 
   <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 sm:pt-32 sm:pb-36 lg:pt-40 lg:pb-44">
-    <p class="flex items-center gap-3 text-gold font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm mb-6">
+    <p class="flex items-center gap-3 text-white font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm mb-6">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-red" aria-hidden="true"></span>
       Democratic Socialists of America
     </p>
     <h1 class="font-display font-black text-5xl sm:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] max-w-4xl">
       {site.tagline}
     </h1>
-    <p class="mt-7 text-lg sm:text-xl text-cream/80 max-w-2xl leading-relaxed">
+    <p class="mt-7 text-lg sm:text-xl text-white/80 max-w-2xl leading-relaxed">
       {site.intro}
     </p>
 
     <div class="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
-      <a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-7 py-4 bg-red hover:bg-red-deep text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
+      <a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-7 py-4 bg-red hover:bg-red-dark text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
         Join the chapter
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12" /></svg>
       </a>
-      <a href="#events" class="inline-flex items-center justify-center px-7 py-4 border-2 border-cream/30 hover:border-cream/70 hover:bg-white/5 text-cream font-semibold rounded-md text-base sm:text-lg transition-colors">
+      <a href="#events" class="inline-flex items-center justify-center px-7 py-4 border-2 border-white/30 hover:border-white/70 hover:bg-white/5 text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
         See upcoming events
       </a>
     </div>
@@ -44,12 +44,12 @@ const next = upcomingEvents(new Date(), 1)[0];
 
   {next && (
     <a href={next.url ?? '#events'} target={next.url ? '_blank' : undefined} rel={next.url ? 'noopener' : undefined}
-       class="group relative block border-t border-white/10 bg-ink/70 backdrop-blur-sm hover:bg-ink transition-colors">
+       class="group relative block bg-red hover:bg-red-dark text-white transition-colors">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-        <span class="text-gold font-semibold tracking-[0.18em] uppercase text-xs">Next up</span>
-        <span class="font-semibold text-cream group-hover:underline underline-offset-4">{next.title}</span>
-        <span class="text-cream/70">{formatLongDate(next.start)} · {formatTime(next.start)}</span>
-        {shortLocation(next) && <span class="text-cream/50">· {shortLocation(next)}</span>}
+        <span class="font-bold tracking-[0.18em] uppercase text-xs px-2 py-0.5 rounded-sm bg-white text-red-dark">Next up</span>
+        <span class="font-bold text-white group-hover:underline underline-offset-4">{next.title}</span>
+        <span class="text-white">{formatLongDate(next.start)} · {formatTime(next.start)}</span>
+        {shortLocation(next) && <span class="text-white/90">· {shortLocation(next)}</span>}
       </div>
     </a>
   )}

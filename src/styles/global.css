@@ -1,19 +1,44 @@
 @import "tailwindcss";
 
-@theme {
-  --color-red: #ec1f27;
-  --color-red-deep: #b5121a;
-  --color-red-tint: #fde8e9;
-  --color-ink: #16161d;
-  --color-ink-soft: #26262f;
-  --color-cream: #faf6ef;
-  --color-sand: #f0e9dc;
-  --color-stone: #6b6a72;
-  --color-pine: #234d3a;
-  --color-gold: #d9a441;
+/*
+ * Brand tokens follow the DSA Design Guide (https://design.dsausa.org).
+ * Palette: DSA Red, DSA Black, and white, plus the guide's tints.
+ * Font: Manifold DSA, DSA's own typeface, self-hosted from src/assets/fonts.
+ */
 
-  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+@font-face { font-family: "Manifold DSA"; font-weight: 400; font-style: normal; font-display: swap; src: url("../assets/fonts/ManifoldDSA-Regular.woff2") format("woff2"); }
+@font-face { font-family: "Manifold DSA"; font-weight: 400; font-style: italic; font-display: swap; src: url("../assets/fonts/ManifoldDSA-RegularItalic.woff2") format("woff2"); }
+@font-face { font-family: "Manifold DSA"; font-weight: 500; font-style: normal; font-display: swap; src: url("../assets/fonts/ManifoldDSA-Medium.woff2") format("woff2"); }
+@font-face { font-family: "Manifold DSA"; font-weight: 600; font-style: normal; font-display: swap; src: url("../assets/fonts/ManifoldDSA-DemiBold.woff2") format("woff2"); }
+@font-face { font-family: "Manifold DSA"; font-weight: 700; font-style: normal; font-display: swap; src: url("../assets/fonts/ManifoldDSA-Bold.woff2") format("woff2"); }
+@font-face { font-family: "Manifold DSA"; font-weight: 800; font-style: normal; font-display: swap; src: url("../assets/fonts/ManifoldDSA-ExtraBold.woff2") format("woff2"); }
+@font-face { font-family: "Manifold DSA"; font-weight: 900; font-style: normal; font-display: swap; src: url("../assets/fonts/ManifoldDSA-Heavy.woff2") format("woff2"); }
+
+@theme {
+  /* DSA Red and its tints (design guide values) */
+  --color-red: #ec1f27;
+  --color-red-1: #f04c53;
+  --color-red-2: #f4797e;
+  --color-red-3: #f7a5a9;
+  --color-red-4: #fbd2d4;
+  /* A darker shade of DSA Red, for hover states and small red text on white
+     where DSA Red alone falls just short of AA contrast. Not a guide value. */
+  --color-red-dark: #c4161d;
+
+  /* DSA Black and its tints (design guide values) */
+  --color-black: #231f20;
+  --color-black-1: #3b3838;
+  --color-black-2: #605c5c;
+  --color-black-3: #8c8989;
+  --color-black-4: #c1c0bf;
+
+  --color-white: #ffffff;
+  /* A very light tint of DSA Black for alternating section backgrounds.
+     Not a guide value; the guide's lightest black tint is too dark for this. */
+  --color-mist: #f4f3f3;
+
+  --font-sans: "Manifold DSA", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Manifold DSA", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 html {
@@ -26,12 +51,13 @@ html {
 }
 
 body {
-  font-family: var(--font-body);
-  color: var(--color-ink);
-  background-color: var(--color-cream);
+  font-family: var(--font-sans);
+  color: var(--color-black);
+  background-color: var(--color-white);
   -webkit-font-smoothing: antialiased;
 }
 
+/* The guide suggests tightening Manifold DSA's tracking at large sizes. */
 h1, h2, h3, h4 {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
@@ -41,7 +67,7 @@ h1, h2, h3, h4 {
 p { text-wrap: pretty; }
 
 :focus-visible {
-  outline: 3px solid var(--color-gold);
+  outline: 3px solid currentColor;
   outline-offset: 3px;
 }
 
@@ -49,10 +75,10 @@ p { text-wrap: pretty; }
 .prose-chapter > * + * { margin-top: 0.9em; }
 .prose-chapter ul { list-style: disc; padding-left: 1.25rem; }
 .prose-chapter li + li { margin-top: 0.35em; }
-.prose-chapter a { color: var(--color-red-deep); text-decoration: underline; text-underline-offset: 3px; }
+.prose-chapter a { color: var(--color-red-dark); text-decoration: underline; text-underline-offset: 3px; }
 .prose-chapter a:hover { color: var(--color-red); }
-.prose-chapter code { font-family: ui-monospace, monospace; font-size: 0.9em; background: var(--color-sand); padding: 0.1em 0.35em; border-radius: 0.25rem; }
-.prose-chapter strong { color: var(--color-ink); }
+.prose-chapter code { font-family: ui-monospace, monospace; font-size: 0.9em; background: var(--color-mist); padding: 0.1em 0.35em; border-radius: 0.25rem; }
+.prose-chapter strong { color: var(--color-black); }
 
 /* Details/summary used for campaign expanders */
 details > summary { list-style: none; cursor: pointer; }
