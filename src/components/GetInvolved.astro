@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import site from '../data/site.json';
 import SectionHeading from './SectionHeading.astro';
+import { href } from '../lib/paths';
 import tabling from '../assets/photos/tabling.jpg';
 import stickers from '../assets/photos/stickers.jpg';
 
@@ -16,7 +17,7 @@ const steps = [
     n: '2',
     title: 'Come to a meeting',
     body: 'Every branch meeting is open. Show up, say hi, and see what we’re about. No membership required to attend.',
-    cta: { label: 'See upcoming events', href: '#events', internal: true },
+    cta: { label: 'See upcoming events', href: href('/events/'), internal: true },
   },
   {
     n: '3',
@@ -31,6 +32,7 @@ const steps = [
     <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
       <div class="lg:col-span-7">
         <SectionHeading eyebrow="Get involved" title="Three steps from curious to comrade." />
+        <p class="mt-4 text-lg text-black-2">Want the longer version? Read the <a href={href('/new-members/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">new member guide</a>.</p>
         <ol class="mt-10 space-y-8">
           {steps.map((s) => (
             <li class="flex gap-5">

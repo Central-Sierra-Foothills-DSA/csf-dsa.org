@@ -1,0 +1,73 @@
+---
+// "The chapter at work": headline wins, then a feed of news and recent events.
+// News comes from src/content/updates/. Recent events come from the calendar
+// automatically, so this section stays fresh without anyone editing it.
+import { getCollection } from 'astro:content';
+import wins from '../data/wins.json';
+import { pastEvents, typeOf, typeLabel, formatShortDate, dateOnly } from '../lib/events';
+import { href } from '../lib/paths';
+import SectionHeading from './SectionHeading.astro';
+
+const updates = (await getCollection('updates')).map((u) => ({
+  date: dateOnly(u.data.date),
+  kind: 'News',
+  title: u.data.title,
+  summary: u.data.summary as string | null,
+  link: u.data.link ? (u.data.link.startsWith('/') ? href(u.data.link) : u.data.link) : null,
+  external: !!u.data.link && !u.data.link.startsWith('/'),
+}));
+
+// Recent events, skipping routine council meetings, repeats of the same title,
+// and double listings of one event (same start time and type).
+const seen = new Set<string>();
+const once = (key: string) => (seen.has(key) ? false : (seen.add(key), true));
+const recent = pastEvents()
+  .filter((e) => typeOf(e) !== 'civic')
+  .filter((e) => once(`title:${e.title.trim()}`))
+  .filter((e) => once(`slot:${e.start}:${typeOf(e)}`))
+  .slice(0, 5)
+  .map((e) => ({ date: new Date(e.start), kind: typeLabel(e), title: e.title, summary: null as string | null, link: e.url, external: true }));
+
+const feed = [...updates, ...recent].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 6);
+---
+<section id="activity" class="bg-red text-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.05] max-w-2xl">This chapter gets things done.</h2>
+    <dl class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+      {wins.map((w) => (
+        <div class="border-t-2 border-white pt-4">
+          <dt class="font-display font-black text-3xl sm:text-4xl leading-none">{w.stat}</dt>
+          <dd class="mt-2">
+            <span class="block font-bold leading-snug">{w.label}</span>
+            <span class="block mt-1 text-sm leading-relaxed">{w.detail}</span>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<section class="py-16 sm:py-20 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <SectionHeading eyebrow="Lately" title="News and recent activity." />
+      <a href={href('/archive/')} class="shrink-0 font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2">Browse the archive →</a>
+    </div>
+    <ol class="mt-10 grid md:grid-cols-2 gap-x-10">
+      {feed.map((item) => (
+        <li class="flex gap-5 py-5 border-t border-black/10">
+          <time datetime={item.date.toISOString()} class="shrink-0 w-16 text-sm font-semibold text-black-2 pt-0.5">{formatShortDate(item.date)}</time>
+          <div>
+            <p class="text-[0.7rem] font-bold uppercase tracking-wider text-red-dark">{item.kind}</p>
+            <h3 class="font-display font-bold text-lg leading-snug mt-0.5">
+              {item.link ? (
+                <a href={item.link} target={item.external ? '_blank' : undefined} rel={item.external ? 'noopener' : undefined} class="hover:text-red-dark hover:underline underline-offset-4 decoration-2">{item.title}</a>
+              ) : item.title}
+            </h3>
+            {item.summary && <p class="mt-1 text-sm text-black-2 leading-relaxed">{item.summary}</p>}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

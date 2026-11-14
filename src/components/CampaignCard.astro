@@ -1,0 +1,20 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { href } from '../lib/paths';
+
+interface Props {
+  campaign: CollectionEntry<'campaigns'>;
+  tone?: 'light' | 'dark';
+}
+const { campaign, tone = 'light' } = Astro.props;
+const c = campaign.data;
+const dark = tone === 'dark';
+---
+<article class:list={['relative rounded-xl p-6 sm:p-7 transition-all', dark ? 'bg-black-1 ring-1 ring-white/10 hover:ring-red-2' : 'bg-white ring-1 ring-black/10 shadow-sm hover:shadow-md']}>
+  <p class:list={['text-[0.7rem] font-bold uppercase tracking-wider', dark ? 'text-red-3' : 'text-red-dark']}>{c.kind === 'endorsement' ? 'Endorsement' : 'Campaign'}</p>
+  <h3 class:list={['font-display font-extrabold text-2xl leading-tight mt-2', dark ? 'text-white' : 'text-black']}>
+    <a href={href(`/campaigns/${campaign.id}/`)} class="after:absolute after:inset-0 hover:underline underline-offset-4 decoration-2">{c.title}</a>
+  </h3>
+  <p class:list={['mt-2 leading-relaxed', dark ? 'text-white/75' : 'text-black-2']}>{c.summary}</p>
+  <span class:list={['mt-4 inline-flex items-center gap-1.5 text-sm font-semibold', dark ? 'text-red-3' : 'text-red-dark']} aria-hidden="true">Read more →</span>
+</article>

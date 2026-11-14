@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { href } from '../lib/paths';
+---
+<Base title="Page not found">
+  <PageHeader eyebrow="404" title="We couldn't find that page." lede="It may have moved. Try one of these instead." />
+  <section class="py-12 sm:py-16 bg-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ul class="grid sm:grid-cols-2 gap-3 font-semibold">
+        <li><a href={href('/')} class="block p-4 rounded-lg bg-mist hover:bg-red hover:text-white transition-colors">Home →</a></li>
+        <li><a href={href('/events/')} class="block p-4 rounded-lg bg-mist hover:bg-red hover:text-white transition-colors">Upcoming events →</a></li>
+        <li><a href={href('/branches/')} class="block p-4 rounded-lg bg-mist hover:bg-red hover:text-white transition-colors">Find your branch →</a></li>
+        <li><a href={href('/new-members/')} class="block p-4 rounded-lg bg-mist hover:bg-red hover:text-white transition-colors">New here? Start here →</a></li>
+      </ul>
+    </div>
+  </section>
+</Base>

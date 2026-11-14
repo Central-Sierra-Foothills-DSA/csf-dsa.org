@@ -1,0 +1,110 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import EventList from '../../components/EventList.astro';
+import BranchMap from '../../components/BranchMap.astro';
+import CampaignCard from '../../components/CampaignCard.astro';
+import site from '../../data/site.json';
+import { upcomingEvents, pastEvents, matches, typeLabel, formatShortDate } from '../../lib/events';
+import { href } from '../../lib/paths';
+
+export async function getStaticPaths() {
+  const branches = await getCollection('branches');
+  return branches.map((branch) => ({ params: { slug: branch.id }, props: { branch } }));
+}
+
+const { branch } = Astro.props;
+const b = branch.data;
+const { Content } = await render(branch);
+
+const matcher = { keywords: b.keywords, cities: b.cities };
+const upcoming = upcomingEvents().filter((e) => matches(e, matcher));
+const recent = pastEvents().filter((e) => matches(e, matcher)).slice(0, 6);
+const campaigns = (await getCollection('campaigns'))
+  .filter((c) => c.data.status === 'active' && c.data.branches.includes(branch.id))
+  .sort((a, c) => a.data.order - c.data.order);
+const mapsUrl = b.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}` : null;
+---
+<Base title={`${b.name} branch`} description={`${b.name} branch of Central Sierra Foothills DSA. ${b.meets}`}>
+  <PageHeader eyebrow="Branch" title={b.name} lede={b.area} back={{ href: href('/branches/'), label: 'All branches' }} />
+
+  <section class="py-12 sm:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14">
+      <div class="lg:col-span-7">
+        <div class="rounded-xl bg-mist p-6 sm:p-7">
+          <h2 class="font-display font-extrabold text-2xl">When and where we meet</h2>
+          <dl class="mt-5 space-y-4">
+            <div class="sm:flex gap-4">
+              <dt class="w-24 shrink-0 font-semibold text-black-2">When</dt>
+              <dd class="font-semibold">{b.meets}</dd>
+            </div>
+            <div class="sm:flex gap-4">
+              <dt class="w-24 shrink-0 font-semibold text-black-2">Where</dt>
+              <dd>
+                <span class="font-semibold">{b.venue}</span>
+                {b.address && (
+                  <span class="block text-black-2">
+                    {b.address}
+                    {mapsUrl && <> · <a href={mapsUrl} target="_blank" rel="noopener" class="font-semibold text-red-dark hover:text-red underline underline-offset-4">Map</a></>}
+                  </span>
+                )}
+              </dd>
+            </div>
+            {b.remote && (
+              <div class="sm:flex gap-4">
+                <dt class="w-24 shrink-0 font-semibold text-black-2">Remote</dt>
+                <dd>{b.remote}</dd>
+              </div>
+            )}
+            <div class="sm:flex gap-4">
+              <dt class="w-24 shrink-0 font-semibold text-black-2">Contact</dt>
+              <dd><a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent(b.name + ' branch')}`} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">{site.contactEmail}</a></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="prose-chapter mt-10 text-lg leading-relaxed">
+          <Content />
+        </div>
+
+        {campaigns.length > 0 && (
+          <div class="mt-12">
+            <h2 class="font-display font-extrabold text-2xl">Campaigns in our area</h2>
+            <div class="mt-5 grid gap-5">
+              {campaigns.map((c) => <CampaignCard campaign={c} />)}
+            </div>
+          </div>
+        )}
+
+        {recent.length > 0 && (
+          <div class="mt-12">
+            <h2 class="font-display font-extrabold text-2xl">Recently</h2>
+            <ul class="mt-4 divide-y divide-black/10 border-y border-black/10">
+              {recent.map((e) => (
+                <li class="flex gap-4 py-3 text-sm">
+                  <span class="w-14 shrink-0 font-semibold text-black-2">{formatShortDate(e.start)}</span>
+                  <span>
+                    {e.url ? <a href={e.url} target="_blank" rel="noopener" class="font-semibold hover:text-red-dark hover:underline underline-offset-4">{e.title}</a> : <span class="font-semibold">{e.title}</span>}
+                    <span class="text-black-2"> · {typeLabel(e)}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      <aside class="lg:col-span-5">
+        <h2 class="font-display font-extrabold text-2xl">Coming up nearby</h2>
+        <div class="mt-4">
+          <EventList events={upcoming} compact empty="Nothing scheduled yet. Check the chapter calendar." />
+        </div>
+        <p class="mt-4 text-sm">
+          <a href={href('/events/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">All chapter events →</a>
+        </p>
+        <div class="mt-10"><BranchMap highlight={branch.id} /></div>
+      </aside>
+    </div>
+  </section>
+</Base>

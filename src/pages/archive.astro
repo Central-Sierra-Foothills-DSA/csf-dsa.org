@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { pastEvents, groupByMonth, typeLabel, shortLocation, formatShortDate, formatFullDate, dateOnly } from '../lib/events';
+import { href } from '../lib/paths';
+
+const months = groupByMonth(pastEvents());
+const total = months.reduce((n, m) => n + m.events.length, 0);
+const pastCampaigns = (await getCollection('campaigns')).filter((c) => c.data.status === 'completed').sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0));
+const updates = (await getCollection('updates')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+<Base title="Archive" description="Past events, news, and campaigns from Central Sierra Foothills DSA.">
+  <PageHeader eyebrow="Archive" title="What we've been up to." lede="Past events, news, and finished campaigns. Events are added here automatically once they've happened." />
+
+  <section class="py-12 sm:py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex flex-wrap gap-2 text-sm font-semibold" aria-label="On this page">
+        <a href="#news" class="px-3.5 py-2 rounded-full bg-mist hover:bg-black-4/60">News</a>
+        <a href="#past-campaigns" class="px-3.5 py-2 rounded-full bg-mist hover:bg-black-4/60">Past campaigns</a>
+        <a href="#past-events" class="px-3.5 py-2 rounded-full bg-mist hover:bg-black-4/60">Past events ({total})</a>
+      </nav>
+
+      <h2 id="news" class="font-display font-extrabold text-2xl sm:text-3xl mt-12">News</h2>
+      <ul class="mt-4 divide-y divide-black/10 border-y border-black/10">
+        {updates.map((u) => (
+          <li class="py-4">
+            <time datetime={u.data.date.toISOString()} class="text-sm font-semibold text-black-2">{formatFullDate(dateOnly(u.data.date))}</time>
+            <h3 class="font-display font-bold text-lg leading-snug mt-0.5">
+              {u.data.link ? <a href={u.data.link.startsWith('/') ? href(u.data.link) : u.data.link} class="hover:text-red-dark hover:underline underline-offset-4">{u.data.title}</a> : u.data.title}
+            </h3>
+            <p class="mt-1 text-black-2">{u.data.summary}</p>
+          </li>
+        ))}
+      </ul>
+
+      <h2 id="past-campaigns" class="font-display font-extrabold text-2xl sm:text-3xl mt-14">Past campaigns</h2>
+      {pastCampaigns.length === 0 ? (
+        <p class="mt-4 text-black-2">Nothing here yet. Everything we've taken on is still underway. See our <a href={href('/campaigns/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">current campaigns</a>.</p>
+      ) : (
+        <ul class="mt-4 divide-y divide-black/10 border-y border-black/10">
+          {pastCampaigns.map((c) => (
+            <li class="py-4">
+              <h3 class="font-display font-bold text-lg leading-snug"><a href={href(`/campaigns/${c.id}/`)} class="hover:text-red-dark hover:underline underline-offset-4">{c.data.title}</a></h3>
+              <p class="mt-1 text-black-2">{c.data.summary}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <h2 id="past-events" class="font-display font-extrabold text-2xl sm:text-3xl mt-14">Past events</h2>
+      {months.map((m) => (
+        <div class="mt-8">
+          <h3 class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">{m.label}</h3>
+          <ul class="mt-2 divide-y divide-black/10 border-y border-black/10">
+            {m.events.map((e) => (
+              <li class="flex gap-4 py-3 text-sm">
+                <span class="w-14 shrink-0 font-semibold text-black-2">{formatShortDate(e.start)}</span>
+                <span>
+                  {e.url ? <a href={e.url} target="_blank" rel="noopener" class="font-semibold hover:text-red-dark hover:underline underline-offset-4">{e.title}</a> : <span class="font-semibold">{e.title}</span>}
+                  <span class="text-black-2"> · {typeLabel(e)}{shortLocation(e) ? ` · ${shortLocation(e)}` : ''}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>

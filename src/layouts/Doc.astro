@@ -1,0 +1,18 @@
+---
+// Layout for plain Markdown pages in src/pages/ (for example the bylaws).
+// Set it in the page's frontmatter:  layout: ../../layouts/Doc.astro
+import Base from './Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { href } from '../lib/paths';
+
+const { frontmatter } = Astro.props;
+const back = frontmatter.backPath ? { href: href(frontmatter.backPath), label: frontmatter.backLabel ?? 'Back' } : undefined;
+---
+<Base title={frontmatter.title} description={frontmatter.lede}>
+  <PageHeader eyebrow={frontmatter.eyebrow} title={frontmatter.title} lede={frontmatter.lede} back={back} />
+  <div class="bg-white">
+    <article class="prose-chapter prose-doc max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 text-lg leading-relaxed">
+      <slot />
+    </article>
+  </div>
+</Base>

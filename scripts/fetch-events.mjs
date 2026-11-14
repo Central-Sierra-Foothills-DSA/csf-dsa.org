@@ -9,6 +9,10 @@
 // If the fetch fails (network down, markup changed), the previously committed
 // events.json is left in place so the build still succeeds. A warning is
 // printed so the failure is visible in CI logs.
+//
+// Past events are never dropped: once an event has happened it stays in
+// events.json even after Solidarity Tech stops listing it. That is what the
+// site's archive page is built from.
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -74,19 +78,28 @@ async function main() {
     return;
   }
 
-  const events = normalize(raw);
-  const payload = {
-    source: SOURCE_URL,
-    fetchedAt: new Date().toISOString(),
-    events,
-  };
-
   let previous = null;
   try {
     previous = JSON.parse(await readFile(OUT_PATH, 'utf8'));
   } catch {
     // first run
   }
+
+  // The site's archive is built from this file, so events must not vanish when
+  // Solidarity Tech stops listing them. Keep any previously saved event that has
+  // already happened and is no longer in the fetch. A future event that is
+  // missing from the fetch was cancelled or changed, so it is dropped.
+  const fresh = normalize(raw);
+  const freshIds = new Set(fresh.map((e) => e.id));
+  const now = Date.now();
+  const kept = (previous?.events ?? []).filter((e) => !freshIds.has(e.id) && new Date(e.end ?? e.start).getTime() < now);
+  const events = [...fresh, ...kept].sort((a, b) => new Date(a.start) - new Date(b.start));
+
+  const payload = {
+    source: SOURCE_URL,
+    fetchedAt: new Date().toISOString(),
+    events,
+  };
 
   await writeFile(OUT_PATH, JSON.stringify(payload, null, 2) + '\n');
   const delta = previous ? events.length - previous.events.length : events.length;

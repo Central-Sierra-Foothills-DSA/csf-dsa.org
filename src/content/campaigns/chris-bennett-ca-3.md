@@ -1,8 +1,11 @@
 ---
 title: "CSF DSA Endorses Chris Bennett for Congress (CA-3)"
 summary: "Our chapter endorsed Chris Bennett in the Democratic primary for California's 3rd Congressional District by a strong supermajority of voting members."
+kind: endorsement
 status: active
-order: 2
+order: 3
+date: 2026-04-26
+eventKeywords: ["bennett"]
 links: []
 ---
 

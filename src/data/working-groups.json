@@ -1,14 +1,22 @@
 [
   {
-    "name": "Membership Outreach",
-    "description": "Tabling, phone banks, and one-on-one conversations that bring new people into the chapter and keep members engaged."
+    "name": "Electoral",
+    "description": "Runs the chapter's endorsement process and backs endorsed candidates and ballot measures with volunteer power."
+  },
+  {
+    "name": "DeFlock / Anti-surveillance",
+    "description": "Organizes against automated license plate readers and other mass surveillance in our towns."
   },
   {
     "name": "Political Education",
     "description": "Reading groups, trainings, and discussions that deepen our shared understanding of socialism and organizing."
   },
   {
-    "name": "Electoral",
-    "description": "Runs the chapter's endorsement process and supports endorsed candidates and ballot measures with volunteer power."
+    "name": "Membership Outreach",
+    "description": "Tabling, phone banks, and one-on-one conversations that bring new people in and keep members engaged."
+  },
+  {
+    "name": "Mutual Aid",
+    "description": "Neighbors meeting each other's needs directly, and building the relationships that make organizing possible."
   }
 ]

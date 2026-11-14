@@ -2,27 +2,33 @@
 import { Image } from 'astro:assets';
 import site from '../data/site.json';
 import badge from '../assets/logos/csf-dsa-white.png';
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+import { href, currentPath } from '../lib/paths';
+
 const links = [
-  { href: '#about', label: 'About' },
-  { href: '#events', label: 'Events' },
-  { href: '#branches', label: 'Branches' },
-  { href: '#campaigns', label: 'Campaigns' },
-  { href: '#get-involved', label: 'Get Involved' },
+  { path: '/about/', label: 'About' },
+  { path: '/events/', label: 'Events' },
+  { path: '/branches/', label: 'Branches' },
+  { path: '/campaigns/', label: 'Campaigns' },
+  { path: '/learn/', label: 'Learn' },
 ];
+const here = currentPath(Astro.url);
+const isActive = (p: string) => here.startsWith(p);
 ---
 <header class="sticky top-0 z-50 bg-black/95 backdrop-blur text-white border-b border-white/10" id="site-header">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <a href={`${base}/`} class="flex items-center gap-3 font-display font-bold tracking-tight hover:text-red-2 transition-colors">
+      <a href={href('/')} class="flex items-center gap-3 font-display font-bold tracking-tight hover:text-red-2 transition-colors">
         <Image src={badge} alt="" width={96} height={96} loading="eager" class="w-12 h-12" />
         <span class="hidden sm:inline text-base">{site.orgName}</span>
         <span class="sm:hidden text-base">{site.orgNameShort}</span>
       </a>
 
-      <nav class="hidden md:flex items-center gap-7 text-sm font-medium" aria-label="Primary">
-        {links.map((l) => <a href={l.href} class="hover:text-red-2 transition-colors">{l.label}</a>)}
-        <a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="px-4 py-2 bg-red hover:bg-red-dark rounded-md font-semibold transition-colors">Join</a>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium" aria-label="Primary">
+        {links.map((l) => (
+          <a href={href(l.path)} aria-current={isActive(l.path) ? 'page' : undefined}
+             class:list={['py-1 border-b-2 transition-colors hover:text-red-2', isActive(l.path) ? 'border-red text-white' : 'border-transparent']}>{l.label}</a>
+        ))}
+        <a href={href('/new-members/')} class="px-4 py-2 bg-red hover:bg-red-dark rounded-md font-semibold transition-colors">Join us</a>
       </nav>
 
       <button id="menu-btn" class="md:hidden p-2 -mr-2 rounded-md hover:bg-white/10 transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -36,8 +42,11 @@ const links = [
 
   <nav id="mobile-menu" class="md:hidden hidden border-t border-white/10" aria-label="Primary mobile">
     <div class="px-4 py-4 flex flex-col gap-1 text-base font-medium">
-      {links.map((l) => <a href={l.href} class="px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors">{l.label}</a>)}
-      <a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="mt-2 px-4 py-3 bg-red hover:bg-red-dark rounded-md font-semibold text-center transition-colors">Join the chapter</a>
+      {links.map((l) => (
+        <a href={href(l.path)} aria-current={isActive(l.path) ? 'page' : undefined}
+           class:list={['px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors', isActive(l.path) && 'bg-white/10']}>{l.label}</a>
+      ))}
+      <a href={href('/new-members/')} class="mt-2 px-4 py-3 bg-red hover:bg-red-dark rounded-md font-semibold text-center transition-colors">New here? Join us</a>
     </div>
   </nav>
 </header>

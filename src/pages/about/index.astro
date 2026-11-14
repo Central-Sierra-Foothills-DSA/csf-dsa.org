@@ -1,0 +1,184 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import site from '../../data/site.json';
+import groups from '../../data/working-groups.json';
+import partners from '../../data/partners.json';
+import { href } from '../../lib/paths';
+
+const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
+
+// From the roots up: each layer exists to support the one above it.
+const layers = [
+  { name: 'Members', body: 'Everything else exists to support the people in the room. Any member can bring a proposal, join a working group, or run for a role.' },
+  { name: 'Branches', body: 'Local groups where you meet your neighbors face to face. Branches run their own meetings and projects.' },
+  { name: 'The chapter', body: 'All four counties together. The chapter handles anything that crosses county lines and supports the branches.' },
+  { name: 'DSA National', body: 'More than a hundred thousand members across the country. Chapter delegates set national priorities at convention.' },
+];
+
+// Officer duties, summarized from Article V of the bylaws.
+const roles = [
+  { name: 'Co-Chairs (two)', body: 'Preside over chapter and steering committee meetings, speak publicly for the chapter, and coordinate the day-to-day work of branches and committees.' },
+  { name: 'Secretary', body: 'Answers chapter correspondence, keeps the membership list and meeting minutes, and keeps us in touch with DSA National.' },
+  { name: 'Treasurer', body: 'Looks after the chapter’s funds and financial records, prepares the annual budget, and reports on finances to the membership.' },
+  { name: 'Social Media Coordinator', body: 'Manages the chapter’s social media.' },
+  { name: 'Branch chairs', body: 'Each branch chair holds a seat on the steering committee, so every branch has a voice in chapter decisions.' },
+];
+---
+<Base title="About us" description="Who Central Sierra Foothills DSA is, what we believe, and how the chapter and its branches are organized.">
+  <PageHeader eyebrow="About" title="Who we are and how we work." lede="A member-run chapter of the Democratic Socialists of America in the Sierra foothills. No paid staff, no big donors. Just neighbors organizing together." />
+
+  <section class="py-12 sm:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14">
+      <div class="lg:col-span-7">
+        <SectionHeading eyebrow="Who we are" title="A socialist chapter for the foothills." />
+        <div class="mt-6 space-y-5 text-lg leading-relaxed">
+          <p>
+            Central Sierra Foothills DSA is the local chapter of the Democratic Socialists of America, the largest socialist organization in the United States.
+            Our members live and work in {site.counties.slice(0, -1).join(', ')}, and {site.counties.at(-1)} counties.
+          </p>
+          <p>
+            The chapter was founded in Auburn in {site.founded}. It began that spring as a reading group that came together around the Bernie Sanders campaign and a local Green New Deal.
+            Today we have about 200 members and branches in Grass Valley / Nevada City, Auburn, Placerville, and Roseville.
+          </p>
+          <p>
+            We fight for things that make working people's lives better: health care for everyone, housing as a human right, strong unions, and an end to mass surveillance in our towns.
+          </p>
+        </div>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href={href('/new-members/')} class="inline-flex items-center px-5 py-3 bg-red hover:bg-red-dark text-white font-semibold rounded-md transition-colors">New here? Start here</a>
+          <a href={href('/learn/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-md transition-colors">What is democratic socialism?</a>
+        </div>
+      </div>
+      <blockquote class="lg:col-span-5 self-start rounded-xl bg-black text-white p-7 sm:p-8">
+        <p class="font-display font-bold text-xl sm:text-2xl leading-snug">
+          “Our conception of socialism is a profoundly democratic one. It is rooted in the belief that human beings should be free to develop to their fullest potential, that public policies should be determined not by wealth but by popular participation, and that individual liberties should be carefully safeguarded.”
+        </p>
+        <footer class="mt-5 text-sm text-white/75">From our <a href={href('/about/bylaws/')} class="underline underline-offset-4 hover:text-red-3">chapter bylaws</a>, Article II</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <section id="structure" class="py-12 sm:py-16 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="How we're organized" title="Built from the roots up." lede="DSA runs bottom-up. Members set chapter priorities, and chapter delegates set national ones." />
+      <ol class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {layers.map((l, i) => (
+          <li class="bg-white rounded-xl p-6 ring-1 ring-black/10">
+            <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-red text-white font-display font-black" aria-hidden="true">{i + 1}</span>
+            <h3 class="font-display font-extrabold text-xl mt-4">{l.name}</h3>
+            <p class="mt-2 text-black-2 leading-relaxed">{l.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section id="steering-committee" class="py-12 sm:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14">
+      <div class="lg:col-span-5">
+        <SectionHeading eyebrow="Steering committee" title="Who keeps things running." />
+        <div class="mt-6 space-y-4 text-lg leading-relaxed">
+          <p>
+            The steering committee is the chapter's five officers plus the chair of each branch. Officers are elected by the membership every year.
+            Nominations are always open, and any member in good standing can run.
+          </p>
+          <p>
+            The committee carries out what members decide and handles business between meetings. It answers to the membership, not the other way around.
+            Our bylaws call it the Executive Committee.
+          </p>
+        </div>
+      </div>
+      <dl class="lg:col-span-7 divide-y divide-black/10 border-y border-black/10">
+        {roles.map((r) => (
+          <div class="py-5 sm:flex gap-6">
+            <dt class="sm:w-56 shrink-0 font-display font-extrabold text-lg">{r.name}</dt>
+            <dd class="text-black-2 leading-relaxed mt-1 sm:mt-0">{r.body}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section id="branches-and-groups" class="py-12 sm:py-16 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-14">
+      <div>
+        <SectionHeading eyebrow="Branches" title="Local, and in charge of local." />
+        <div class="mt-6 space-y-4 text-lg leading-relaxed">
+          <p>
+            A branch is a group of at least five members organized around a town or area. Branches hold their own meetings, speak for DSA locally, and can endorse in local races on their own.
+            Each branch chooses a chair, who represents the branch on the steering committee.
+          </p>
+        </div>
+        <ul class="mt-6 grid sm:grid-cols-2 gap-3">
+          {branches.map((b) => (
+            <li><a href={href(`/branches/${b.id}/`)} class="block p-4 rounded-lg bg-white ring-1 ring-black/10 font-display font-bold hover:text-red-dark hover:ring-red transition-colors">{b.data.name} →</a></li>
+          ))}
+        </ul>
+        <p class="mt-4 text-black-2">No branch near you yet? We'd love to see one in Truckee and Tahoe. <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">Email us</a> and we'll help you start one.</p>
+      </div>
+      <div>
+        <SectionHeading eyebrow="Working groups" title="Teams that cross county lines." />
+        <p class="mt-6 text-lg leading-relaxed">Working groups take on one kind of work for the whole chapter. They're open to every member, and anyone can start one.</p>
+        <dl class="mt-6 space-y-5">
+          {groups.map((g) => (
+            <div class="pl-5 border-l-4 border-red">
+              <dt class="font-display font-extrabold text-lg">{g.name}</dt>
+              <dd class="text-black-2 leading-relaxed">{g.description}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="decisions" class="py-12 sm:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="How we decide" title="One member, one vote." />
+      <div class="mt-10 grid md:grid-cols-3 gap-6">
+        <div class="rounded-xl bg-mist p-6">
+          <h3 class="font-display font-extrabold text-xl">Anyone can propose</h3>
+          <p class="mt-2 text-black-2 leading-relaxed">Any member can bring a motion. We discuss it together at a chapter meeting, where questions and amendments are welcome. Guests can speak too.</p>
+        </div>
+        <div class="rounded-xl bg-mist p-6">
+          <h3 class="font-display font-extrabold text-xl">Everyone votes</h3>
+          <p class="mt-2 text-black-2 leading-relaxed">After the meeting, every member in good standing gets an anonymous online ballot. You don't have to be in the room to have a say.</p>
+        </div>
+        <div class="rounded-xl bg-mist p-6">
+          <h3 class="font-display font-extrabold text-xl">Local stays local</h3>
+          <p class="mt-2 text-black-2 leading-relaxed">The whole chapter votes on anything that spans counties, such as congressional races and chapter money. Branches handle local decisions.</p>
+        </div>
+      </div>
+      <p class="mt-8 text-lg leading-relaxed max-w-3xl">
+        The chapter holds a General Meeting every year to elect officers, and at least four regular chapter meetings a year. Branches meet monthly.
+        The full rules are in our <a href={href('/about/bylaws/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">chapter bylaws</a>.
+      </p>
+    </div>
+  </section>
+
+  {partners.length > 0 && (
+    <section id="partners" class="py-12 sm:py-16 bg-mist">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Allies" title="Organizations we work with." />
+        <ul class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {partners.map((p: { name: string; url?: string; blurb?: string }) => (
+            <li class="bg-white rounded-xl p-5 ring-1 ring-black/10">
+              <h3 class="font-display font-bold text-lg">{p.url ? <a href={p.url} target="_blank" rel="noopener" class="hover:text-red-dark">{p.name} ↗</a> : p.name}</h3>
+              {p.blurb && <p class="mt-1 text-sm text-black-2 leading-relaxed">{p.blurb}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <section class="py-12 sm:py-16 bg-black text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="font-display font-black text-3xl sm:text-4xl">Questions about the chapter?</h2>
+      <p class="mt-4 text-lg text-white/80">Email <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-3 hover:text-white underline underline-offset-4">{site.contactEmail}</a> or come to a meeting and ask in person.</p>
+      <a href={href('/events/')} class="mt-8 inline-flex items-center px-6 py-3.5 bg-red hover:bg-red-dark text-white font-semibold rounded-md transition-colors">See upcoming events</a>
+    </div>
+  </section>
+</Base>

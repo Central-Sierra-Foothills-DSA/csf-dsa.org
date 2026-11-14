@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import data from '../data/local-government.json';
+import site from '../data/site.json';
+import { formatFullDate, upcomingEvents, typeOf } from '../lib/events';
+import EventList from '../components/EventList.astro';
+import { href } from '../lib/paths';
+
+interface Jurisdiction { name: string; type: string; county: string; body: string; homeUrl?: string | null; meetingsUrl?: string | null; schedule?: string | null; location?: string | null }
+interface Tool { label: string; url: string; what: string }
+
+const all = (data.jurisdictions as Jurisdiction[]).filter((j) => j.meetingsUrl);
+const counties = ['Placer', 'Nevada', 'El Dorado', 'Sierra'];
+const byCounty = counties.map((c) => ({
+  county: c,
+  items: all.filter((j) => j.county === c).sort((a, b) => (a.type === 'county' ? -1 : b.type === 'county' ? 1 : a.name.localeCompare(b.name))),
+})).filter((g) => g.items.length);
+const tools = data.lookupTools as Tool[];
+const civic = upcomingEvents().filter((e) => typeOf(e) === 'civic').slice(0, 4);
+---
+<Base title="Local government" description="Where and when your city council and county board of supervisors meet in Placer, Nevada, El Dorado, and Sierra counties.">
+  <PageHeader eyebrow="Local government" title="Show up where decisions get made." lede="City councils and county boards decide a lot about daily life, and most meetings are nearly empty. Here's where to find yours." />
+
+  {civic.length > 0 && (
+    <section class="py-12 sm:py-16 bg-white">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="We'll be there" title="Meetings on our calendar." lede="These are the ones where our campaigns are on the agenda. Come along." />
+        <div class="mt-8"><EventList events={civic} compact /></div>
+        <p class="mt-4"><a href={href('/events/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">All upcoming events →</a></p>
+      </div>
+    </section>
+  )}
+
+  <section id="meetings" class="py-12 sm:py-16 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="Agendas and schedules" title="Find your council or board." lede="Each link goes to the official page for agendas and meeting dates. Schedules change, so always check the official page before you go." />
+      {byCounty.map((g) => (
+        <div class="mt-10">
+          <h3 class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">{g.county} County</h3>
+          <ul class="mt-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {g.items.map((j) => (
+              <li class="bg-white rounded-xl p-5 ring-1 ring-black/10 flex flex-col">
+                <h4 class="font-display font-extrabold text-lg leading-tight">{j.name}</h4>
+                <p class="text-sm text-black-2">{j.body}</p>
+                {j.schedule && <p class="mt-3 text-sm leading-relaxed"><span class="font-semibold">Usually meets:</span> {j.schedule}</p>}
+                {j.location && <p class="mt-1 text-sm text-black-2 leading-relaxed">{j.location}</p>}
+                <a href={j.meetingsUrl!} target="_blank" rel="noopener" class="mt-auto pt-4 font-semibold text-red-dark hover:text-red underline underline-offset-4">Agendas and meeting dates ↗</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      {data.checkedOn && <p class="mt-8 text-sm text-black-2">Links and schedules last checked {formatFullDate(`${data.checkedOn}T12:00:00-08:00`)}. Spot something out of date? Email <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">{site.contactEmail}</a>.</p>}
+    </div>
+  </section>
+
+  {tools.length > 0 && (
+    <section id="representatives" class="py-12 sm:py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Who represents you" title="Look up your districts and representatives." lede="District lines are confusing. These official tools find yours from your address." />
+        <ul class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tools.map((t) => (
+            <li>
+              <a href={t.url} target="_blank" rel="noopener" class="group block h-full p-5 bg-mist rounded-lg hover:bg-red hover:text-white transition-colors">
+                <span class="font-display font-bold text-lg">{t.label} <span aria-hidden="true">↗</span></span>
+                <p class="mt-1 text-sm text-black-2 group-hover:text-white leading-relaxed">{t.what}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+</Base>

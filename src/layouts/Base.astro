@@ -11,10 +11,9 @@ interface Props {
   description?: string;
 }
 
-const {
-  title = `${site.orgName} — Democratic Socialists of America`,
-  description = site.intro,
-} = Astro.props;
+const { title: pageTitle, description = site.intro } = Astro.props;
+// Inner pages pass a short title ("Events"); the chapter name is appended here.
+const title = pageTitle ? `${pageTitle} — ${site.orgName}` : `${site.orgName} — Democratic Socialists of America`;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const ogImage = new URL(`${base}/images/og.png`, Astro.site ?? 'https://csf-dsa.org').href;

@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import site from '../data/site.json';
 import bridge from '../assets/photos/foresthill-bridge.jpg';
 import { upcomingEvents, formatLongDate, formatTime, shortLocation } from '../lib/events';
+import { href } from '../lib/paths';
 
 const next = upcomingEvents(new Date(), 1)[0];
 ---
@@ -17,33 +18,32 @@ const next = upcomingEvents(new Date(), 1)[0];
     class="absolute inset-0 -z-20 w-full h-full object-cover object-[center_40%]"
   />
   <div class="absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/80 to-black/30" aria-hidden="true"></div>
-  <div class="absolute inset-x-0 bottom-0 h-40 -z-10 bg-gradient-to-t from-black to-transparent" aria-hidden="true"></div>
 
-  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 sm:pt-32 sm:pb-36 lg:pt-40 lg:pb-44">
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20 sm:pt-28 sm:pb-28 lg:pt-32 lg:pb-32">
     <p class="flex items-center gap-3 text-white font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm mb-6">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-red" aria-hidden="true"></span>
       Democratic Socialists of America
     </p>
-    <h1 class="font-display font-black text-5xl sm:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] max-w-4xl">
+    <h1 class="font-display font-black text-5xl sm:text-6xl lg:text-7xl leading-[0.98] max-w-4xl">
       {site.tagline}
     </h1>
-    <p class="mt-7 text-lg sm:text-xl text-white/80 max-w-2xl leading-relaxed">
-      {site.intro}
+    <p class="mt-7 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed">
+      We're your neighbors and coworkers in Placer, Nevada, El Dorado, and Sierra counties, organizing for a society run by and for working people. Wherever you're starting from, there's a place for you here.
     </p>
 
     <div class="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
-      <a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-7 py-4 bg-red hover:bg-red-dark text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
-        Join the chapter
+      <a href={href('/new-members/')} class="inline-flex items-center justify-center gap-2 px-7 py-4 bg-red hover:bg-red-dark text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
+        I'm new here
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12" /></svg>
       </a>
-      <a href="#events" class="inline-flex items-center justify-center px-7 py-4 border-2 border-white/30 hover:border-white/70 hover:bg-white/5 text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
+      <a href={href('/events/')} class="inline-flex items-center justify-center px-7 py-4 border-2 border-white/40 hover:border-white hover:bg-white/5 text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
         See upcoming events
       </a>
     </div>
   </div>
 
   {next && (
-    <a href={next.url ?? '#events'} target={next.url ? '_blank' : undefined} rel={next.url ? 'noopener' : undefined}
+    <a href={next.url ?? href('/events/')} target={next.url ? '_blank' : undefined} rel={next.url ? 'noopener' : undefined}
        class="group relative block bg-red hover:bg-red-dark text-white transition-colors">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
         <span class="font-bold tracking-[0.18em] uppercase text-xs px-2 py-0.5 rounded-sm bg-white text-red-dark">Next up</span>

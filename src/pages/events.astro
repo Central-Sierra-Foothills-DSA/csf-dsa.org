@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import EventList from '../components/EventList.astro';
+import site from '../data/site.json';
+import { upcomingEvents, typeOf, EVENT_TYPES, eventsFetchedAt, formatShortDate } from '../lib/events';
+import { href } from '../lib/paths';
+
+const upcoming = upcomingEvents(new Date());
+const present = EVENT_TYPES.filter((t) => upcoming.some((e) => typeOf(e) === t.key));
+const count = (key: string) => upcoming.filter((e) => typeOf(e) === key).length;
+
+// The filter works without JavaScript: each chip is a radio button, and these
+// rules hide events (and then-empty days) that don't match the checked one.
+const filterCss = present
+  .map((t) => `
+.events-filter:has(input[value="${t.key}"]:checked) ~ .events-list .event:not([data-type="${t.key}"]) { display: none; }
+.events-filter:has(input[value="${t.key}"]:checked) ~ .events-list .event-day:not(:has(.event[data-type="${t.key}"])) { display: none; }`)
+  .join('\n');
+---
+<Base title="Events" description="Upcoming meetings, socials, actions, and trainings from Central Sierra Foothills DSA.">
+  <PageHeader eyebrow="Events" title="What's coming up." lede="Branch meetings, socials, actions, and local government meetings where our campaigns are on the agenda. You don't have to be a member to show up." />
+
+  <section class="py-12 sm:py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <style set:html={filterCss}></style>
+
+      <fieldset class="events-filter">
+        <legend class="text-xs font-semibold tracking-[0.18em] uppercase text-black-2 mb-3">Show</legend>
+        <div class="flex flex-wrap gap-2">
+          <label class="chip"><input type="radio" name="type" value="all" class="sr-only" checked /> Everything <span class="chip-count">{upcoming.length}</span></label>
+          {present.map((t) => (
+            <label class="chip"><input type="radio" name="type" value={t.key} class="sr-only" /> {t.plural} <span class="chip-count">{count(t.key)}</span></label>
+          ))}
+        </div>
+      </fieldset>
+
+      <div class="events-list mt-8">
+        <EventList events={upcoming} empty="Nothing on the calendar right now. Check back soon." />
+      </div>
+
+      <div class="mt-10 p-6 rounded-xl bg-mist flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="font-display font-bold text-lg">RSVP and full details</h2>
+          <p class="text-sm text-black-2 mt-1">Each event links to its page on our Solidarity Tech calendar, where you can RSVP and get Zoom links.</p>
+        </div>
+        <a href={site.links.fullCalendar} target="_blank" rel="noopener" class="shrink-0 inline-flex items-center justify-center px-5 py-3 bg-black hover:bg-black-1 text-white font-semibold rounded-md transition-colors">Open the full calendar ↗</a>
+      </div>
+
+      <p class="mt-6 text-sm text-black-2">
+        Times are Pacific. This list updates from the calendar automatically (last synced {formatShortDate(eventsFetchedAt)}).
+        Looking for something that already happened? <a href={href('/archive/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">Browse the archive</a>.
+      </p>
+    </div>
+  </section>
+</Base>
