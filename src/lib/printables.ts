@@ -59,6 +59,8 @@ export const formatIds = Object.keys(formats) as FormatId[];
 
 export type Design = {
   id: string;
+  /** 'event' flyers have fill-in boxes; 'join' flyers are ready-made. */
+  group: 'event' | 'join';
   title: string;
   eyebrow: string;
   headline: string;
@@ -78,6 +80,8 @@ export type Printable = {
   design: Design;
   formatId: FormatId;
   format: Format;
+  /** Fill-in boxes on this file (none for ready-made designs and images). */
+  fields: Partial<Record<'when' | 'where' | 'note', number>>;
   /** Path of the generated file, relative to the site root (wrap in href()). */
   file: string;
 };
@@ -97,7 +101,7 @@ export async function getDesigns(): Promise<Design[]> {
   const c = data.chapter;
   const chapterQr = linkFor(c.qr);
   const designs: Design[] = [
-    { id: c.id, title: c.title, eyebrow: c.eyebrow, headline: c.headline, body: c.body, cta: c.cta, socialCta: c.socialCta, qrUrl: chapterQr, qrLabel: displayUrl(chapterQr) },
+    { id: c.id, group: 'event', title: c.title, eyebrow: c.eyebrow, headline: c.headline, body: c.body, cta: c.cta, socialCta: c.socialCta, qrUrl: chapterQr, qrLabel: displayUrl(chapterQr) },
   ];
   const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
   const t = data.branch;
@@ -105,6 +109,7 @@ export async function getDesigns(): Promise<Design[]> {
     const vars = { name: b.data.name, area: b.data.area, meets: b.data.meets, slug: b.id };
     designs.push({
       id: `${b.id}-branch`,
+      group: 'event',
       title: fill(t.title, vars),
       eyebrow: fill(t.eyebrow, vars),
       headline: fill(t.headline, vars),
@@ -116,6 +121,12 @@ export async function getDesigns(): Promise<Design[]> {
       qrLabel: fill(t.qrLabel, vars),
     });
   }
+  for (const j of data.join) {
+    designs.push({
+      id: j.id, group: 'join', title: j.title, eyebrow: j.eyebrow, headline: j.headline, body: j.body,
+      cta: data.joinCta, socialCta: data.joinSocialCta, qrUrl: chapterQr, qrLabel: displayUrl(chapterQr),
+    });
+  }
   return designs;
 }
 
@@ -125,7 +136,8 @@ export async function getPrintables(): Promise<Printable[]> {
     formatIds.map((formatId) => {
       const format: Format = formats[formatId];
       const slug = `${design.id}-${formatId}`;
-      return { slug, design, formatId, format, file: `${printablesDir}/csf-dsa-${slug}.${format.kind}` };
+      const fields = format.kind === 'pdf' && design.group === 'event' ? format.fields : {};
+      return { slug, design, formatId, format, fields, file: `${printablesDir}/csf-dsa-${slug}.${format.kind}` };
     }),
   );
 }

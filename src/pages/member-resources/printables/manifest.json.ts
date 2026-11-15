@@ -7,7 +7,7 @@ export const GET: APIRoute = async () => {
     slug: p.slug,
     file: p.file,
     preview: p.formatId === 'poster' ? previewFile(p.design.id) : undefined,
-    fillable: p.format.kind === 'pdf',
+    fillable: Object.keys(p.fields).length > 0,
     ...(p.format.kind === 'pdf'
       ? { kind: 'pdf', widthIn: p.format.sheet.w, heightIn: p.format.sheet.h, fieldPt: p.format.fieldPt }
       : { kind: 'png', widthPx: p.format.px.w, heightPx: p.format.px.h }),

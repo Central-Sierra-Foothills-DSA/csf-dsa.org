@@ -22,6 +22,8 @@ const { fieldBox } = printablesText;
 const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
 const facebook = displayUrl(site.social.facebook);
 const line = 'border-b-[0.25cqw] border-black-3';
+// Ready-made flyers have no fill-in box, so the headline and QR code get the room.
+const ready = Object.keys(fields).length === 0;
 ---
 <article class="flyer @container w-full h-full bg-white text-black flex flex-col overflow-hidden">
   <header class="bg-red text-white flex items-center gap-[3cqw] px-[6cqw] py-[3cqw]">
@@ -31,9 +33,9 @@ const line = 'border-b-[0.25cqw] border-black-3';
 
   <div class="flex-1 flex flex-col px-[6cqw] pt-[4cqw] pb-[3.5cqw]">
     <p class="font-semibold uppercase tracking-[0.16em] text-[2.7cqw] text-red-dark">{design.eyebrow}</p>
-    <h1 class="mt-[1.5cqw] font-display font-black text-[9.4cqw] leading-[0.95] tracking-[-0.01em]">{design.headline}</h1>
+    <h1 class:list={['mt-[1.5cqw] font-display font-black leading-[0.95] tracking-[-0.01em]', ready ? 'text-[12.5cqw]' : 'text-[9.4cqw]']}>{design.headline}</h1>
     <div class="mt-[2.6cqw] h-[1.1cqw] w-[16cqw] bg-red"></div>
-    <p class="mt-[2.6cqw] text-[3.3cqw] leading-[1.36] text-black-1">{design.body}</p>
+    <p class:list={['mt-[2.6cqw] leading-[1.36] text-black-1', ready ? 'text-[3.9cqw]' : 'text-[3.3cqw]']}>{design.body}</p>
     {design.meets && (
       <p class="mt-[1.8cqw] text-[3.3cqw] leading-[1.36]">
         <span class="font-bold">{design.meets.label}:</span> {design.meets.text}
@@ -42,6 +44,17 @@ const line = 'border-b-[0.25cqw] border-black-3';
 
     <div class="flex-1"></div>
 
+    {ready ? (
+      <div class="mt-[3cqw] flex items-center gap-[5cqw]">
+        <div class="shrink-0 bg-white ring-[0.3cqw] ring-black/15 rounded-[2cqw] p-[2cqw]">
+          <QR url={design.qrUrl} class="w-[30cqw] h-[30cqw]" />
+        </div>
+        <div>
+          <p class="font-display font-black text-[6.4cqw] leading-[1]">{design.cta}</p>
+          <p class="mt-[1.5cqw] font-bold text-[4cqw] text-red-dark">{design.qrLabel}</p>
+        </div>
+      </div>
+    ) : (
     <div class="mt-[3cqw] flex gap-[3cqw] items-stretch">
       <section class="flex-1 min-w-0 rounded-[2cqw] bg-mist px-[3.5cqw] pt-[2.6cqw] pb-[3cqw]">
         <p class="font-semibold uppercase tracking-[0.16em] text-[2.5cqw] text-red-dark">{fieldBox.title}</p>
@@ -72,6 +85,7 @@ const line = 'border-b-[0.25cqw] border-black-3';
         <p class="mt-[0.6cqw] font-bold text-[2.5cqw] leading-[1.2] text-red-dark">{design.qrLabel}</p>
       </div>
     </div>
+    )}
 
     <footer class="mt-[3cqw] pt-[2cqw] border-t-[0.25cqw] border-black-4 flex flex-wrap justify-between gap-x-[3cqw] text-[2.4cqw] text-black-2">
       <span>Instagram <span class="font-semibold text-black">{instagram}</span></span>

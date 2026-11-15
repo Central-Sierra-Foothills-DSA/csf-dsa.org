@@ -25,6 +25,40 @@
     "qrLabel": "csf-dsa.org/branches"
   },
 
+  "_join": "Ready-made 'join us' flyers: no fill-in boxes, a big QR code to the chapter sign-up form. Each one is made in every size. Add, remove, or reword them here; `id` becomes the file name.",
+  "join": [
+    {
+      "id": "join-us",
+      "title": "Join us",
+      "eyebrow": "Democratic Socialists of America",
+      "headline": "Join us.",
+      "body": "We're working people across Placer, Nevada, El Dorado, and Sierra counties, organizing for a fairer economy and a real democracy. No experience needed. Come as you are."
+    },
+    {
+      "id": "join-fed-up",
+      "title": "Fed up? Get organized.",
+      "eyebrow": "Democratic Socialists of America",
+      "headline": "Fed up? Get organized.",
+      "body": "Rent, healthcare, wages: the problems are big, but there are a lot of us. Join neighbors across the Sierra foothills who are organizing to fix them."
+    },
+    {
+      "id": "join-not-alone",
+      "title": "You don't have to fight alone",
+      "eyebrow": "Democratic Socialists of America",
+      "headline": "You don't have to fight alone.",
+      "body": "When working people stick together, we win things none of us could win alone. Find your people in the foothills."
+    },
+    {
+      "id": "join-socialists-here",
+      "title": "Socialists live here too",
+      "eyebrow": "Democratic Socialists of America",
+      "headline": "Socialists live here too.",
+      "body": "Yes, even in the foothills. We're your neighbors, coworkers, and friends, building a better future together. There's a place for you."
+    }
+  ],
+  "joinCta": "Scan to join us",
+  "joinSocialCta": "Join us",
+
   "fieldBox": {
     "title": "Our next event",
     "labels": { "when": "When", "where": "Where", "note": "Also" }

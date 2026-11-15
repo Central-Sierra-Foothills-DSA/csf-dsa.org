@@ -103,8 +103,10 @@ to preview the layout. Commit the regenerated PDF with the change. CI does not r
 
 ## The flyer library
 
-`public/files/printables/` is generated too. There is one chapter flyer plus one per
-branch (made automatically from `src/content/branches/`), each in six formats: letter
+`public/files/printables/` is generated too. There are event flyers with fill-in boxes
+(one chapter flyer plus one per branch, made automatically from `src/content/branches/`)
+and ready-made "join us" flyers with no boxes (the `join` list in `printables.json`; add
+or reword them there). Each comes in six formats: letter
 poster, half-page (2 per sheet), quarter-page (4 per sheet), and three social image sizes.
 Text is in `src/data/printables.json`. Sizes and fill-in box limits are in `formats` in
 `src/lib/printables.ts`. The layouts are `src/components/printables/Flyer.astro` and

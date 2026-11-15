@@ -9,6 +9,10 @@ import { getDesigns, getPrintables, getReadyMade, previewFile, printablesText } 
 
 const designs = await getDesigns();
 const ready = getReadyMade();
+const flyerSections = [
+  { id: 'join', group: 'join', bg: 'bg-mist', eyebrow: 'Join us', title: 'Ready-made recruiting flyers.', lede: 'Nothing to fill in. The QR code goes to the chapter sign-up form. Print sizes are PDFs; social sizes are PNG images.' },
+  { id: 'event', group: 'event', bg: 'bg-white', eyebrow: 'Event flyers', title: 'Add your event, then print.', lede: 'Print sizes are PDFs with fill-in boxes for when, where, and a short note. Social sizes are PNG images, ready to post.' },
+] as const;
 const items = await getPrintables();
 const { howTo, rules } = printablesText;
 const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
@@ -20,7 +24,13 @@ const downloadName = (file: string) => file.split('/').pop();
     title="Flyers and printables."
     lede="Flyers you can fill in with your event details, plus ready-to-go signs, handouts, and images for tables, meetings, and social media."
     back={{ href: href('/member-resources/'), label: 'Member resources' }}
-  />
+  >
+    <nav aria-label="On this page" class="mt-6 flex flex-wrap gap-2">
+      {[['#join', 'Join us flyers'], ['#event', 'Event flyers'], ['#ready', 'Signs, handouts, and images']].map(([to, label]) => (
+        <a href={to} class="px-4 py-2 rounded-full bg-white/10 ring-1 ring-white/40 hover:bg-white hover:text-red-dark font-semibold text-sm transition-colors">{label}</a>
+      ))}
+    </nav>
+  </PageHeader>
 
   <section class="py-12 sm:py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-6">
@@ -47,12 +57,12 @@ const downloadName = (file: string) => file.split('/').pop();
     </div>
   </section>
 
-  <section class="py-12 sm:py-16 bg-mist">
+  {flyerSections.map((s) => (
+  <section id={s.id} class:list={['py-12 sm:py-16', s.bg]}>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <SectionHeading eyebrow="Flyers" title="Pick a flyer, pick a size." lede="Print sizes are PDFs with fill-in boxes. Social sizes are PNG images, ready to post." />
-      <p class="mt-4"><a href="#ready" class={linkClass}>Skip to ready-to-go signs, handouts, and images ↓</a></p>
+      <SectionHeading eyebrow={s.eyebrow} title={s.title} lede={s.lede} />
       <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {designs.map((d) => {
+        {designs.filter((d) => d.group === s.group).map((d) => {
           const files = items.filter((p) => p.design.id === d.id);
           const print = files.filter((p) => p.format.kind === 'pdf');
           const social = files.filter((p) => p.format.kind === 'png');
@@ -94,8 +104,9 @@ const downloadName = (file: string) => file.split('/').pop();
       </ul>
     </div>
   </section>
+  ))}
 
-  <section id="ready" class="py-12 sm:py-16 bg-white">
+  <section id="ready" class="py-12 sm:py-16 bg-mist">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Ready to go" title="Nothing to fill in. Print or post." lede="Signs, handouts, and sheets for tables and meetings, plus images to share." />
       {(['print', 'social'] as const).map((group) => (
@@ -103,7 +114,7 @@ const downloadName = (file: string) => file.split('/').pop();
           <h3 class="mt-10 font-display font-extrabold text-2xl">{group === 'print' ? 'To print' : 'To share'}</h3>
           <ul class="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {ready.filter((r) => r.group === group).map((r) => (
-              <li class="rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
+              <li class="bg-white rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
                 <div class="bg-mist aspect-[4/3] flex items-center justify-center p-4 border-b border-black/10">
                   <img
                     src={href(r.preview)}
