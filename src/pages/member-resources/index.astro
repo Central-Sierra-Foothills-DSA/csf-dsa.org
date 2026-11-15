@@ -40,6 +40,11 @@ const sections = [
             <li><a href={`#${s.id}`} class={linkClass}>{s.label}</a></li>
           ))}
         </ul>
+        <p class="mt-8 pt-6 border-t border-black/10 text-black-2">
+          Background reading:
+          <a href={href('/learn/')} class={linkClass}>What is democratic socialism?</a> ·
+          <a href={href('/about/')} class={linkClass}>How the chapter is organized</a>
+        </p>
       </div>
       <aside class="lg:col-span-5 rounded-xl bg-black text-white p-6 sm:p-8">
         <p class="font-semibold tracking-[0.18em] uppercase text-xs text-red-2">Printable</p>

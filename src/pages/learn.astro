@@ -214,6 +214,13 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
           </li>
         ))}
       </ul>
+      <div class="mt-8 rounded-xl bg-white ring-1 ring-black/10 p-6 sm:flex sm:items-center sm:gap-6">
+        <p class="flex-1 leading-relaxed">
+          <span class="font-display font-extrabold text-lg">Sharing this with someone?</span>
+          <span class="text-black-2"> There's a printable "What is democratic socialism?" handout and a matching social media post, under <em>Signs &amp; handouts</em> in our flyer library.</span>
+        </p>
+        <a href={href('/member-resources/printables/')} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center px-5 py-3 bg-black hover:bg-red text-white font-semibold rounded-md transition-colors">Flyers and printables →</a>
+      </div>
     </div>
   </section>
 

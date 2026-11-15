@@ -9,32 +9,17 @@ import site from '../data/site.json';
 import tabling from '../assets/photos/tabling.jpg';
 import { upcomingEvents, typeOf } from '../lib/events';
 import { href } from '../lib/paths';
+import gettingStarted from '../data/getting-started.json';
+import { resolveLink } from '../lib/member-guide';
 
 // Good first events: branch meetings and socials.
 const firstEvents = upcomingEvents().filter((e) => ['meeting', 'social'].includes(typeOf(e))).slice(0, 3);
 
-const steps = [
-  {
-    title: 'Say hello',
-    body: 'Fill out our short chapter form. It tells us where you live so we can point you to your nearest branch and keep you posted on meetings and actions.',
-    cta: { label: 'Chapter sign-up form', href: site.links.joinChapterForm, external: true },
-  },
-  {
-    title: 'Come to a meeting or a social',
-    body: 'Every branch meeting is open, whether or not you’re a member. Socials are an even easier way in. Bring a friend if you like.',
-    cta: { label: 'Find your branch', href: href('/branches/'), external: false },
-  },
-  {
-    title: 'Become a member',
-    body: 'Join DSA through the national website. You’re placed in our chapter automatically based on where you live. Dues go to DSA National, with monthly and yearly options and reduced rates if money is tight.',
-    cta: { label: 'Join DSA', href: site.links.joinDsaNational, external: true },
-  },
-  {
-    title: 'Find your thing',
-    body: 'Once you’re a member you’ll be invited to the chapter Slack, where the work continues between meetings. Try a working group, help with a campaign, or just keep showing up. Any amount of time is welcome.',
-    cta: { label: 'Member resources', href: href('/member-resources/'), external: false },
-  },
-];
+// Steps live in src/data/getting-started.json, shared with the home page.
+const steps = gettingStarted.steps.map((s) => {
+  const link = resolveLink(s.cta);
+  return { title: s.title, body: s.body, cta: { label: s.cta.label, href: link.href, external: link.external } };
+});
 
 const faqs = [
   { q: 'Do I have to be a member to come to a meeting?', a: 'No. Branch meetings and most events are open to everyone. Only members vote, but guests are welcome to listen and speak.' },
@@ -59,7 +44,7 @@ const faqs = [
             The Democratic Socialists of America is the largest socialist organization in the country. We're a member-run organization of working people who believe the economy and the government should serve everyone, not just the wealthy few.
           </p>
           <p>
-            Central Sierra Foothills DSA is the chapter for {site.counties.slice(0, -1).join(', ')}, and {site.counties.at(-1)} counties. We have about 200 members and four local branches. We run campaigns, show up at city councils, table at community events, and look out for each other.
+            Central Sierra Foothills DSA is the chapter for {site.counties.slice(0, -1).join(', ')}, and {site.counties.at(-1)} counties. We have about {site.approxMembers} members and four local branches. We run campaigns, show up at city councils, table at community events, and look out for each other.
           </p>
         </div>
         <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 font-semibold">

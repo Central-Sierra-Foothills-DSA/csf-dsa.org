@@ -14,7 +14,7 @@ const branches = (await getCollection('branches')).sort((a, b) => a.data.order -
 // Quick facts. Each one is stated elsewhere on this page.
 const facts = [
   { n: site.founded, label: 'founded in Auburn' },
-  { n: '~200', label: 'members' },
+  { n: `~${site.approxMembers}`, label: 'members' },
   { n: String(branches.length), label: 'local branches' },
   { n: String(site.counties.length), label: 'counties' },
   { n: '0', label: 'paid staff' },
@@ -68,7 +68,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
             </p>
             <p>
               The chapter was founded in Auburn in {site.founded}. It began that spring as a reading group that came together around the Bernie Sanders campaign and a local Green New Deal.
-              Today we have about 200 members and branches in Grass Valley / Nevada City, Auburn, Placerville, and Roseville.
+              Today we have about {site.approxMembers} members and branches in Grass Valley / Nevada City, Auburn, Placerville, and Roseville.
             </p>
           </div>
           <div class="mt-8 flex flex-wrap gap-3">
@@ -249,7 +249,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
       </ol>
       <div class="mt-8 rounded-xl ring-1 ring-black/10 p-6 sm:flex sm:items-center sm:gap-6">
         <p class="text-lg leading-relaxed flex-1">
-          The chapter holds a General Meeting every year to elect officers, and at least four regular chapter meetings a year. Branches meet monthly.
+          The chapter holds a General Meeting every year to elect officers, and at least four regular chapter meetings a year. Most branches meet monthly.
         </p>
         <a href={href('/about/bylaws/')} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center px-5 py-3 bg-black hover:bg-red text-white font-semibold rounded-md transition-colors">Read the bylaws →</a>
       </div>

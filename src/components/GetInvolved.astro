@@ -6,26 +6,14 @@ import { href } from '../lib/paths';
 import tabling from '../assets/photos/tabling.jpg';
 import stickers from '../assets/photos/stickers.jpg';
 
-const steps = [
-  {
-    n: '1',
-    title: 'Tell us you’re interested',
-    body: 'Fill out our chapter form so we can connect you with your nearest branch and keep you posted on meetings and actions.',
-    cta: { label: 'Chapter sign-up form', href: site.links.joinChapterForm },
-  },
-  {
-    n: '2',
-    title: 'Come to a meeting',
-    body: 'Every branch meeting is open. Show up, say hi, and see what we’re about. No membership required to attend.',
-    cta: { label: 'See upcoming events', href: href('/events/'), internal: true },
-  },
-  {
-    n: '3',
-    title: 'Become a member',
-    body: 'Join DSA nationally with sliding-scale dues and select Central Sierra Foothills as your chapter. Members vote on endorsements, campaigns, and leadership.',
-    cta: { label: 'Join DSA', href: site.links.joinDsaNational },
-  },
-];
+import gettingStarted from '../data/getting-started.json';
+import { resolveLink } from '../lib/member-guide';
+
+// The first three steps from src/data/getting-started.json, shared with /new-members/.
+const steps = gettingStarted.steps.slice(0, 3).map((s, i) => {
+  const link = resolveLink(s.cta);
+  return { n: String(i + 1), title: s.title, body: s.body, cta: { label: s.cta.label, href: link.href, internal: !link.external } };
+});
 ---
 <section id="get-involved" class="py-20 sm:py-28 bg-white">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
