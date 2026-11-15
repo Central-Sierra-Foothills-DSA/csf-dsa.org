@@ -25,6 +25,22 @@ const practice = [
 const freedoms = ['Free speech', 'Free elections', 'The right to organize'];
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+// Glossary groups, in display order. Each term in glossary.json names its group
+// in `category`. A term with an unknown category fails the build.
+const groupInfo = [
+  { id: 'ideas', title: 'The big ideas', blurb: 'The core ideas behind what we do and why.' },
+  { id: 'organizing', title: 'Workers and organizing', blurb: 'How working people build power together.' },
+  { id: 'policy', title: "What we're fighting for", blurb: 'Big policy ideas you will hear about.' },
+  { id: 'dsa', title: 'How DSA works', blurb: 'The words for how our organization runs.' },
+];
+for (const t of glossary) {
+  if (!groupInfo.some((g) => g.id === t.category)) {
+    throw new Error(`glossary.json: "${t.term}" has unknown category "${t.category}". Use one of: ${groupInfo.map((g) => g.id).join(', ')}`);
+  }
+}
+const groups = groupInfo.map((g) => ({ ...g, terms: glossary.filter((t) => t.category === g.id) }));
+
 // The longest quote gets the big spot.
 const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.text.length);
 ---
@@ -129,22 +145,55 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
   <!-- Glossary -->
   <section id="glossary" class="py-14 sm:py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <SectionHeading eyebrow="Glossary" title="Words you'll hear at meetings." lede="Nobody is born knowing these. Ask at any meeting and someone will happily explain." />
-      <nav aria-label="Glossary terms" class="mt-8">
-        <ul class="flex flex-wrap gap-2">
-          {glossary.map((g) => (
-            <li><a href={`#term-${slug(g.term)}`} class="block px-3.5 py-1.5 rounded-full bg-mist hover:bg-red hover:text-white text-sm font-semibold transition-colors">{g.term}</a></li>
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <SectionHeading eyebrow="Glossary" title="Words you'll hear at meetings." lede="Nobody is born knowing these. Ask at any meeting and someone will happily explain." />
+        <p class="flex items-baseline gap-3">
+          <span class="font-display font-black text-6xl text-red leading-none">{glossary.length}</span>
+          <span class="font-display font-bold text-lg leading-tight">words in<br />{groups.length} groups</span>
+        </p>
+      </div>
+
+      <!-- Index, like the back of a book -->
+      <nav id="glossary-index" aria-label="Glossary index" class="mt-10 scroll-mt-24 rounded-2xl bg-black text-white p-6 sm:p-8">
+        <p class="font-semibold tracking-[0.18em] uppercase text-xs text-red-2">Jump to a word</p>
+        <div class="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {groups.map((g, i) => (
+            <div>
+              <a href={`#group-${g.id}`} class="group flex items-baseline gap-2 hover:text-red-2">
+                <span class="font-display font-black text-red text-sm">{String(i + 1).padStart(2, '0')}</span>
+                <span class="font-display font-extrabold text-lg leading-tight group-hover:underline underline-offset-4">{g.title}</span>
+              </a>
+              <ul class="mt-3 space-y-1.5 border-l border-white/15 pl-4">
+                {g.terms.map((t) => (
+                  <li><a href={`#term-${slug(t.term)}`} class="text-white/75 hover:text-white hover:underline underline-offset-4">{t.term}</a></li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </nav>
-      <dl class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {glossary.map((g) => (
-          <div id={`term-${slug(g.term)}`} class="scroll-mt-24 rounded-r-xl p-6 bg-mist border-l-4 border-red target:bg-red-4/60 target:ring-2 target:ring-red transition-colors">
-            <dt class="font-display font-extrabold text-xl leading-tight">{g.term}</dt>
-            <dd class="mt-2 text-black-1 leading-relaxed">{g.definition}</dd>
-          </div>
-        ))}
-      </dl>
+
+      <!-- One block per group, dictionary style -->
+      {groups.map((g, i) => (
+        <div id={`group-${g.id}`} class="mt-16 sm:mt-20 scroll-mt-24 grid lg:grid-cols-12 gap-6 lg:gap-12 border-t-4 border-black pt-8">
+          <header class="lg:col-span-4">
+            <div class="lg:sticky lg:top-24">
+              <span class="block font-display font-black text-7xl sm:text-8xl leading-none outline-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="mt-3 font-display font-black text-3xl leading-tight">{g.title}</h3>
+              <p class="mt-2 text-black-2 leading-relaxed">{g.blurb}</p>
+              <a href="#glossary-index" class="mt-4 inline-block text-sm font-semibold text-red-dark hover:text-red underline underline-offset-4">↑ Back to the index</a>
+            </div>
+          </header>
+          <dl class="lg:col-span-8 divide-y divide-black/10">
+            {g.terms.map((t) => (
+              <div id={`term-${slug(t.term)}`} class="term scroll-mt-24 relative -ml-4 pl-4 grid sm:grid-cols-[13rem_1fr] gap-x-8 gap-y-2 py-6">
+                <dt class="font-display font-black text-2xl leading-tight">{t.term}</dt>
+                <dd class="text-lg text-black-1 leading-relaxed">{t.definition}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -179,3 +228,24 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
     </div>
   </section>
 </Base>
+
+<style>
+  /* Outlined group numbers in the glossary. */
+  .outline-num {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--color-red);
+  }
+  /* The entry you jumped to gets a red bar and a tint. */
+  .term:target {
+    background: color-mix(in srgb, var(--color-red-4) 45%, transparent);
+  }
+  .term:target::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--color-red);
+  }
+</style>
