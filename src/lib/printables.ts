@@ -3,6 +3,7 @@
 // `npm run printables` reads. Text lives in src/data/printables.json.
 import { getCollection } from 'astro:content';
 import data from '../data/printables.json';
+import quotes from '../data/quotes.json';
 import { resolveLink, displayUrl, type GuideLink } from './member-guide';
 
 export { data as printablesText };
@@ -131,3 +132,53 @@ export async function getPrintables(): Promise<Printable[]> {
 
 /** Preview image for a design's card on the library page. */
 export const previewFile = (designId: string) => `${printablesDir}/previews/${designId}.jpg`;
+
+// ---------------------------------------------------------------------------
+// Ready-made printables: nothing to fill in. Each one is a layout in
+// src/components/printables/ready/.
+
+export type ReadyLayout = 'table-sign' | 'handout' | 'sign-in' | 'standards' | 'ds-social' | 'quote';
+
+export type ReadyItem = {
+  slug: string;
+  layout: ReadyLayout;
+  title: string;
+  blurb: string;
+  group: 'print' | 'social';
+  kind: 'pdf' | 'png';
+  /** Paper size in inches (PDF) or image size in pixels (PNG). */
+  sheet?: { w: number; h: number };
+  px?: { w: number; h: number };
+  /** Copies per sheet (PDF only). */
+  cols: number;
+  rows: number;
+  size: string;
+  file: string;
+  /** Image shown on the library page. */
+  preview: string;
+  /** Extra data for the layout, e.g. which quote. */
+  index?: number;
+};
+
+export function getReadyMade(): ReadyItem[] {
+  const r = data.ready;
+  const pdf = (slug: string, layout: ReadyLayout, t: { title: string; blurb: string }, sheet: { w: number; h: number }, size: string, cols = 1, rows = 1): ReadyItem => ({
+    slug, layout, title: t.title, blurb: t.blurb, group: 'print', kind: 'pdf', sheet, cols, rows, size,
+    file: `${printablesDir}/csf-dsa-${slug}.pdf`, preview: `${printablesDir}/previews/${slug}.jpg`,
+  });
+  const png = (slug: string, layout: ReadyLayout, title: string, blurb: string, px: { w: number; h: number }, index?: number): ReadyItem => {
+    const file = `${printablesDir}/csf-dsa-${slug}.png`;
+    return { slug, layout, title, blurb, group: 'social', kind: 'png', px, cols: 1, rows: 1, size: `${px.w} × ${px.h} px`, file, preview: file, index };
+  };
+  return [
+    pdf('table-sign', 'table-sign', r.tableSign, { w: 11, h: 8.5 }, '11 × 8.5 in (landscape)'),
+    pdf('what-is-democratic-socialism', 'handout', r.handout, { w: 11, h: 8.5 }, '5.5 × 8.5 in, 2 per sheet', 2, 1),
+    pdf('sign-in-sheet', 'sign-in', r.signIn, { w: 8.5, h: 11 }, '8.5 × 11 in'),
+    pdf('community-standards', 'standards', r.standards, { w: 8.5, h: 11 }, '8.5 × 11 in'),
+    png('what-is-democratic-socialism-post', 'ds-social', r.dsSocial.title, r.dsSocial.blurb, { w: 1080, h: 1350 }),
+    ...quotes.map((q, i) =>
+      png(`quote-${slugify(q.who)}`, 'quote', `${r.quotes.title}: ${q.who}`, r.quotes.blurb, { w: 1080, h: 1080 }, i)),
+  ];
+}
+
+const slugify = (s: string) => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

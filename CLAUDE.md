@@ -117,6 +117,14 @@ over every element marked `data-field`. Copies on one sheet share field names, s
 together. It fails if any text runs off a flyer; shorten the text if that happens. Commit
 the regenerated files. CI does not rebuild them.
 
+The library also has ready-made items with nothing to fill in: a table sign, a "What is
+democratic socialism?" handout and post, a sign-in sheet, a community standards poster,
+and a quote card per entry in `src/data/quotes.json`. They're listed in `getReadyMade()`
+in `src/lib/printables.ts`, with layouts in `src/components/printables/ready/`. Most of
+their text comes from existing data (`member-guide.json`, `glossary.json`, `quotes.json`,
+`working-groups.json`), so editing those changes the printables too. Rerun
+`npm run printables` after.
+
 The fill-in boxes are deliberately limited to event details (when, where, a short note,
 each with a character limit). Headlines, logos, QR codes, and links stay fixed. Don't add
 a free-form headline field or an in-browser flyer editor without discussing it first.

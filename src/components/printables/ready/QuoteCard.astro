@@ -1,0 +1,28 @@
+---
+// Square quote card. Quotes from quotes.json. Sizes in cqw.
+import { Image } from 'astro:assets';
+import site from '../../../data/site.json';
+import quotes from '../../../data/quotes.json';
+import { displayUrl } from '../../../lib/member-guide';
+import badgeWhite from '../../../assets/logos/csf-dsa-white.png';
+
+interface Props { index: number }
+const q = quotes[Astro.props.index];
+// Longer quotes get smaller type so every card fits.
+const size = q.text.length > 120 ? 'text-[6cqw]' : q.text.length > 70 ? 'text-[7cqw]' : 'text-[8.4cqw]';
+const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
+---
+<article class="@container w-full h-full bg-black text-white flex flex-col overflow-hidden p-[8cqw]">
+  <span class="font-display font-black text-red text-[22cqw] leading-[0.6] h-[11cqw]" aria-hidden="true">“</span>
+  <div class="flex-1 flex flex-col justify-center">
+    <blockquote class:list={['font-display font-extrabold leading-[1.12] tracking-[-0.005em]', size]}>{q.text}</blockquote>
+    <div class="mt-[5cqw] h-[1.2cqw] w-[14cqw] bg-red"></div>
+    <p class="mt-[3cqw] font-display font-bold text-[4.4cqw]">{q.who}</p>
+    <p class="mt-[0.6cqw] text-[3.2cqw] text-white/70">{q.where}</p>
+  </div>
+  <footer class="flex items-center gap-[2.5cqw]">
+    <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[9cqw] h-[9cqw]" />
+    <p class="flex-1 font-display font-bold text-[3.2cqw] leading-[1.1]">Central Sierra<br />Foothills DSA</p>
+    <p class="text-[3.2cqw] font-semibold text-white/85">{instagram}</p>
+  </footer>
+</article>

@@ -39,7 +39,7 @@ const kb = (path) => `${Math.round(statSync(path).size / 1024)} KB`;
 
 // Text that doesn't fit gets clipped silently, so check for it.
 const overflowing = (page) =>
-  page.$$eval('.flyer, .social', (els) =>
+  page.$$eval('.sheet article', (els) =>
     els.some((el) => [...el.querySelectorAll('*')].some((c) => {
       const r = c.getBoundingClientRect(), box = el.getBoundingClientRect();
       return r.height > 0 && r.bottom > box.bottom + 0.5;
@@ -85,7 +85,7 @@ try {
         };
       });
     });
-    if (fields.length === 0) throw new Error(`${item.slug}: no fill-in boxes found`);
+    if (item.fillable && fields.length === 0) throw new Error(`${item.slug}: no fill-in boxes found`);
 
     const printed = await page.pdf({ preferCSSPageSize: true, printBackground: true });
     const pdf = await PDFDocument.load(printed);
@@ -118,13 +118,13 @@ try {
       });
     }
     for (const field of made.values()) field.setFontSize(item.fieldPt);
-    form.updateFieldAppearances(font);
-    pdf.setTitle(`Central Sierra Foothills DSA flyer`);
+    if (made.size) form.updateFieldAppearances(font);
+    pdf.setTitle(`Central Sierra Foothills DSA`);
     pdf.setAuthor('Central Sierra Foothills DSA');
 
     const path = out(item.file);
     writeFileSync(path, await pdf.save());
-    console.log(`${item.file} (${kb(path)}, ${made.size} fill-in boxes)`);
+    console.log(`${item.file} (${kb(path)}${made.size ? `, ${made.size} fill-in boxes` : ''})`);
 
     if (item.preview) {
       await page.emulateMediaType('screen');

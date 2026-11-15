@@ -5,9 +5,10 @@ import PageHeader from '../../../components/PageHeader.astro';
 import SectionHeading from '../../../components/SectionHeading.astro';
 import site from '../../../data/site.json';
 import { href } from '../../../lib/paths';
-import { getDesigns, getPrintables, previewFile, printablesText } from '../../../lib/printables';
+import { getDesigns, getPrintables, getReadyMade, previewFile, printablesText } from '../../../lib/printables';
 
 const designs = await getDesigns();
+const ready = getReadyMade();
 const items = await getPrintables();
 const { howTo, rules } = printablesText;
 const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
@@ -17,7 +18,7 @@ const downloadName = (file: string) => file.split('/').pop();
   <PageHeader
     eyebrow="For members"
     title="Flyers and printables."
-    lede="Flyers for tables, bulletin boards, and meetings, plus images for social media. Fill in your event details, then print."
+    lede="Flyers you can fill in with your event details, plus ready-to-go signs, handouts, and images for tables, meetings, and social media."
     back={{ href: href('/member-resources/'), label: 'Member resources' }}
   />
 
@@ -49,6 +50,7 @@ const downloadName = (file: string) => file.split('/').pop();
   <section class="py-12 sm:py-16 bg-mist">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Flyers" title="Pick a flyer, pick a size." lede="Print sizes are PDFs with fill-in boxes. Social sizes are PNG images, ready to post." />
+      <p class="mt-4"><a href="#ready" class={linkClass}>Skip to ready-to-go signs, handouts, and images ↓</a></p>
       <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {designs.map((d) => {
           const files = items.filter((p) => p.design.id === d.id);
@@ -90,6 +92,39 @@ const downloadName = (file: string) => file.split('/').pop();
           );
         })}
       </ul>
+    </div>
+  </section>
+
+  <section id="ready" class="py-12 sm:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="Ready to go" title="Nothing to fill in. Print or post." lede="Signs, handouts, and sheets for tables and meetings, plus images to share." />
+      {(['print', 'social'] as const).map((group) => (
+        <>
+          <h3 class="mt-10 font-display font-extrabold text-2xl">{group === 'print' ? 'To print' : 'To share'}</h3>
+          <ul class="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {ready.filter((r) => r.group === group).map((r) => (
+              <li class="rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
+                <div class="bg-mist aspect-[4/3] flex items-center justify-center p-4 border-b border-black/10">
+                  <img
+                    src={href(r.preview)}
+                    alt={`Preview: ${r.title}`}
+                    loading="lazy"
+                    class="max-w-full max-h-full w-auto h-auto shadow-md"
+                  />
+                </div>
+                <div class="p-5 flex-1 flex flex-col">
+                  <h4 class="font-display font-extrabold text-lg leading-snug">{r.title}</h4>
+                  <p class="mt-1 text-black-2 text-sm leading-relaxed flex-1">{r.blurb}</p>
+                  <p class="mt-3">
+                    <a href={href(r.file)} download={downloadName(r.file)} class={linkClass}>Download {r.kind.toUpperCase()}</a>
+                    <span class="block text-sm text-black-2">{r.size}</span>
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      ))}
     </div>
   </section>
 </Base>

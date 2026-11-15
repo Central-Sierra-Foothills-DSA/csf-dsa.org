@@ -30,6 +30,44 @@
     "labels": { "when": "When", "where": "Where", "note": "Also" }
   },
 
+  "_ready": "Ready-made printables with nothing to fill in. Most of their text comes from other files: member-guide.json (democratic socialism, community standards), glossary.json, quotes.json, and working-groups.json.",
+  "ready": {
+    "tableSign": {
+      "title": "Table sign",
+      "blurb": "Stand it up on your table so people know who you are.",
+      "headline": "Talk to a socialist.",
+      "sub": "Ask us anything. Then come organize with your neighbors.",
+      "cta": "Scan to join us"
+    },
+    "handout": {
+      "title": "What is democratic socialism?",
+      "blurb": "A short handout for people who are curious. Two per sheet.",
+      "cta": "Learn more",
+      "join": "Join us"
+    },
+    "signIn": {
+      "title": "Sign-in sheet",
+      "blurb": "For tables and events, so you can follow up with the people you meet.",
+      "headline": "Stay in touch.",
+      "intro": "Leave your info and someone from the chapter will follow up.",
+      "columns": ["Name", "Email", "Phone", "Town", "Interested in"],
+      "rows": 17,
+      "phoneCta": "Rather sign up on your phone?"
+    },
+    "standards": {
+      "title": "Community standards poster",
+      "blurb": "Put it up at meetings so everyone knows what we expect of each other."
+    },
+    "dsSocial": {
+      "title": "What is democratic socialism? (post)",
+      "blurb": "A one-image explainer to share."
+    },
+    "quotes": {
+      "title": "Quote cards",
+      "blurb": "Square images to share, one quote each."
+    }
+  },
+
   "howTo": [
     "Open the PDF in a browser (Chrome, Edge, Firefox), Adobe Acrobat Reader, or Preview on a Mac.",
     "Click a line under \"Our next event\" and type. On half-page and quarter-page sheets, every copy on the sheet updates at once.",
