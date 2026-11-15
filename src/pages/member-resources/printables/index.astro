@@ -7,6 +7,7 @@ import SectionHeading from '../../../components/SectionHeading.astro';
 import site from '../../../data/site.json';
 import { href } from '../../../lib/paths';
 import { getDesigns, getPrintables, getReadyMade, previewFile, printablesText } from '../../../lib/printables';
+import { getUploads, uploadsFolder } from '../../../lib/uploads';
 
 const designs = await getDesigns();
 const ready = getReadyMade();
@@ -19,6 +20,11 @@ const items = await getPrintables();
 const { howTo, rules } = printablesText;
 const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
 const downloadName = (file: string) => file.split('/').pop();
+
+// Member uploads. The button opens the folder on GitHub, whose README explains uploading.
+const uploads = getUploads();
+const uploadFolder = `${site.links.github}/tree/main/${uploadsFolder}`;
+const dateFmt = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 ---
 <Base title="Flyers and printables" description="Printable flyers and social media images for Central Sierra Foothills DSA, for tabling, meetings, and events. Fill in your event details before you print.">
   <PageHeader
@@ -28,7 +34,7 @@ const downloadName = (file: string) => file.split('/').pop();
     back={{ href: href('/member-resources/'), label: 'Member resources' }}
   >
     <nav aria-label="On this page" class="mt-6 flex flex-wrap gap-2">
-      {[['#join', 'Join us flyers'], ['#event', 'Event flyers'], ['#hangouts', 'Hangouts and socials'],['#ready', 'Signs, handouts, and images']].map(([to, label]) => (
+      {[['#shared', 'Shared flyers'], ['#join', 'Join us flyers'], ['#event', 'Event flyers'], ['#hangouts', 'Hangouts and socials'],['#ready', 'Signs, handouts, and images']].map(([to, label]) => (
         <a href={to} class="px-4 py-2 rounded-full bg-white/10 ring-1 ring-white/40 hover:bg-white hover:text-red-dark font-semibold text-sm transition-colors">{label}</a>
       ))}
     </nav>
@@ -57,6 +63,51 @@ const downloadName = (file: string) => file.split('/').pop();
         </ul>
         <p class="mt-4 text-black-2">Questions? Email <a href={`mailto:${site.contactEmail}`} class={linkClass}>{site.contactEmail}</a>.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- Shared flyers: whatever members have uploaded to public/files/printables/uploads/ -->
+  <section id="shared" class="py-12 sm:py-16 bg-black text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-12 gap-8 items-end">
+        <div class="lg:col-span-8">
+          <SectionHeading eyebrow="Shared flyers" title="Made by members, for the chapter." tone="dark" lede="Flyers for specific events and campaigns, uploaded by members and reviewed by the steering committee." />
+        </div>
+        <div class="lg:col-span-4 lg:text-right">
+          <a href={uploadFolder} target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-3 bg-red hover:bg-red-dark rounded-md font-semibold transition-colors">
+            Add a flyer <span aria-hidden="true">↗</span>
+          </a>
+          <p class="mt-2 text-sm text-white/60">Needs a GitHub account with access to the site.</p>
+        </div>
+      </div>
+
+      {uploads.length > 0 ? (
+        <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {uploads.map((u) => (
+            <li class="bg-white text-black rounded-xl overflow-hidden flex flex-col">
+              <div class="aspect-[4/3] bg-mist flex items-center justify-center p-4 border-b border-black/10">
+                {u.preview ? (
+                  <img src={u.preview} alt={`Preview: ${u.title}`} loading="lazy" class="max-w-full max-h-full w-auto h-auto shadow-md" />
+                ) : (
+                  <span class="w-20 h-24 rounded-md bg-red text-white font-display font-black text-xl flex items-end justify-center pb-3 shadow-md" aria-hidden="true">PDF</span>
+                )}
+              </div>
+              <div class="p-5 flex-1 flex flex-col">
+                {u.date && <p class="text-xs font-semibold tracking-[0.16em] uppercase text-red-dark">{dateFmt.format(u.date)}</p>}
+                <h3 class="mt-1 font-display font-extrabold text-lg leading-snug">{u.title}</h3>
+                {u.description && <p class="mt-1 text-sm text-black-2 leading-relaxed">{u.description}</p>}
+                <p class="mt-auto pt-4">
+                  <a href={u.file} download={u.fileName} class={linkClass}>Download {u.kind === 'pdf' ? 'PDF' : 'image'}</a>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="mt-10 rounded-xl ring-1 ring-white/15 p-6 text-white/80 leading-relaxed max-w-3xl">
+          Nothing here yet. Made a flyer for an event? Steering committee members can add it with the button above. The folder on GitHub explains how, step by step.
+        </p>
+      )}
     </div>
   </section>
 

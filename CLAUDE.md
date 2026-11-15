@@ -46,6 +46,7 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | Working groups                   | `src/data/working-groups.json`                     |
 | Allied organizations             | `src/data/partners.json` (`name`, optional `url` and `blurb`). The section on `/about/` appears once this has entries. |
 | New member guide and packet text | `src/data/member-guide.json`, then `npm run packet` (see below) |
+| Shared flyers (member uploads)   | Drop files in `src/flyers/` (see its README). Listed automatically by `src/lib/uploads.ts` |
 | Flyer text and sizes             | `src/data/printables.json` and `formats` in `src/lib/printables.ts`, then `npm run printables` (see below) |
 | Glossary terms, quotes           | `src/data/glossary.json` (each term needs a `category`: ideas, organizing, policy, or dsa; groups are defined in `src/pages/learn.astro`), `src/data/quotes.json` |
 | Further-reading links            | `src/data/resources.json`                          |
