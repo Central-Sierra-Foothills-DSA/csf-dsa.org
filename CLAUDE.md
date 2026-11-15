@@ -36,7 +36,8 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 
 | You want to change...            | Edit this                                          |
 |----------------------------------|----------------------------------------------------|
-| Org name, tagline, links, social, email | `src/data/site.json`                        |
+| Org name, tagline, links, social, email, approximate member count (`approxMembers`) | `src/data/site.json` |
+| Getting-started steps (New here and the home page) | `src/data/getting-started.json` |
 | A branch's schedule, venue, or description | `src/content/branches/<name>.md`         |
 | Add a branch                     | New file in `src/content/branches/` (copy an existing one) |
 | A campaign or endorsement        | `src/content/campaigns/<name>.md`                  |
