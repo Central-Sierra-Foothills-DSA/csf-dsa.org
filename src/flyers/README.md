@@ -1,8 +1,8 @@
 # Shared flyers
 
 Files in this folder appear on the website's
-[Flyers and printables](https://csf-dsa.org/member-resources/printables/#shared)
-page under **Shared flyers**. You don't need to touch any code.
+[Flyers and printables](https://csf-dsa.org/member-resources/printables/)
+page under the **Shared by members** tab. You don't need to touch any code.
 
 ## How to add a flyer
 
