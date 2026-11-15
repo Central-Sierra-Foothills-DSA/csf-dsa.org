@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
+import Journey from '../components/Journey.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import EventList from '../components/EventList.astro';
 import site from '../data/site.json';
@@ -47,6 +48,7 @@ const faqs = [
 ---
 <Base title="New here? Start here" description="New to Central Sierra Foothills DSA? What DSA is, what a first meeting is like, and how to join.">
   <PageHeader eyebrow="Welcome" title="New here? Start here." lede="You don't need to be an expert, or even a member, to get involved. Here's what to expect and how to take the first step." />
+  <Journey current="curious" />
 
   <section class="py-12 sm:py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">

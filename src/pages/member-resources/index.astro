@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import Journey from '../../components/Journey.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import site from '../../data/site.json';
 import groups from '../../data/working-groups.json';
@@ -11,24 +12,34 @@ import { guide, resolveLink, packetPath } from '../../lib/member-guide';
 const packet = href(packetPath);
 const { membership, structure, participation, tools, standards, workbook, nextSteps } = guide;
 const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
+// Jump links at the top of the page. Each id matches a section below.
+const sections = [
+  { id: 'membership', label: 'Voting membership and dues' },
+  { id: 'how-it-works', label: 'Branches and working groups' },
+  { id: 'participation', label: 'Taking part' },
+  { id: 'stay-connected', label: 'Slack, email, and calendars' },
+  { id: 'standards', label: 'Community standards' },
+  { id: 'workbook', label: 'The optional workbook' },
+  { id: 'printables', label: 'Flyers and printables' },
+];
 ---
 <Base title="Member resources" description="A guide for new members of Central Sierra Foothills DSA: how the chapter works, how to stay connected, our community standards, and a printable new member packet.">
-  <PageHeader eyebrow="For members" title="Welcome to the chapter." lede="You joined. Here's how the chapter works, where the conversation happens, and how to find your place in the work. Whether you're new to organizing or not, you belong here." />
+  <PageHeader eyebrow="For members" title="Welcome to the chapter." lede="You joined. Here's how the chapter works, where the conversation happens, and how to find your place in the work.">
+    <p class="mt-5 font-semibold">
+      Not a member yet? <a href={href('/new-members/')} class="underline underline-offset-4 decoration-2 hover:decoration-white/60">Start with New here →</a>
+    </p>
+  </PageHeader>
+  <Journey current="joined" />
 
   <section class="py-12 sm:py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">
       <div class="lg:col-span-7">
-        <SectionHeading eyebrow="Start here" title="One chapter, a lot of ground." />
-        <div class="mt-6 space-y-5 text-lg leading-relaxed">
-          <p>
-            Our chapter covers {site.counties.slice(0, -1).join(', ')}, and {site.counties.at(-1)} counties, from Roseville and El Dorado Hills up to Truckee and Tahoe. {guide.region}
-          </p>
-          <p>Our goal is simple: {guide.goal.charAt(0).toLowerCase() + guide.goal.slice(1)}</p>
-        </div>
-        <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-          <a href={href('/learn/')} class={linkClass}>What is democratic socialism? →</a>
-          <a href={href('/about/')} class={linkClass}>About the chapter →</a>
-        </div>
+        <SectionHeading eyebrow="On this page" title="Everything you need to get going." />
+        <ul class="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-3 text-lg">
+          {sections.map((s) => (
+            <li><a href={`#${s.id}`} class={linkClass}>{s.label}</a></li>
+          ))}
+        </ul>
       </div>
       <aside class="lg:col-span-5 rounded-xl bg-black text-white p-6 sm:p-8">
         <p class="font-semibold tracking-[0.18em] uppercase text-xs text-red-2">Printable</p>

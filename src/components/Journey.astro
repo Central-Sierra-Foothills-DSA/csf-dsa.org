@@ -1,0 +1,51 @@
+---
+// "You are here" strip that ties the newcomer and member pages together:
+// Curious (New here) → Joined (Member resources) → Getting active (Flyers).
+// Put it right under <PageHeader> on each of those pages.
+import { href } from '../lib/paths';
+
+interface Props {
+  current: 'curious' | 'joined' | 'active';
+}
+const { current } = Astro.props;
+
+const steps = [
+  { id: 'curious', label: 'Curious', title: 'New here', body: 'Who we are, what a meeting is like, and how to join.', path: '/new-members/' },
+  { id: 'joined', label: 'Just joined', title: 'Member resources', body: 'How the chapter works, Slack, and our community standards.', path: '/member-resources/' },
+  { id: 'active', label: 'Getting active', title: 'Flyers and printables', body: 'Flyers, signs, and handouts for tabling and events.', path: '/member-resources/printables/' },
+] as const;
+---
+<nav aria-label="Where to start" class="bg-white border-b border-black/10">
+  <ol class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 grid sm:grid-cols-3 gap-3">
+    {steps.map((s, i) => {
+      const here = s.id === current;
+      return (
+        <li>
+          <a
+            href={href(s.path)}
+            aria-current={here ? 'page' : undefined}
+            class:list={[
+              'h-full flex gap-3 rounded-lg p-4 transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-red',
+              here ? 'bg-red text-white' : 'bg-mist hover:bg-black-4/50',
+            ]}
+          >
+            <span
+              class:list={[
+                'w-8 h-8 shrink-0 rounded-full font-display font-black text-sm flex items-center justify-center',
+                here ? 'bg-white text-red-dark' : 'bg-black text-white',
+              ]}
+              aria-hidden="true"
+            >{i + 1}</span>
+            <span class="min-w-0">
+              <span class:list={['block text-xs font-semibold tracking-[0.16em] uppercase', here ? 'text-white/85' : 'text-red-dark']}>
+                {s.label}{here && <span class="sr-only"> (you are here)</span>}
+              </span>
+              <span class="block font-display font-extrabold text-lg leading-tight">{s.title}</span>
+              <span class:list={['block mt-1 text-sm leading-snug', here ? 'text-white/85' : 'text-black-2']}>{s.body}</span>
+            </span>
+          </a>
+        </li>
+      );
+    })}
+  </ol>
+</nav>

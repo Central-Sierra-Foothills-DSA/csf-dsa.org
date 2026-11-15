@@ -2,6 +2,7 @@
 // The flyer library. Text in src/data/printables.json; files built by `npm run printables`.
 import Base from '../../../layouts/Base.astro';
 import PageHeader from '../../../components/PageHeader.astro';
+import Journey from '../../../components/Journey.astro';
 import SectionHeading from '../../../components/SectionHeading.astro';
 import site from '../../../data/site.json';
 import { href } from '../../../lib/paths';
@@ -32,6 +33,7 @@ const downloadName = (file: string) => file.split('/').pop();
       ))}
     </nav>
   </PageHeader>
+  <Journey current="active" />
 
   <section class="py-12 sm:py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-6">
