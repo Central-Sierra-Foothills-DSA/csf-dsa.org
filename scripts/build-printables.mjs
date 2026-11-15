@@ -59,7 +59,8 @@ try {
       await page.evaluate(() => document.fonts.ready);
       if (await overflowing(page)) warnings.push(item.slug);
       const path = out(item.file);
-      await (await page.$('.sheet')).screenshot({ path, type: 'png' });
+      const jpg = item.file.endsWith('.jpg');
+      await (await page.$('.sheet')).screenshot({ path, type: jpg ? 'jpeg' : 'png', ...(jpg && { quality: 88 }) });
       console.log(`${item.file} (${kb(path)})`);
       continue;
     }

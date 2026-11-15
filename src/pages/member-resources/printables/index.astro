@@ -10,9 +10,9 @@ import { getDesigns, getPrintables, getReadyMade, previewFile, printablesText } 
 const designs = await getDesigns();
 const ready = getReadyMade();
 const flyerSections = [
-  { id: 'join', group: 'join', bg: 'bg-mist', eyebrow: 'Join us', title: 'Ready-made recruiting flyers.', lede: 'Nothing to fill in. The QR code goes to the chapter sign-up form. Print sizes are PDFs; social sizes are PNG images.' },
-  { id: 'event', group: 'event', bg: 'bg-white', eyebrow: 'Event flyers', title: 'Add your event, then print.', lede: 'Print sizes are PDFs with fill-in boxes for when, where, and a short note. Social sizes are PNG images, ready to post.' },
-  { id: 'hangouts', group: 'hangout', bg: 'bg-mist', eyebrow: 'Hangouts and socials', title: 'Coffee, snacks, and good company.', lede: 'Invitations to socials, with fill-in boxes for when and where. The QR code goes to the events calendar. Social sizes are PNG images that point people to the calendar.' },
+  { id: 'join', group: 'join', bg: 'bg-mist', eyebrow: 'Join us', title: 'Ready-made recruiting flyers.', lede: 'Nothing to fill in. The QR code goes to the chapter sign-up form. Print sizes are PDFs; social sizes are JPG images.' },
+  { id: 'event', group: 'event', bg: 'bg-white', eyebrow: 'Event flyers', title: 'Add your event, then print.', lede: 'Print sizes are PDFs with fill-in boxes for when, where, and a short note. Social sizes are JPG images, ready to post.' },
+  { id: 'hangouts', group: 'hangout', bg: 'bg-mist', eyebrow: 'Hangouts and socials', title: 'Coffee, snacks, and good company.', lede: 'Invitations to socials, with fill-in boxes for when and where. The QR code goes to the events calendar. Social sizes are JPG images that point people to the calendar.' },
 ] as const;
 const items = await getPrintables();
 const { howTo, rules } = printablesText;
@@ -89,7 +89,7 @@ const downloadName = (file: string) => file.split('/').pop();
                   ))}
                 </ul>
 
-                <h4 class="mt-5 text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">Social media (PNG)</h4>
+                <h4 class="mt-5 text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">Social media (JPG)</h4>
                 <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-2">
                   {social.map((p) => (
                     <li>

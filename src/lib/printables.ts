@@ -151,7 +151,9 @@ export async function getPrintables(): Promise<Printable[]> {
       const format: Format = formats[formatId];
       const slug = `${design.id}-${formatId}`;
       const fields = format.kind === 'pdf' && design.group !== 'join' ? format.fields : {};
-      return { slug, design, formatId, format, fields, file: `${printablesDir}/csf-dsa-${slug}.${format.kind}` };
+      // Social images have a photo or texture, so JPG is far smaller than PNG.
+      const ext = format.kind === 'pdf' ? 'pdf' : 'jpg';
+      return { slug, design, formatId, format, fields, file: `${printablesDir}/csf-dsa-${slug}.${ext}` };
     }),
   );
 }
