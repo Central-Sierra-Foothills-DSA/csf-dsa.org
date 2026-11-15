@@ -65,6 +65,8 @@ export type Design = {
   tone?: 'red' | 'black';
   /** Heading of the fill-in box, if not the default. */
   fieldTitle?: string;
+  /** Line icon shown in the header (hangouts). */
+  icon?: 'chat' | 'coffee' | 'snack' | 'pot';
   title: string;
   eyebrow: string;
   headline: string;
@@ -134,7 +136,7 @@ export async function getDesigns(): Promise<Design[]> {
   const eventsQr = linkFor(data.hangoutQr);
   for (const h of data.hangouts) {
     designs.push({
-      id: h.id, group: 'hangout', tone: 'black', fieldTitle: data.hangoutFieldTitle,
+      id: h.id, group: 'hangout', tone: 'black', fieldTitle: data.hangoutFieldTitle, icon: h.icon as Design['icon'],
       title: h.title, eyebrow: h.eyebrow, headline: h.headline, body: h.body,
       cta: data.hangoutCta, socialCta: data.hangoutSocialCta, qrUrl: eventsQr, qrLabel: displayUrl(eventsQr),
     });

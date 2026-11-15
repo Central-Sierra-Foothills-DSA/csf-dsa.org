@@ -59,10 +59,11 @@
   "joinCta": "Scan to join us",
   "joinSocialCta": "Join us",
 
-  "_hangouts": "Invitations to socials and hangouts. They have fill-in boxes for when and where, and a black header so they look different from the recruiting flyers. The QR code goes to the events calendar.",
+  "_hangouts": "Invitations to socials and hangouts. They have fill-in boxes for when and where, and a black header so they look different from the recruiting flyers. The QR code goes to the events calendar. `icon` is one of chat, coffee, snack, pot (drawn in src/components/printables/Icon.astro).",
   "hangouts": [
     {
       "id": "hangout-come-hang-out",
+      "icon": "chat",
       "title": "Come hang out",
       "eyebrow": "Social",
       "headline": "Come hang out.",
@@ -70,6 +71,7 @@
     },
     {
       "id": "hangout-coffee",
+      "icon": "coffee",
       "title": "Coffee with socialists",
       "eyebrow": "Social",
       "headline": "Coffee with socialists.",
@@ -77,6 +79,7 @@
     },
     {
       "id": "hangout-snacks",
+      "icon": "snack",
       "title": "Snacks and solidarity",
       "eyebrow": "Social",
       "headline": "Snacks and solidarity.",
@@ -84,6 +87,7 @@
     },
     {
       "id": "hangout-potluck",
+      "icon": "pot",
       "title": "Potluck",
       "eyebrow": "Potluck",
       "headline": "Bring a dish. Bring a friend.",

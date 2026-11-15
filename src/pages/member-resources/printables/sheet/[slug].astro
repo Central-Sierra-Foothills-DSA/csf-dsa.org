@@ -44,7 +44,7 @@ const ReadyLayout = ready && {
     >
       {Array.from({ length: cols * rows }, () => (
         <div class="min-w-0 min-h-0">
-          {flyer && flyer.format.kind === 'pdf' && <Flyer design={flyer.design} fields={flyer.fields} />}
+          {flyer && flyer.format.kind === 'pdf' && <Flyer design={flyer.design} fields={flyer.fields} tall={flyer.formatId === 'half'} />}
           {ReadyLayout && <ReadyLayout />}
         </div>
       ))}

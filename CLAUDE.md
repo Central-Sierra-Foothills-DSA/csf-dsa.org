@@ -111,7 +111,11 @@ list). Add or reword designs in those lists. Each comes in six formats: letter
 poster, half-page (2 per sheet), quarter-page (4 per sheet), and three social image sizes.
 Text is in `src/data/printables.json`. Sizes and fill-in box limits are in `formats` in
 `src/lib/printables.ts`. The layouts are `src/components/printables/Flyer.astro` and
-`Social.astro`, sized in `cqw` so one design scales to every size.
+`Social.astro`, sized in `cqw` so one design scales to every size. Red designs use
+`src/assets/photos/foresthill-bridge-red.jpg`, a red-tinted copy made with
+`node scripts/make-red-photo.mjs <in> <out>`. Don't tint photos with CSS filters or blend
+modes in these layouts: Chrome turns them into huge images and the PDFs balloon to megabytes.
+Hangout icons are drawn in `src/components/printables/Icon.astro`.
 
 To update: edit, start `npm run dev`, then run `npm run printables` (or
 `npm run printables -- auburn` for matching files only). The script (puppeteer-core and

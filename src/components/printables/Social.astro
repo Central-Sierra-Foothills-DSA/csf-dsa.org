@@ -1,12 +1,16 @@
 ---
 // One social media image. Fills its parent box and scales with it (sizes in cqw),
 // so the same design works as a square post, a portrait post, and a story.
+// Matches the print flyers: red with the tinted Foresthill Bridge photo, or black
+// with a line icon for hangouts.
 import { Image } from 'astro:assets';
 import QR from '../QR.astro';
+import Icon from './Icon.astro';
 import site from '../../data/site.json';
 import { displayUrl } from '../../lib/member-guide';
 import type { Design } from '../../lib/printables';
 import badgeWhite from '../../assets/logos/csf-dsa-white.png';
+import bridge from '../../assets/photos/foresthill-bridge-red.jpg';
 
 interface Props {
   design: Design;
@@ -16,25 +20,38 @@ interface Props {
   tall?: boolean;
 }
 const { design, compact = false, tall = false } = Astro.props;
+const dark = design.tone === 'black';
 const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
 ---
-<article class:list={['social @container w-full h-full text-white', design.tone === 'black' ? 'bg-black' : 'bg-red', ' flex flex-col overflow-hidden', tall ? 'p-[8cqw] pt-[14cqw] pb-[16cqw]' : 'p-[7cqw]']}>
-  <header class="flex items-center gap-[3cqw]">
+<article class:list={['social @container relative w-full h-full text-white flex flex-col overflow-hidden', dark ? 'bg-black' : 'bg-red', tall ? 'p-[8cqw] pt-[14cqw] pb-[16cqw]' : 'p-[7cqw]']}>
+  {dark ? (
+    <>
+      <svg class:list={['absolute right-0 top-0 w-[65%] opacity-40', tall ? 'h-[30%]' : 'h-[50%]']} aria-hidden="true"><defs><pattern id="sdots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="11" cy="11" r="2.2" fill="#ec1f27" /></pattern></defs><rect width="100%" height="100%" fill="url(#sdots)" /></svg>
+      {design.icon && <Icon name={design.icon} class:list={['absolute right-[7cqw] text-white', tall ? 'top-[13cqw] w-[30cqw] h-[30cqw]' : 'top-[6cqw] w-[24cqw] h-[24cqw]']} />}
+    </>
+  ) : (
+    <>
+      <Image loading="eager" src={bridge} alt="" format="jpg" quality={70} widths={[1080]} sizes="1080px" class="absolute inset-x-0 top-0 h-[62%] w-full object-cover object-top" />
+      <div class="absolute inset-x-0 top-0 h-[62%] bg-gradient-to-t from-red via-red/30 to-transparent" aria-hidden="true"></div>
+    </>
+  )}
+
+  <header class="relative flex items-center gap-[3cqw]">
     <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[13cqw] h-[13cqw]" />
     <p class="font-display font-bold text-[4.2cqw] leading-[1.1]">Central Sierra<br />Foothills DSA</p>
   </header>
 
-  <div class="flex-1 flex flex-col justify-center py-[4cqw]">
-    <p class="font-semibold uppercase tracking-[0.16em] text-[3.2cqw] text-white/85">{design.eyebrow}</p>
-    <h1 class:list={['mt-[2cqw] font-display font-black leading-[0.93] tracking-[-0.01em]', tall ? 'text-[15cqw]' : 'text-[12.5cqw]']}>{design.headline}</h1>
-    <div class:list={['mt-[4cqw] h-[1.4cqw] w-[18cqw]', design.tone === 'black' ? 'bg-red' : 'bg-white']}></div>
+  <div class="relative flex-1 flex flex-col justify-center py-[4cqw]">
+    <p class:list={['self-start rounded-full px-[3cqw] py-[0.9cqw] font-bold uppercase tracking-[0.14em] text-[3cqw]', dark ? 'bg-red text-white' : 'bg-white text-red-dark']}>{design.eyebrow}</p>
+    <h1 class:list={['mt-[3cqw] font-display font-black leading-[0.93] tracking-[-0.015em]', tall ? 'text-[15cqw]' : 'text-[12.5cqw]']}>{design.headline}</h1>
+    <div class:list={['mt-[4cqw] h-[1.4cqw] w-[18cqw]', dark ? 'bg-red' : 'bg-white']}></div>
     {!compact && <p class:list={['mt-[4cqw] leading-[1.35] text-white/90', tall ? 'text-[4.6cqw]' : 'text-[4cqw]']}>{design.body}</p>}
     {!compact && design.meets && (
       <p class="mt-[3cqw] text-[3.8cqw] leading-[1.35]"><span class="font-bold">{design.meets.label}:</span> {design.meets.text}</p>
     )}
   </div>
 
-  <footer class="flex items-center gap-[4cqw]">
+  <footer class="relative flex items-center gap-[4cqw]">
     <div class="shrink-0 bg-white rounded-[2cqw] p-[2cqw]">
       <QR url={design.qrUrl} class="w-[17cqw] h-[17cqw]" />
     </div>
