@@ -6,7 +6,7 @@ import EventList from '../../components/EventList.astro';
 import BranchMap from '../../components/BranchMap.astro';
 import CampaignCard from '../../components/CampaignCard.astro';
 import site from '../../data/site.json';
-import { upcomingEvents, pastEvents, matches, typeLabel, formatShortDate } from '../../lib/events';
+import { upcomingEvents, pastEvents, matches, typeLabel, typeOf, formatShortDate, EVENT_TYPES } from '../../lib/events';
 import { href } from '../../lib/paths';
 
 export async function getStaticPaths() {
@@ -20,14 +20,56 @@ const { Content } = await render(branch);
 
 const matcher = { keywords: b.keywords, cities: b.cities };
 const upcoming = upcomingEvents().filter((e) => matches(e, matcher));
-const recent = pastEvents().filter((e) => matches(e, matcher)).slice(0, 6);
+const past = pastEvents().filter((e) => matches(e, matcher));
+const recent = past.slice(0, 6);
+
+// Activity stats: shows the branch is alive without saying who or how many attend.
+// Computed at build time; the site rebuilds daily, so they stay current.
+// City council and county board meetings match a branch by town but aren't the
+// branch getting together, so they're left out of these numbers.
+const own = (e: (typeof past)[number]) => typeOf(e) !== 'civic';
+const sixMonthsAgo = new Date();
+sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+const lastSix = past.filter((e) => own(e) && new Date(e.start) >= sixMonthsAgo);
+const lastMet = past.find(own);
+const upcomingOwn = upcoming.filter(own);
+const breakdown = EVENT_TYPES
+  .map((t) => ({ label: t.plural.toLowerCase(), n: lastSix.filter((e) => typeOf(e) === t.key).length }))
+  .filter((t) => t.n > 0)
+  .sort((a, c) => c.n - a.n)
+  .slice(0, 3);
+const stats = [
+  lastSix.length > 0 && { n: String(lastSix.length), label: `${lastSix.length === 1 ? 'event' : 'events'} in the last 6 months` },
+  lastMet && { n: formatShortDate(lastMet.start), label: 'last got together' },
+  upcomingOwn.length > 0
+    ? { n: String(upcomingOwn.length), label: upcomingOwn.length === 1 ? 'branch event coming up' : 'branch events coming up' }
+    : { n: 'Next up', label: 'check the calendar', link: href('/events/') },
+].filter(Boolean) as { n: string; label: string; link?: string }[];
 const campaigns = (await getCollection('campaigns'))
   .filter((c) => c.data.status === 'active' && c.data.branches.includes(branch.id))
   .sort((a, c) => a.data.order - c.data.order);
 const mapsUrl = b.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}` : null;
 ---
 <Base title={`${b.name} branch`} description={`${b.name} branch of Central Sierra Foothills DSA. ${b.meets}`}>
-  <PageHeader eyebrow="Branch" title={b.name} lede={b.area} back={{ href: href('/branches/'), label: 'All branches' }} />
+  <PageHeader eyebrow="Branch" title={b.name} lede={b.area} back={{ href: href('/branches/'), label: 'All branches' }}>
+    <div class="mt-8">
+      <dl class="grid grid-cols-3 gap-2 sm:gap-3 max-w-3xl">
+        {stats.map((s) => (
+          <div class="rounded-lg bg-white/10 ring-1 ring-white/25 px-3 sm:px-4 py-3">
+            <dt class="sr-only">{s.label}</dt>
+            <dd class="font-display font-black text-xl sm:text-4xl leading-none">{s.n}</dd>
+            <dd class="mt-1 text-xs sm:text-sm leading-snug text-white/85">{s.link ? <a href={s.link} class="underline underline-offset-4 hover:text-white">{s.label} →</a> : s.label}</dd>
+          </div>
+        ))}
+      </dl>
+      {breakdown.length > 0 && (
+        <p class="mt-3 text-sm text-white/85">
+          Lately: {breakdown.map((t, i) => <>{i > 0 && ' · '}<span class="font-semibold text-white">{t.n}</span> {t.label}</>)}
+          · <a href={href('/archive/#past-events')} class="underline underline-offset-4 hover:text-white">see the archive</a>
+        </p>
+      )}
+    </div>
+  </PageHeader>
 
   <section class="py-12 sm:py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14">
