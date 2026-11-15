@@ -1,0 +1,95 @@
+---
+// The flyer library. Text in src/data/printables.json; files built by `npm run printables`.
+import Base from '../../../layouts/Base.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+import site from '../../../data/site.json';
+import { href } from '../../../lib/paths';
+import { getDesigns, getPrintables, previewFile, printablesText } from '../../../lib/printables';
+
+const designs = await getDesigns();
+const items = await getPrintables();
+const { howTo, rules } = printablesText;
+const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
+const downloadName = (file: string) => file.split('/').pop();
+---
+<Base title="Flyers and printables" description="Printable flyers and social media images for Central Sierra Foothills DSA, for tabling, meetings, and events. Fill in your event details before you print.">
+  <PageHeader
+    eyebrow="For members"
+    title="Flyers and printables."
+    lede="Flyers for tables, bulletin boards, and meetings, plus images for social media. Fill in your event details, then print."
+    back={{ href: href('/member-resources/'), label: 'Member resources' }}
+  />
+
+  <section class="py-12 sm:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-6">
+      <div class="rounded-xl bg-mist p-6 sm:p-8">
+        <h2 class="font-display font-extrabold text-2xl">How to fill one in</h2>
+        <ol class="mt-4 space-y-3">
+          {howTo.map((step, i) => (
+            <li class="flex gap-3 leading-relaxed">
+              <span class="w-7 h-7 shrink-0 rounded-full bg-red text-white font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div class="rounded-xl ring-1 ring-black/10 p-6 sm:p-8">
+        <h2 class="font-display font-extrabold text-2xl">Use them well</h2>
+        <ul class="mt-4 space-y-3">
+          {rules.map((r) => (
+            <li class="flex gap-3 leading-relaxed"><span class="mt-2 w-2 h-2 shrink-0 rounded-full bg-red" aria-hidden="true"></span>{r}</li>
+          ))}
+        </ul>
+        <p class="mt-4 text-black-2">Questions? Email <a href={`mailto:${site.contactEmail}`} class={linkClass}>{site.contactEmail}</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 sm:py-16 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="Flyers" title="Pick a flyer, pick a size." lede="Print sizes are PDFs with fill-in boxes. Social sizes are PNG images, ready to post." />
+      <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {designs.map((d) => {
+          const files = items.filter((p) => p.design.id === d.id);
+          const print = files.filter((p) => p.format.kind === 'pdf');
+          const social = files.filter((p) => p.format.kind === 'png');
+          return (
+            <li class="bg-white rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
+              <img
+                src={href(previewFile(d.id))}
+                alt={`Preview of the ${d.title} flyer: "${d.headline}"`}
+                width="490" height="634" loading="lazy"
+                class="w-full h-auto border-b border-black/10"
+              />
+              <div class="p-6 flex-1 flex flex-col">
+                <h3 class="font-display font-extrabold text-xl">{d.title}</h3>
+                <p class="mt-1 text-black-2 text-sm">QR code goes to {d.qrUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}</p>
+
+                <h4 class="mt-5 text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">Print (PDF)</h4>
+                <ul class="mt-2 space-y-2">
+                  {print.map((p) => (
+                    <li>
+                      <a href={href(p.file)} download={downloadName(p.file)} class={linkClass}>{p.format.label}</a>
+                      <span class="block text-sm text-black-2">{p.format.size}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <h4 class="mt-5 text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">Social media (PNG)</h4>
+                <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+                  {social.map((p) => (
+                    <li>
+                      <a href={href(p.file)} download={downloadName(p.file)} class={linkClass}>{p.format.label}</a>
+                      <span class="block text-sm text-black-2">{p.format.size}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+</Base>

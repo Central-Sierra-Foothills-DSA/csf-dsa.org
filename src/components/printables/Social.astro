@@ -1,0 +1,47 @@
+---
+// One social media image. Fills its parent box and scales with it (sizes in cqw),
+// so the same design works as a square post, a portrait post, and a story.
+import { Image } from 'astro:assets';
+import QR from '../QR.astro';
+import site from '../../data/site.json';
+import { displayUrl } from '../../lib/member-guide';
+import type { Design } from '../../lib/printables';
+import badgeWhite from '../../assets/logos/csf-dsa-white.png';
+
+interface Props {
+  design: Design;
+  /** Leave out the paragraph, for the square size. */
+  compact?: boolean;
+  /** Extra room: bigger type, for the story size. */
+  tall?: boolean;
+}
+const { design, compact = false, tall = false } = Astro.props;
+const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
+---
+<article class:list={['social @container w-full h-full bg-red text-white flex flex-col overflow-hidden', tall ? 'p-[8cqw] pt-[14cqw] pb-[16cqw]' : 'p-[7cqw]']}>
+  <header class="flex items-center gap-[3cqw]">
+    <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[13cqw] h-[13cqw]" />
+    <p class="font-display font-bold text-[4.2cqw] leading-[1.1]">Central Sierra<br />Foothills DSA</p>
+  </header>
+
+  <div class="flex-1 flex flex-col justify-center py-[4cqw]">
+    <p class="font-semibold uppercase tracking-[0.16em] text-[3.2cqw] text-white/85">{design.eyebrow}</p>
+    <h1 class:list={['mt-[2cqw] font-display font-black leading-[0.93] tracking-[-0.01em]', tall ? 'text-[15cqw]' : 'text-[12.5cqw]']}>{design.headline}</h1>
+    <div class="mt-[4cqw] h-[1.4cqw] w-[18cqw] bg-white"></div>
+    {!compact && <p class:list={['mt-[4cqw] leading-[1.35] text-white/90', tall ? 'text-[4.6cqw]' : 'text-[4cqw]']}>{design.body}</p>}
+    {!compact && design.meets && (
+      <p class="mt-[3cqw] text-[3.8cqw] leading-[1.35]"><span class="font-bold">{design.meets.label}:</span> {design.meets.text}</p>
+    )}
+  </div>
+
+  <footer class="flex items-center gap-[4cqw]">
+    <div class="shrink-0 bg-white rounded-[2cqw] p-[2cqw]">
+      <QR url={design.qrUrl} class="w-[17cqw] h-[17cqw]" />
+    </div>
+    <div class="min-w-0">
+      <p class="font-display font-extrabold text-[5.2cqw] leading-[1.05]">{design.socialCta}</p>
+      <p class="mt-[1cqw] font-bold text-[4.4cqw]">{design.qrLabel}</p>
+      <p class="mt-[1cqw] text-[3.4cqw] text-white/85">Follow {instagram}</p>
+    </div>
+  </footer>
+</article>

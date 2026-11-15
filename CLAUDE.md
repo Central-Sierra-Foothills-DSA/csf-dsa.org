@@ -17,6 +17,8 @@ A static site built with Astro 5 and Tailwind CSS 4. No backend, no database.
 | `/new-members/`          | `src/pages/new-members.astro`          | New member guide and FAQ                    |
 | `/member-resources/`     | `src/pages/member-resources/index.astro` | Orientation for new members, conduct, link to the printable packet |
 | `/member-resources/packet/` | `src/pages/member-resources/packet.astro` | Print layout of the new member packet (source of the PDF; not linked, `noindex`) |
+| `/member-resources/printables/` | `src/pages/member-resources/printables/index.astro` | Flyer library: chapter and branch flyers to download |
+| `/member-resources/printables/sheet/<name>/` | `src/pages/member-resources/printables/sheet/[slug].astro` | One flyer sheet or social image (source of the files; not linked, `noindex`) |
 | `/about/`                | `src/pages/about/index.astro`          | Who we are, structure, roles, how we decide |
 | `/about/bylaws/`         | `src/pages/about/bylaws.md`            | Full text of the chapter bylaws             |
 | `/branches/`             | `src/pages/branches/index.astro`       | Branch map, cards, closest-branch lookup    |
@@ -44,6 +46,7 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | Working groups                   | `src/data/working-groups.json`                     |
 | Allied organizations             | `src/data/partners.json` (`name`, optional `url` and `blurb`). The section on `/about/` appears once this has entries. |
 | New member guide and packet text | `src/data/member-guide.json`, then `npm run packet` (see below) |
+| Flyer text and sizes             | `src/data/printables.json` and `formats` in `src/lib/printables.ts`, then `npm run printables` (see below) |
 | Glossary terms, quotes           | `src/data/glossary.json`, `src/data/quotes.json`   |
 | Further-reading links            | `src/data/resources.json`                          |
 | Towns in the closest-branch list | `src/data/towns.json`                              |
@@ -97,6 +100,26 @@ To update it: edit the JSON or the layout, start `npm run dev`, then run `npm ru
 in a second terminal. The script prints the page to PDF with headless Chrome or Edge
 (set `CHROME_PATH` if it can't find one). Open `/member-resources/packet/` in a browser
 to preview the layout. Commit the regenerated PDF with the change. CI does not rebuild it.
+
+## The flyer library
+
+`public/files/printables/` is generated too. There is one chapter flyer plus one per
+branch (made automatically from `src/content/branches/`), each in six formats: letter
+poster, half-page (2 per sheet), quarter-page (4 per sheet), and three social image sizes.
+Text is in `src/data/printables.json`. Sizes and fill-in box limits are in `formats` in
+`src/lib/printables.ts`. The layouts are `src/components/printables/Flyer.astro` and
+`Social.astro`, sized in `cqw` so one design scales to every size.
+
+To update: edit, start `npm run dev`, then run `npm run printables` (or
+`npm run printables -- auburn` for matching files only). The script (puppeteer-core and
+pdf-lib, using your installed Chrome or Edge) saves each sheet, then adds PDF form fields
+over every element marked `data-field`. Copies on one sheet share field names, so they fill
+together. It fails if any text runs off a flyer; shorten the text if that happens. Commit
+the regenerated files. CI does not rebuild them.
+
+The fill-in boxes are deliberately limited to event details (when, where, a short note,
+each with a character limit). Headlines, logos, QR codes, and links stay fixed. Don't add
+a free-form headline field or an in-browser flyer editor without discussing it first.
 
 ## Events are generated, don't hand-edit them
 

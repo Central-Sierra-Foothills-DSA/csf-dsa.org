@@ -1,0 +1,44 @@
+---
+// One sheet of the flyer library: a print sheet (1, 2, or 4 flyers on letter
+// paper) or a social image. `npm run printables` saves each of these pages to
+// public/files/printables/. Not linked from the site.
+import Sheet from '../../../../layouts/Sheet.astro';
+import Flyer from '../../../../components/printables/Flyer.astro';
+import Social from '../../../../components/printables/Social.astro';
+import { getPrintables, type Printable } from '../../../../lib/printables';
+
+export async function getStaticPaths() {
+  const items = await getPrintables();
+  return items.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+}
+
+const { p } = Astro.props as { p: Printable };
+const f = p.format;
+const title = `${p.design.title} · ${f.label}`;
+---
+{f.kind === 'pdf' ? (
+  <Sheet title={title} pageSize={`${f.sheet.w}in ${f.sheet.h}in`}>
+    <div
+      class="sheet grid bg-white"
+      style={`width:${f.sheet.w}in;height:${f.sheet.h}in;grid-template-columns:repeat(${f.cols},1fr);grid-template-rows:repeat(${f.rows},1fr)`}
+      data-kind="pdf"
+      data-pt={f.fieldPt}
+    >
+      {Array.from({ length: f.cols * f.rows }, () => (
+        <div class="min-w-0 min-h-0"><Flyer design={p.design} fields={f.fields} /></div>
+      ))}
+      {f.cols > 1 && <div class="cut absolute inset-y-0 left-1/2 border-l border-dashed" aria-hidden="true"></div>}
+      {f.rows > 1 && <div class="cut absolute inset-x-0 top-1/2 border-t border-dashed" aria-hidden="true"></div>}
+    </div>
+  </Sheet>
+) : (
+  <Sheet title={title}>
+    <div class="sheet" style={`width:${f.px.w}px;height:${f.px.h}px`} data-kind="png">
+      <Social design={p.design} compact={p.formatId === 'square'} tall={p.formatId === 'story'} />
+    </div>
+  </Sheet>
+)}
+
+<style>
+  .cut { border-color: var(--color-black-4); }
+</style>
