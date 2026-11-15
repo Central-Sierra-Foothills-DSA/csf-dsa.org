@@ -14,7 +14,20 @@ export interface ChapterEvent {
 
 export const TIMEZONE = 'America/Los_Angeles';
 
-export const allEvents: ChapterEvent[] = data.events as ChapterEvent[];
+// The scraped history can hold the same event twice with different time zone
+// offsets (e.g. 12:00+11:00 and 21:00-04:00 are the same moment), so keep one
+// entry per event page and actual start time. The first one seen wins.
+function dedupe(events: ChapterEvent[]): ChapterEvent[] {
+  const seen = new Set<string>();
+  return events.filter((e) => {
+    const key = `${e.url ?? e.title}|${new Date(e.start).getTime()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export const allEvents: ChapterEvent[] = dedupe(data.events as ChapterEvent[]);
 export const eventsFetchedAt: string = data.fetchedAt;
 
 // ---- Upcoming and past ----------------------------------------------------
@@ -72,12 +85,26 @@ export interface EventMatcher {
   cities?: string[];
 }
 
+// A city name as a whole word, but not as part of a street name:
+// "156 S Auburn St, Grass Valley" is not in Auburn.
+const STREET = '(?:st|street|rd|road|ave|avenue|blvd|boulevard|way|dr|drive|ln|lane|ct|court|hwy|highway|pkwy|parkway)';
+const cityPatterns = new Map<string, RegExp>();
+function cityPattern(city: string): RegExp {
+  let re = cityPatterns.get(city);
+  if (!re) {
+    const escaped = city.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    re = new RegExp(`\\b${escaped}\\b(?!\\s+${STREET}\\b)`);
+    cityPatterns.set(city, re);
+  }
+  return re;
+}
+
 export function matches(e: ChapterEvent, m: EventMatcher): boolean {
   const title = e.title.toLowerCase();
   const where = [e.location ?? '', ...e.locations].join(' ').toLowerCase();
   return (
     (m.keywords ?? []).some((k) => title.includes(k.toLowerCase())) ||
-    (m.cities ?? []).some((c) => where.includes(c.toLowerCase()))
+    (m.cities ?? []).some((c) => cityPattern(c).test(where))
   );
 }
 
