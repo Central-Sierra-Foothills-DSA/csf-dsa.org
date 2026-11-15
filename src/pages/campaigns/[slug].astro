@@ -51,7 +51,7 @@ const label = c.kind === 'endorsement' ? 'Endorsement' : 'Campaign';
               </dd>
             </div>
           </dl>
-          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent(c.title)}`} class="mt-6 inline-flex items-center justify-center w-full px-5 py-3 bg-red hover:bg-red-dark text-white font-semibold rounded-md transition-colors">Get involved</a>
+          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent(c.title)}`} class="mt-6 inline-flex items-center justify-center w-full px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">Get involved</a>
         </div>
 
         {events.length > 0 && (

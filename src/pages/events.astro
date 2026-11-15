@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import EventList from '../components/EventList.astro';
+import CalendarSubscribe from '../components/CalendarSubscribe.astro';
 import site from '../data/site.json';
 import { upcomingEvents, typeOf, EVENT_TYPES, eventsFetchedAt, formatShortDate } from '../lib/events';
 import { href } from '../lib/paths';
@@ -39,7 +40,9 @@ const filterCss = present
         <EventList events={upcoming} empty="Nothing on the calendar right now. Check back soon." />
       </div>
 
-      <div class="mt-10 p-6 rounded-xl bg-mist flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="mt-10"><CalendarSubscribe /></div>
+
+      <div class="mt-4 p-6 rounded-xl bg-mist flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 class="font-display font-bold text-lg">RSVP and full details</h2>
           <p class="text-sm text-black-2 mt-1">Each event links to its page on our Solidarity Tech calendar, where you can RSVP and get Zoom links.</p>

@@ -45,7 +45,7 @@ const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name
       <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {branches.map((b, i) => (
           <div class="bg-white rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
-            <a href={href(`/branches/${b.id}/`)} class="group flex items-center gap-3 px-5 py-4 bg-red text-white hover:bg-red-dark transition-colors">
+            <a href={href(`/branches/${b.id}/`)} class="group flex items-center gap-3 px-5 py-4 bg-red-dark text-white hover:bg-red-dark transition-colors">
               <span class="w-8 h-8 shrink-0 rounded-full bg-white text-red-dark font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
               <span class="font-display font-extrabold text-lg leading-tight flex-1">{b.data.name}</span>
               <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
@@ -66,7 +66,7 @@ const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name
               Chapter-wide meetings are often held on Zoom, some branches offer a Zoom link, and we would love to help you start a branch closer to home.
             </p>
           </div>
-          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Starting a branch')}`} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-red hover:bg-red-dark text-white font-semibold rounded-md transition-colors">
+          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Starting a branch')}`} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">
             <UiIcon name="mail" /> Email us about it
           </a>
         </div>
@@ -79,7 +79,7 @@ const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name
       <h2 class="font-display font-black text-3xl sm:text-4xl">Every branch is open to everyone.</h2>
       <p class="mt-4 text-lg text-white/80">Pick the one that suits you and come to a meeting. You don't need to be a member yet.</p>
       <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-        <a href={href('/events/')} class="px-6 py-3 bg-red hover:bg-red-dark rounded-md font-semibold transition-colors">See upcoming meetings</a>
+        <a href={href('/events/')} class="px-6 py-3 bg-red-dark hover:bg-black-1 rounded-md font-semibold transition-colors">See upcoming meetings</a>
         <a href={href('/new-members/')} class="px-6 py-3 ring-2 ring-white/40 hover:ring-white rounded-md font-semibold transition-colors">New here? Start here</a>
       </div>
     </div>

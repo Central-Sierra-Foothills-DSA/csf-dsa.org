@@ -30,7 +30,7 @@ const layers = [
 // Bar width and color for each layer, roots (widest) to top.
 const layerStyle = [
   'lg:w-full bg-black text-white',
-  'lg:w-[88%] bg-red text-white',
+  'lg:w-[88%] bg-red-dark text-white',
   'lg:w-[76%] bg-red-3 text-black',
   'lg:w-[64%] bg-red-4 text-black',
 ];
@@ -72,7 +72,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
             </p>
           </div>
           <div class="mt-8 flex flex-wrap gap-3">
-            <a href={href('/new-members/')} class="inline-flex items-center px-5 py-3 bg-red hover:bg-red-dark text-white font-semibold rounded-md transition-colors">New here? Start here</a>
+            <a href={href('/new-members/')} class="inline-flex items-center px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">New here? Start here</a>
             <a href={href('/learn/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-md transition-colors">What is democratic socialism?</a>
           </div>
         </div>
@@ -102,7 +102,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
   </section>
 
   <!-- Bylaws quote -->
-  <section class="py-14 sm:py-20 bg-red text-white overflow-hidden">
+  <section class="py-14 sm:py-20 bg-red-dark text-white overflow-hidden">
     <figure class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <span class="absolute -top-10 sm:-top-14 left-0 sm:-left-2 font-display font-black text-[10rem] sm:text-[14rem] leading-none text-white/15 select-none" aria-hidden="true">“</span>
       <blockquote class="relative font-display font-bold text-2xl sm:text-3xl lg:text-[2.1rem] leading-snug">
@@ -163,13 +163,13 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           <span class="font-black text-3xl text-red" aria-hidden="true">+</span>
           <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{branches.length}</span><span class="block mt-1 text-sm font-bold">branch chairs</span></span>
           <span class="font-black text-3xl text-red" aria-hidden="true">=</span>
-          <span class="rounded-xl bg-red text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + branches.length}</span><span class="block mt-1 text-sm font-bold">steering committee</span></span>
+          <span class="rounded-xl bg-red-dark text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + branches.length}</span><span class="block mt-1 text-sm font-bold">steering committee</span></span>
         </div>
       </div>
 
       <ul class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {roles.map((r, i) => (
-          <li class:list={['rounded-xl p-6', i === roles.length - 1 ? 'bg-red text-white' : 'bg-mist']}>
+          <li class:list={['rounded-xl p-6', i === roles.length - 1 ? 'bg-red-dark text-white' : 'bg-mist']}>
             <p class:list={['text-xs font-semibold tracking-[0.16em] uppercase', i === roles.length - 1 ? 'text-white/80' : 'text-red-dark']}>
               {i === roles.length - 1 ? 'One per branch' : 'Officer'}
             </p>
@@ -195,7 +195,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
             {branches.map((b, i) => (
               <li>
                 <a href={href(`/branches/${b.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white ring-1 ring-black/10 hover:ring-red transition-colors">
-                  <span class="w-8 h-8 shrink-0 rounded-full bg-red text-white font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+                  <span class="w-8 h-8 shrink-0 rounded-full bg-red-dark text-white font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
                   <span class="font-display font-bold flex-1 group-hover:text-red-dark">{b.data.name}</span>
                   <span class="text-red-dark" aria-hidden="true">→</span>
                 </a>
@@ -276,7 +276,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="font-display font-black text-3xl sm:text-4xl">Questions about the chapter?</h2>
       <p class="mt-4 text-lg text-white/80">Email <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-3 hover:text-white underline underline-offset-4">{site.contactEmail}</a> or come to a meeting and ask in person.</p>
-      <a href={href('/events/')} class="mt-8 inline-flex items-center px-6 py-3.5 bg-red hover:bg-red-dark text-white font-semibold rounded-md transition-colors">See upcoming events</a>
+      <a href={href('/events/')} class="mt-8 inline-flex items-center px-6 py-3.5 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">See upcoming events</a>
     </div>
   </section>
 </Base>

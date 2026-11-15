@@ -22,6 +22,10 @@ const branches = defineCollection({
     address: z.string().optional(),
     /** How to join remotely, if that is possible. */
     remote: z.string().optional(),
+    /** Access at the meeting place, in plain words: step-free entry, parking, restrooms,
+     *  kids welcome, food. Leave it out until someone has checked; the page then
+     *  invites people to ask. */
+    access: z.string().optional(),
     /** Venue coordinates, for the closest-branch list. */
     lat: z.number(),
     lon: z.number(),

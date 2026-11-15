@@ -37,7 +37,7 @@ const day = (iso: string, opts: Intl.DateTimeFormatOptions) => new Intl.DateTime
 // Type badges, in brand colors only.
 const badge: Record<string, string> = {
   meeting: 'bg-black text-white',
-  action: 'bg-red text-white',
+  action: 'bg-red-dark text-white',
   social: 'bg-red-4 text-red-dark',
   civic: 'bg-black-4/60 text-black',
   training: 'bg-white text-black ring-1 ring-black/20',
@@ -175,7 +175,7 @@ const filterCss = present
                           <span class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-black-2">
                             <span class:list={['px-2 py-0.5 rounded-full text-xs font-bold', badge[type]]}>{typeLabel(e)}</span>
                             {branch && <span class="px-2 py-0.5 rounded-full text-xs font-semibold ring-1 ring-red/40 text-red-dark">{branch}</span>}
-                            {where && <span class="truncate">{where}</span>}
+                            {where && <span class="truncate min-w-0 max-w-full">{where}</span>}
                           </span>
                         </span>
                       </li>

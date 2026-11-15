@@ -61,6 +61,8 @@ export type Design = {
   id: string;
   /** 'event' and 'hangout' flyers have fill-in boxes; 'join' flyers are ready-made. */
   group: 'event' | 'join' | 'hangout';
+  /** Language of the design's words. Spanish flyers say "Síguenos" instead of "Follow". */
+  lang?: 'en' | 'es';
   /** Header color. Hangouts use black so they read differently from recruiting flyers. */
   tone?: 'red' | 'black';
   /** Heading of the fill-in box, if not the default. */
@@ -129,8 +131,9 @@ export async function getDesigns(): Promise<Design[]> {
   }
   for (const j of data.join) {
     designs.push({
-      id: j.id, group: 'join', title: j.title, eyebrow: j.eyebrow, headline: j.headline, body: j.body,
-      cta: data.joinCta, socialCta: data.joinSocialCta, qrUrl: chapterQr, qrLabel: displayUrl(chapterQr),
+      id: j.id, group: 'join', lang: (j as { lang?: 'en' | 'es' }).lang ?? 'en', title: j.title, eyebrow: j.eyebrow, headline: j.headline, body: j.body,
+      cta: (j as { cta?: string }).cta ?? data.joinCta, socialCta: (j as { socialCta?: string }).socialCta ?? data.joinSocialCta,
+      qrUrl: chapterQr, qrLabel: displayUrl(chapterQr),
     });
   }
   const eventsQr = linkFor(data.hangoutQr);

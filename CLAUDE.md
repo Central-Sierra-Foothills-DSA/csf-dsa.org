@@ -29,6 +29,8 @@ A static site built with Astro 5 and Tailwind CSS 4. No backend, no database.
 | `/learn/`                | `src/pages/learn.astro`                | What democratic socialism is, glossary, quotes |
 | `/local-government/`     | `src/pages/local-government.astro`     | Official council and board meeting pages    |
 | `/archive/`              | `src/pages/archive.astro`              | Past events, news, finished campaigns       |
+| `/events.ics`            | `src/pages/events.ics.ts`              | Calendar feed people subscribe to (built daily with the site) |
+| `/es/…`                  | `src/pages/es/`                        | Spanish versions of Home, New here, About, Branches (+ each branch), Learn, Events. See "Spanish pages" below |
 
 Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up form.
 
@@ -54,6 +56,8 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | Towns in the closest-branch list | `src/data/towns.json`                              |
 | Council and board links          | `src/data/local-government.json`                   |
 | Bylaws text                      | `src/pages/about/bylaws.md`                        |
+| Spanish wording                  | `src/data/es/` (`common.json` menu/footer, `branches.json`, `shared.json`) and the pages in `src/pages/es/` |
+| Meeting access details (step-free entry, parking, kids) | `access:` in a branch file (English) and in `src/data/es/branches.json` (Spanish) |
 | Page copy or layout              | The page file, or a component in `src/components/` |
 | Nav and footer links             | `src/components/Nav.astro`, `src/components/Footer.astro` |
 | Colors, fonts, global CSS        | `src/styles/global.css` (Tailwind `@theme` block)  |
@@ -84,6 +88,9 @@ The site follows the DSA Design Guide: https://design.dsausa.org
   `red-1` to `red-4`, `black` (#231F20) with tints `black-1` to `black-4`, `white`.
   Two additions that are not guide values: `red-dark` (hover states, small red text
   on white) and `mist` (light section background). Don't introduce other hues.
+- Text on a red background goes on `red-dark`, not `red`: white on DSA Red is about 4.4:1, just
+  under the 4.5:1 needed for normal-size text. Keep `red` for accents (rules, dots, borders,
+  icons) and very large type. Printed flyers and the packet are exempt.
 - Lean on red. Use `red-dark`, not `red`, for small red text on white; use `red-2`
   or `red-3` for red text on black. Check contrast.
 - Font is Manifold DSA for all text, weights 400 to 900. No other typefaces.
@@ -137,6 +144,24 @@ their text comes from existing data (`member-guide.json`, `glossary.json`, `quot
 The fill-in boxes are deliberately limited to event details (when, where, a short note,
 each with a character limit). Headlines, logos, QR codes, and links stay fixed. Don't add
 a free-form headline field or an in-browser flyer editor without discussing it first.
+
+## Spanish pages
+
+The pages a newcomer needs also exist in Spanish under `/es/`, with a language switch in the
+menu (`src/lib/i18n.ts` pairs each English page with its Spanish one). Member-only pages
+(member resources, packet, archive, bylaws, campaigns) stay in English and are labeled "en inglés".
+Event titles and descriptions come from Solidarity Tech, so they stay in English; dates, times,
+and event types are translated.
+
+- Spanish is informal (tú). Keep the same facts as the English; don't add new ones.
+- When English text changes on one of these pages, change the Spanish page or data file too.
+  Branch text is in `src/data/es/branches.json`; glossary, quotes, working groups, and
+  getting-started steps are in `src/data/es/shared.json`. The build fails if a branch, glossary
+  term, quote, working group, or step has no Spanish version, so new entries can't slip through.
+- Every Spanish page shows a "Traducción en revisión" note until `reviewed` is set to `true` in
+  `src/data/es/common.json`. Set it once a fluent member has checked the pages.
+- Shared components take a `lang` prop (`Base`, `Nav`, `Footer`, `EventList`, `BranchMap`,
+  `CalendarSubscribe`). Event helpers in `src/lib/events.ts` take an optional `lang` too.
 
 ## Events are generated, don't hand-edit them
 

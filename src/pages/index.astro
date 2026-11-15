@@ -48,7 +48,7 @@ const nextMeeting = (keywords: string[]) => upcoming.find((e) => typeOf(e) === '
             const m = nextMeeting(b.data.keywords);
             return (
               <li class="relative flex gap-4 py-5 group">
-                <span class="shrink-0 w-9 h-9 rounded-full bg-red text-white font-display font-black flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+                <span class="shrink-0 w-9 h-9 rounded-full bg-red-dark text-white font-display font-black flex items-center justify-center" aria-hidden="true">{i + 1}</span>
                 <div class="min-w-0">
                   <h3 class="font-display font-extrabold text-xl leading-tight">
                     <a href={href(`/branches/${b.id}/`)} class="after:absolute after:inset-0 group-hover:text-red-dark">{b.data.name}</a>

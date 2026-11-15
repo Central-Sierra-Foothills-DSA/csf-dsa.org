@@ -1,0 +1,43 @@
+{
+  "_comment": "Spanish text for each branch, keyed by the branch file name in src/content/branches/. Names, addresses, and map pins come from the English file. When a branch's English file changes, update its entry here too.",
+  "grass-valley-nevada-city": {
+    "area": "El oeste del condado de Nevada",
+    "meets": "El primer jueves de cada mes, de 6:00 a 8:00 p.m.",
+    "venue": "Salón comunitario de BriarPatch Food Co-op, Grass Valley",
+    "remote": "Las reuniones son en persona. Por accesibilidad, podemos ofrecer un enlace de Zoom si lo pides. Escríbenos con unos días de anticipación y lo preparamos.",
+    "body": [
+      "La rama de Grass Valley / Nevada City es donde los miembros del condado de Nevada conocen a sus vecinos y se ponen a trabajar. Las reuniones empiezan con algo de comer y tiempo para convivir, y luego pasan a la agenda: noticias de los grupos de trabajo, asuntos de la rama y planes para las próximas acciones y eventos.",
+      "¿Eres nuevo en DSA? Una reunión de rama es un gran primer paso. Ven, saluda y conoce de qué se trata. No necesitas ser miembro para asistir.",
+      "Entre reuniones, la rama organiza convivios, pone mesas informativas en eventos de la comunidad y asiste a las reuniones del gobierno local cuando nuestras campañas están en la agenda."
+    ]
+  },
+  "auburn": {
+    "area": "Auburn y las colinas cercanas del condado de Placer",
+    "meets": "Una vez al mes, entre semana, a las 6:30 p.m. El día cambia, así que revisa el calendario.",
+    "venue": "Salón comunitario de BriarPatch Food Co-op, Auburn",
+    "remote": "Las reuniones tienen opción por Zoom. Confirma tu asistencia en el calendario para recibir el enlace.",
+    "body": [
+      "La rama de Auburn reúne a miembros de Auburn y de los pueblos cercanos de la sierra. El capítulo mismo se fundó en Auburn en 2020, y la rama es el lugar para involucrarte localmente: conocer a otros miembros, enterarte de lo que hace el capítulo y ayudar a decidir qué hacemos después.",
+      "Todos son bienvenidos a las reuniones de la rama, seas miembro o no."
+    ]
+  },
+  "placerville": {
+    "area": "El condado de El Dorado",
+    "meets": "Una vez al mes. El día y la hora cambian, así que revisa el calendario.",
+    "venue": "El lugar cambia. Confirma tu asistencia en el calendario para recibir la dirección y el enlace de Zoom.",
+    "remote": "Las reuniones casi siempre tienen opción por Zoom. Confirma tu asistencia en el calendario para recibir el enlace.",
+    "body": [
+      "La rama de Placerville es el hogar de los miembros de todo el condado de El Dorado. Además de las reuniones mensuales, la rama hace alcance comunitario en el centro y organiza convivios.",
+      "Todos son bienvenidos a las reuniones de la rama, seas miembro o no."
+    ]
+  },
+  "roseville": {
+    "area": "El sur del condado de Placer",
+    "meets": "Revisa el calendario para la próxima reunión.",
+    "venue": "Las reuniones recientes han sido en Shady Coffee & Tea, Roseville",
+    "body": [
+      "La rama de Roseville reúne a miembros de Roseville y del resto del sur del condado de Placer. Es una de nuestras ramas más nuevas, y hay mucho espacio para ayudar a darle forma.",
+      "Todos son bienvenidos a las reuniones de la rama, seas miembro o no."
+    ]
+  }
+}

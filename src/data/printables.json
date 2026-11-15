@@ -1,6 +1,5 @@
 {
   "_comment": "Text for the flyer library (/member-resources/printables/). Branch flyers are made for every file in src/content/branches/ using the `branch` template; {name}, {area} and {meets} come from the branch file. After editing, run `npm run printables` with `npm run dev` going to rebuild the files.",
-
   "chapter": {
     "id": "join-the-chapter",
     "title": "Join the chapter",
@@ -9,9 +8,10 @@
     "body": "We're working people organizing across the Sierra foothills for affordable housing, healthcare for all, and an economy that works for everyone. No experience needed.",
     "cta": "Scan to join us",
     "socialCta": "Join us",
-    "qr": { "siteLink": "joinChapterForm" }
+    "qr": {
+      "siteLink": "joinChapterForm"
+    }
   },
-
   "branch": {
     "title": "{name} branch",
     "eyebrow": "{name} branch",
@@ -20,12 +20,13 @@
     "meetsLabel": "When we meet",
     "cta": "Scan for meeting details",
     "socialCta": "Meeting details",
-    "qr": { "path": "/branches/{slug}/" },
+    "qr": {
+      "path": "/branches/{slug}/"
+    },
     "_qrLabel": "The address printed under the QR code. Shorter than the branch page's own address so it fits; it lists every branch.",
     "qrLabel": "csf-dsa.org/branches"
   },
-
-  "_join": "Ready-made 'join us' flyers: no fill-in boxes, a big QR code to the chapter sign-up form. Each one is made in every size. Add, remove, or reword them here; `id` becomes the file name.",
+  "_join": "Ready-made 'join us' flyers: no fill-in boxes, a big QR code to the chapter sign-up form. Each one is made in every size. Add, remove, or reword them here; `id` becomes the file name. Spanish designs set \"lang\": \"es\" plus their own \"cta\" and \"socialCta\".",
   "join": [
     {
       "id": "join-us",
@@ -54,11 +55,30 @@
       "eyebrow": "Democratic Socialists of America",
       "headline": "Socialists live here too.",
       "body": "Yes, even in the foothills. We're your neighbors, coworkers, and friends, building a better future together. There's a place for you."
+    },
+    {
+      "id": "join-us-es",
+      "lang": "es",
+      "title": "Únete (en español)",
+      "eyebrow": "Socialistas Democráticos de América",
+      "headline": "Únete.",
+      "body": "Somos gente trabajadora de los condados de Placer, Nevada, El Dorado y Sierra, y nos organizamos por una economía más justa y una democracia de verdad. No necesitas experiencia. Ven como eres.",
+      "cta": "Escanea para unirte",
+      "socialCta": "Únete"
+    },
+    {
+      "id": "join-not-alone-es",
+      "lang": "es",
+      "title": "No tienes que luchar solo (en español)",
+      "eyebrow": "Socialistas Democráticos de América",
+      "headline": "No tienes que luchar solo.",
+      "body": "Cuando la gente trabajadora se une, gana cosas que nadie podría ganar solo. Encuentra a tu gente en la sierra.",
+      "cta": "Escanea para unirte",
+      "socialCta": "Únete"
     }
   ],
   "joinCta": "Scan to join us",
   "joinSocialCta": "Join us",
-
   "_hangouts": "Invitations to socials and hangouts. They have fill-in boxes for when and where, and a black header so they look different from the recruiting flyers. The QR code goes to the events calendar. `icon` is one of chat, coffee, snack, pot (drawn in src/components/printables/Icon.astro).",
   "hangouts": [
     {
@@ -97,13 +117,17 @@
   "hangoutCta": "Scan for upcoming events",
   "hangoutSocialCta": "Upcoming events",
   "hangoutFieldTitle": "Join us",
-  "hangoutQr": { "path": "/events/" },
-
+  "hangoutQr": {
+    "path": "/events/"
+  },
   "fieldBox": {
     "title": "Our next event",
-    "labels": { "when": "When", "where": "Where", "note": "Also" }
+    "labels": {
+      "when": "When",
+      "where": "Where",
+      "note": "Also"
+    }
   },
-
   "_ready": "Ready-made printables with nothing to fill in. Most of their text comes from other files: member-guide.json (democratic socialism, community standards), glossary.json, quotes.json, and working-groups.json.",
   "ready": {
     "tableSign": {
@@ -124,7 +148,13 @@
       "blurb": "For tables and events, so you can follow up with the people you meet.",
       "headline": "Stay in touch.",
       "intro": "Leave your info and someone from the chapter will follow up.",
-      "columns": ["Name", "Email", "Phone", "Town", "Interested in"],
+      "columns": [
+        "Name",
+        "Email",
+        "Phone",
+        "Town",
+        "Interested in"
+      ],
       "rows": 17,
       "phoneCta": "Rather sign up on your phone?"
     },
@@ -141,14 +171,12 @@
       "blurb": "Square images to share, one quote each."
     }
   },
-
   "howTo": [
     "Open the PDF in a browser (Chrome, Edge, Firefox), Adobe Acrobat Reader, or Preview on a Mac.",
     "Click a line under \"Our next event\" and type. On half-page and quarter-page sheets, every copy on the sheet updates at once.",
     "Print at actual size (100%) on plain letter paper. Cut along the dashed lines.",
     "Leave the boxes empty to write details in by hand."
   ],
-
   "rules": [
     "These flyers are for chapter and branch events. Keep the fill-in boxes to event details: date, time, place, and a short note.",
     "Don't use them to speak for the chapter on endorsements, positions, or anything the chapter hasn't decided. Ask in Slack or email the chapter first.",

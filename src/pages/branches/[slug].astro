@@ -63,7 +63,7 @@ const day = (iso: string, opts: Intl.DateTimeFormatOptions) => new Intl.DateTime
 // Type badges, matching the archive page.
 const badge: Record<string, string> = {
   meeting: 'bg-black text-white',
-  action: 'bg-red text-white',
+  action: 'bg-red-dark text-white',
   social: 'bg-red-4 text-red-dark',
   civic: 'bg-black-4/60 text-black',
   training: 'bg-white text-black ring-1 ring-black/20',
@@ -71,11 +71,11 @@ const badge: Record<string, string> = {
 };
 
 // The "when, where, online, questions" cards.
-type Detail = { icon: 'calendar' | 'pin' | 'video' | 'mail'; label: string; body: string; sub?: string; link?: { href: string; text: string; external: boolean } };
+type Detail = { icon: 'calendar' | 'pin' | 'video' | 'mail'; label: string; body: string; sub?: string; access?: string | null; link?: { href: string; text: string; external: boolean } };
 const contactHref = `mailto:${site.contactEmail}?subject=${encodeURIComponent(b.name + ' branch')}`;
 const details = [
   { icon: 'calendar', label: 'When', body: b.meets },
-  { icon: 'pin', label: 'Where', body: b.venue, sub: b.address, link: mapsUrl ? { href: mapsUrl, text: 'Open in maps', external: true } : undefined },
+  { icon: 'pin', label: 'Where', body: b.venue, sub: b.address, access: b.access ?? null, link: mapsUrl ? { href: mapsUrl, text: 'Open in maps', external: true } : undefined },
   b.remote ? { icon: 'video', label: 'Online', body: b.remote } : null,
   { icon: 'mail', label: 'Questions', body: 'Email the chapter and mention this branch.', link: { href: contactHref, text: site.contactEmail, external: false } },
 ].filter(Boolean) as Detail[];
@@ -110,11 +110,17 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
         {details.map((d) => (
           <div class="rounded-xl bg-mist p-5 flex flex-col">
             <dt class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-dark">
-              <span class="w-8 h-8 rounded-full bg-red text-white flex items-center justify-center"><UiIcon name={d.icon} class="w-4.5 h-4.5" /></span>
+              <span class="w-8 h-8 rounded-full bg-red-dark text-white flex items-center justify-center"><UiIcon name={d.icon} class="w-4.5 h-4.5" /></span>
               {d.label}
             </dt>
             <dd class="mt-3 font-semibold leading-snug">{d.body}</dd>
             {d.sub && <dd class="mt-1 text-sm text-black-2">{d.sub}</dd>}
+            {d.access !== undefined && (
+              <dd class="mt-2 text-sm">
+                <span class="font-semibold">Access:</span>{' '}
+                {d.access ?? <>Questions about step-free entry, parking, or bringing kids? <a href={contactHref} class={linkClass}>Ask us</a>.</>}
+              </dd>
+            )}
             {d.link && (
               <dd class="mt-auto pt-3 text-sm">
                 <a href={d.link.href} target={d.link.external ? '_blank' : undefined} rel={d.link.external ? 'noopener' : undefined} class:list={[linkClass, 'break-all']}>{d.link.text}{d.link.external && ' ↗'}</a>
@@ -135,7 +141,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           <Content />
         </div>
         <div class="mt-8 flex flex-wrap gap-3">
-          <a href={href('/events/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red hover:bg-red-dark text-white font-semibold rounded-md transition-colors"><UiIcon name="calendar" /> Find the next meeting</a>
+          <a href={href('/events/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors"><UiIcon name="calendar" /> Find the next meeting</a>
           <a href={href('/new-members/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-md transition-colors">New here? Start here</a>
         </div>
       </div>
@@ -184,7 +190,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           <SectionHeading eyebrow="Recently" title="What we've been up to." />
           <a href={href('/archive/#past-events')} class={linkClass}>Full archive →</a>
         </div>
-        <ul class="mt-8 grid md:grid-cols-2 gap-3">
+        <ul class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3">
           {recent.map((e) => {
             const type = typeOf(e);
             const where = shortLocation(e);
@@ -201,7 +207,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
                     : <span class="font-semibold leading-snug">{e.title}</span>}
                   <span class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-black-2">
                     <span class:list={['px-2 py-0.5 rounded-full text-xs font-bold', badge[type]]}>{typeLabel(e)}</span>
-                    {where && <span class="truncate">{where}</span>}
+                    {where && <span class="truncate min-w-0 max-w-full">{where}</span>}
                   </span>
                 </span>
               </li>
@@ -220,7 +226,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
         <ul class="mt-8 space-y-2">
           {others.map(({ o, n }) => (
             <li>
-              <a href={href(`/branches/${o.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white/5 ring-1 ring-white/10 hover:bg-red hover:ring-red transition-colors">
+              <a href={href(`/branches/${o.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white/5 ring-1 ring-white/10 hover:bg-red-dark hover:ring-red-dark transition-colors">
                 <span class="w-8 h-8 shrink-0 rounded-full bg-white text-black font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{n}</span>
                 <span class="flex-1 min-w-0">
                   <span class="block font-display font-bold">{o.data.name}</span>

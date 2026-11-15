@@ -1,0 +1,31 @@
+---
+// "Add our events to your calendar": subscribe links for the /events.ics feed.
+// A subscription keeps updating; the download is a one-time copy.
+import UiIcon from './UiIcon.astro';
+import { href } from '../lib/paths';
+import type { Lang } from '../lib/i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const es = lang === 'es';
+
+const feed = new URL(href('/events.ics'), Astro.site ?? 'https://csf-dsa.org');
+const webcal = feed.href.replace(/^https?:/, 'webcal:');
+const google = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(webcal)}`;
+
+const t = es
+  ? { title: 'Agrega nuestros eventos a tu calendario', body: 'Suscríbete una vez y los eventos del capítulo aparecerán solos en tu calendario, con las actualizaciones.', google: 'Google Calendar', apple: 'Apple o Outlook', download: 'Descargar (.ics)' }
+  : { title: 'Add our events to your calendar', body: 'Subscribe once and chapter events show up in your own calendar, and stay up to date.', google: 'Google Calendar', apple: 'Apple or Outlook', download: 'Download (.ics)' };
+const btn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-white ring-1 ring-black/15 hover:ring-red-dark hover:text-red-dark font-semibold text-sm transition-colors';
+---
+<div class="rounded-xl ring-1 ring-black/10 p-6 sm:flex sm:items-center sm:gap-6">
+  <div class="flex-1">
+    <h2 class="flex items-center gap-2 font-display font-bold text-lg"><UiIcon name="calendar" class="w-5 h-5 text-red-dark" /> {t.title}</h2>
+    <p class="text-sm text-black-2 mt-1">{t.body}</p>
+  </div>
+  <div class="mt-4 sm:mt-0 flex flex-wrap gap-2 shrink-0">
+    <a href={google} target="_blank" rel="noopener" class={btn}>{t.google} ↗</a>
+    <a href={webcal} class={btn}>{t.apple}</a>
+    <a href={href('/events.ics')} download="csf-dsa-events.ics" class={btn}>{t.download}</a>
+  </div>
+</div>

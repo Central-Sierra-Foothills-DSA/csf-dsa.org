@@ -1,0 +1,61 @@
+{
+  "_comment": "Spanish versions of shared data used on the Spanish pages: working groups (working-groups.json), getting-started steps (getting-started.json), glossary (glossary.json), and quotes (quotes.json). Keep the same order and number of entries as the English files; the pages check this when the site builds.",
+
+  "workingGroups": [
+    { "name": "Electoral", "description": "Lleva el proceso de respaldos del capítulo y apoya con voluntarios a los candidatos y medidas que respaldamos." },
+    { "name": "DeFlock / Contra la vigilancia", "description": "Se organiza contra los lectores automáticos de placas y otras formas de vigilancia masiva en nuestros pueblos." },
+    { "name": "Educación política", "description": "Grupos de lectura, capacitaciones y conversaciones que profundizan nuestra comprensión compartida del socialismo y la organización." },
+    { "name": "Alcance a miembros", "description": "Mesas informativas, llamadas telefónicas y conversaciones uno a uno que traen gente nueva y mantienen a los miembros involucrados." },
+    { "name": "Ayuda mutua", "description": "Vecinos que cubren directamente las necesidades de los demás, y que construyen las relaciones que hacen posible la organización." }
+  ],
+
+  "steps": [
+    {
+      "title": "Saluda",
+      "body": "Llena nuestro breve formulario del capítulo. Nos dice dónde vives para conectarte con la rama más cercana y avisarte de reuniones y acciones. El formulario está en inglés.",
+      "cta": { "label": "Formulario del capítulo", "siteLink": "joinChapterForm" }
+    },
+    {
+      "title": "Ven a una reunión o a un convivio",
+      "body": "Todas las reuniones de rama están abiertas, seas miembro o no. Los convivios son una forma aún más fácil de empezar. Trae a un amigo si quieres.",
+      "cta": { "label": "Encuentra tu rama", "path": "/es/ramas/" }
+    },
+    {
+      "title": "Hazte miembro",
+      "body": "Únete a DSA en el sitio nacional (en inglés). Te asignan a nuestro capítulo automáticamente según dónde vives. Las cuotas van a DSA nacional, con opciones mensuales o anuales y tarifas reducidas si el dinero está apretado.",
+      "cta": { "label": "Únete a DSA", "siteLink": "joinDsaNational" }
+    },
+    {
+      "title": "Encuentra lo tuyo",
+      "body": "Como miembro, te invitaremos al Slack del capítulo, donde el trabajo sigue entre reuniones. Prueba un grupo de trabajo, ayuda con una campaña o simplemente sigue viniendo. Cualquier cantidad de tiempo cuenta.",
+      "cta": { "label": "Recursos para miembros (en inglés)", "path": "/member-resources/" }
+    }
+  ],
+
+  "glossary": [
+    { "term": "Socialismo democrático", "definition": "La idea de que la economía, como el gobierno, debe funcionar de forma democrática: por y para la gente que hace el trabajo, no para el lucro de unos pocos dueños." },
+    { "term": "Capitalismo", "definition": "Un sistema económico en el que las cosas de las que depende la sociedad, como los lugares de trabajo, la vivienda y la energía, son de propiedad privada y funcionan para generar ganancias." },
+    { "term": "Clase trabajadora", "definition": "Todas las personas que tienen que trabajar por un sueldo o salario para salir adelante, más quienes dependen de ellas. O sea, la mayoría de nosotros." },
+    { "term": "Solidaridad", "definition": "Apoyar a otros trabajadores porque sus luchas están conectadas con la tuya, aunque su pelea no sea directamente la tuya." },
+    { "term": "Sindicato", "definition": "Trabajadores que se unen para negociar con su empleador como grupo sobre el sueldo, el horario y las condiciones de trabajo." },
+    { "term": "Negociación colectiva", "definition": "Negociar un contrato con un empleador como un grupo unido de trabajadores, y no uno por uno." },
+    { "term": "Las bases", "definition": "Los miembros comunes de un sindicato u organización, a diferencia de su personal o sus dirigentes." },
+    { "term": "Ayuda mutua", "definition": "Vecinos que cubren directamente las necesidades de los demás, como iguales. Solidaridad, no caridad." },
+    { "term": "Organizar", "definition": "Reunir a la gente alrededor de un problema compartido y construir suficiente poder colectivo para resolverlo." },
+    { "term": "Propiedad pública", "definition": "Cuando un servicio o recurso, como una empresa de servicios, un hospital o la vivienda, es del público y funciona según las necesidades de la gente y no para generar ganancias." },
+    { "term": "Medicare para Todos", "definition": "Un solo plan de salud público que cubre a todos, sin primas, deducibles ni redes de proveedores." },
+    { "term": "Nuevo Pacto Verde", "definition": "Un plan para enfrentar la crisis climática dando trabajo a la gente en la construcción de energía limpia, transporte público y vivienda, con buenos empleos sindicales." },
+    { "term": "Respaldo", "definition": "Una votación de los miembros para poner el nombre del capítulo, y a veces su tiempo y energía, detrás de un candidato o una campaña." },
+    { "term": "Capítulo", "definition": "Una organización local de DSA. El nuestro cubre los condados de Placer, Nevada, El Dorado y Sierra." },
+    { "term": "Rama", "definition": "Un grupo local dentro del capítulo, organizado alrededor de un pueblo o zona, donde los miembros se reúnen en persona." },
+    { "term": "Grupo de trabajo", "definition": "Un equipo de miembros enfocado en un tipo de trabajo, como las elecciones o la educación política. Cualquiera puede unirse a uno o empezar uno." },
+    { "term": "Camarada", "definition": "Así nos llamamos entre nosotros. Significa alguien del mismo lado, que trabaja por lo mismo." }
+  ],
+
+  "quotes": [
+    { "text": "Mientras exista una clase baja, yo soy parte de ella; mientras exista un elemento criminal, yo soy de él; y mientras haya un alma en prisión, yo no soy libre.", "where": "Declaración ante el tribunal, 1918" },
+    { "text": "La trabajadora debe tener pan, pero también debe tener rosas.", "where": "Discurso, 1912" },
+    { "text": "Llámalo democracia, o llámalo socialismo democrático, pero tiene que haber una mejor distribución de la riqueza en este país para todos los hijos de Dios.", "where": "Discurso ante el Negro American Labor Council, 1965" }
+  ],
+  "quotesNote": "Citas traducidas del inglés."
+}

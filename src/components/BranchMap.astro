@@ -5,23 +5,27 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import map from '../assets/photos/chapter-map.jpg';
 import { href } from '../lib/paths';
+import { esText, type Lang } from '../lib/i18n';
 
 interface Props {
   /** Highlight one branch and dim the rest. */
   highlight?: string;
+  lang?: Lang;
 }
-const { highlight } = Astro.props;
+const { highlight, lang = 'en' } = Astro.props;
+const branchPath = (id: string) => (lang === 'es' ? `/es/ramas/${id}/` : `/branches/${id}/`);
+const alt = lang === 'es' ? esText.map.alt : 'Map of the chapter area covering Placer, Nevada, El Dorado, and Sierra counties, with a numbered pin for each branch';
 const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
 ---
 <figure class="rounded-xl overflow-hidden shadow-lg ring-1 ring-black/10 bg-white">
   <div class="relative">
-    <Image src={map} alt="Map of the chapter area covering Placer, Nevada, El Dorado, and Sierra counties, with a numbered pin for each branch" widths={[600, 900, 1500]} sizes="(min-width: 1024px) 640px, 100vw" class="w-full h-auto" />
+    <Image src={map} alt={alt} widths={[600, 900, 1500]} sizes="(min-width: 1024px) 640px, 100vw" class="w-full h-auto" />
     {branches.map((b, i) => (
-      <a href={href(`/branches/${b.id}/`)}
+      <a href={href(branchPath(b.id))}
          class:list={['group absolute -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full font-display font-black text-sm text-white ring-[3px] ring-white shadow-lg transition-transform hover:scale-110 focus-visible:scale-110',
            !highlight || highlight === b.id ? 'bg-red' : 'bg-black-2']}
          style={`left:${b.data.mapPin.x}%;top:${b.data.mapPin.y}%`}
-         aria-label={`${b.data.name} branch`}>
+         aria-label={lang === 'es' ? `Rama de ${b.data.name}` : `${b.data.name} branch`}>
         {i + 1}
         <span class="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1.5 whitespace-nowrap rounded-sm bg-black px-2 py-0.5 text-xs font-semibold text-white opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity">{b.data.name}</span>
       </a>
@@ -31,7 +35,7 @@ const branches = (await getCollection('branches')).sort((a, b) => a.data.order -
     <ol class="flex flex-wrap gap-x-5 gap-y-1.5 text-sm">
       {branches.map((b, i) => (
         <li>
-          <a href={href(`/branches/${b.id}/`)} class="inline-flex items-center gap-2 font-semibold hover:text-red-dark">
+          <a href={href(branchPath(b.id))} class="inline-flex items-center gap-2 font-semibold hover:text-red-dark">
             <span class:list={['inline-flex items-center justify-center w-5 h-5 rounded-full text-[0.7rem] font-black text-white', !highlight || highlight === b.id ? 'bg-red' : 'bg-black-2']}>{i + 1}</span>
             {b.data.name}
           </a>

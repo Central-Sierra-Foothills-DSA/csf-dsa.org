@@ -92,7 +92,7 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
       <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {practice.map((p) => (
           <li class="bg-white rounded-xl p-6 ring-1 ring-black/10 border-t-4 border-red">
-            <span class="w-16 h-16 rounded-full bg-red text-white flex items-center justify-center" aria-hidden="true">
+            <span class="w-16 h-16 rounded-full bg-red-dark text-white flex items-center justify-center" aria-hidden="true">
               <svg class="w-9 h-9" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d={p.icon} /></svg>
             </span>
             <p class="mt-5 font-display font-extrabold text-xl leading-tight">{p.title}</p>
@@ -116,7 +116,7 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
         </div>
         <ul class="lg:col-span-5 flex flex-wrap gap-3">
           {freedoms.map((f) => (
-            <li class="px-5 py-3 rounded-full bg-red font-display font-bold text-lg">{f}</li>
+            <li class="px-5 py-3 rounded-full bg-red-dark font-display font-bold text-lg">{f}</li>
           ))}
         </ul>
       </div>
@@ -204,7 +204,7 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
       <ul class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {resources.map((r) => (
           <li>
-            <a href={r.href} target="_blank" rel="noopener" class="group h-full flex flex-col p-6 bg-white rounded-xl ring-1 ring-black/10 hover:bg-red hover:ring-red hover:text-white transition-colors">
+            <a href={r.href} target="_blank" rel="noopener" class="group h-full flex flex-col p-6 bg-white rounded-xl ring-1 ring-black/10 hover:bg-red-dark hover:ring-red-dark hover:text-white transition-colors">
               <span class="font-display font-extrabold text-xl">{r.label}</span>
               <span class="mt-2 flex-1 text-sm text-black-2 group-hover:text-white/90 leading-relaxed">{r.blurb}</span>
               <span class="mt-5 w-10 h-10 rounded-full bg-red group-hover:bg-white text-white group-hover:text-red flex items-center justify-center transition-colors" aria-hidden="true">
@@ -224,7 +224,7 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
     </div>
   </section>
 
-  <section class="py-12 sm:py-16 bg-red text-white">
+  <section class="py-12 sm:py-16 bg-red-dark text-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="font-display font-black text-3xl sm:text-4xl">Learn with other people.</h2>
       <p class="mt-4 text-lg leading-relaxed text-white/90">Our Political Education working group runs reading groups and discussions.</p>

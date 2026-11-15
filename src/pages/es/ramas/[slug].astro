@@ -1,0 +1,209 @@
+---
+// Spanish branch page. Mirrors src/pages/branches/[slug].astro; the branch's
+// Spanish text is in src/data/es/branches.json.
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import EventList from '../../../components/EventList.astro';
+import BranchMap from '../../../components/BranchMap.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+import UiIcon from '../../../components/UiIcon.astro';
+import site from '../../../data/site.json';
+import { upcomingEvents, pastEvents, matches, typeLabel, typeOf, formatShortDate, shortLocation, EVENT_TYPES_ES, TIMEZONE } from '../../../lib/events';
+import { branchEs } from '../../../lib/es';
+import { esText } from '../../../lib/i18n';
+import { href } from '../../../lib/paths';
+
+export async function getStaticPaths() {
+  const branches = await getCollection('branches');
+  return branches.map((branch) => ({ params: { slug: branch.id }, props: { branch } }));
+}
+
+const { branch } = Astro.props;
+const b = branch.data;
+const t = branchEs(branch.id);
+
+const matcher = { keywords: b.keywords, cities: b.cities };
+const upcoming = upcomingEvents().filter((e) => matches(e, matcher));
+const past = pastEvents().filter((e) => matches(e, matcher));
+
+// Same activity rules as the English page: city council and county board
+// meetings aren't the branch getting together, so they're left out.
+const own = (e: (typeof past)[number]) => typeOf(e) !== 'civic';
+const sixMonthsAgo = new Date();
+sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+const lastSix = past.filter((e) => own(e) && new Date(e.start) >= sixMonthsAgo);
+const lastMet = past.find(own);
+const upcomingOwn = upcoming.filter(own);
+const upcomingCivic = upcoming.filter((e) => !own(e)).slice(0, 3);
+const recent = past.filter(own).slice(0, 6);
+const breakdown = (Object.keys(EVENT_TYPES_ES) as (keyof typeof EVENT_TYPES_ES)[])
+  .map((k) => ({ k, n: lastSix.filter((e) => typeOf(e) === k).length }))
+  .filter((x) => x.n > 0)
+  .sort((a, c) => c.n - a.n)
+  .slice(0, 3)
+  .map(({ k, n }) => ({ n, label: (n === 1 ? EVENT_TYPES_ES[k].label : EVENT_TYPES_ES[k].plural).toLowerCase() }));
+const stats = [
+  lastSix.length > 0 && { n: String(lastSix.length), label: `${lastSix.length === 1 ? 'evento' : 'eventos'} en los últimos 6 meses` },
+  lastMet && { n: formatShortDate(lastMet.start, 'es'), label: 'última vez que nos reunimos' },
+  upcomingOwn.length > 0
+    ? { n: String(upcomingOwn.length), label: upcomingOwn.length === 1 ? 'evento de la rama próximamente' : 'eventos de la rama próximamente' }
+    : { n: 'Lo próximo', label: 'revisa el calendario', link: href('/es/eventos/') },
+].filter(Boolean) as { n: string; label: string; link?: string }[];
+
+const mapsUrl = b.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}` : null;
+const allBranches = (await getCollection('branches')).sort((a, c) => a.data.order - c.data.order);
+const others = allBranches.map((o, i) => ({ o, n: i + 1 })).filter(({ o }) => o.id !== branch.id);
+const day = (iso: string, opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('es-US', { timeZone: TIMEZONE, ...opts }).format(new Date(iso));
+const badge: Record<string, string> = {
+  meeting: 'bg-black text-white', action: 'bg-red-dark text-white', social: 'bg-red-4 text-red-dark',
+  civic: 'bg-black-4/60 text-black', training: 'bg-white text-black ring-1 ring-black/20', other: 'bg-mist text-black-2',
+};
+
+const contactHref = `mailto:${site.contactEmail}?subject=${encodeURIComponent('Rama de ' + b.name)}`;
+const access = t.access ?? null;
+type Detail = { icon: 'calendar' | 'pin' | 'video' | 'mail'; label: string; body: string; sub?: string; access?: string | null; link?: { href: string; text: string; external: boolean } };
+const details = [
+  { icon: 'calendar', label: 'Cuándo', body: t.meets },
+  { icon: 'pin', label: 'Dónde', body: t.venue, sub: b.address, access, link: mapsUrl ? { href: mapsUrl, text: 'Abrir en el mapa', external: true } : undefined },
+  t.remote ? { icon: 'video', label: 'En línea', body: t.remote } : null,
+  { icon: 'mail', label: 'Preguntas', body: 'Escribe al capítulo y menciona esta rama.', link: { href: contactHref, text: site.contactEmail, external: false } },
+].filter(Boolean) as Detail[];
+const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
+---
+<Base lang="es" title={`Rama de ${b.name}`} description={`Rama de ${b.name} de Central Sierra Foothills DSA. ${t.meets}`}>
+  <PageHeader eyebrow="Rama" title={b.name} lede={t.area} back={{ href: href('/es/ramas/'), label: 'Todas las ramas' }}>
+    <div class="mt-8">
+      <dl class="grid grid-cols-3 gap-2 sm:gap-3 max-w-3xl">
+        {stats.map((s) => (
+          <div class="rounded-lg bg-white/10 ring-1 ring-white/25 px-3 sm:px-4 py-3">
+            <dt class="sr-only">{s.label}</dt>
+            <dd class="font-display font-black text-xl sm:text-4xl leading-none">{s.n}</dd>
+            <dd class="mt-1 text-xs sm:text-sm leading-snug text-white/85">{s.link ? <a href={s.link} class="underline underline-offset-4 hover:text-white">{s.label} →</a> : s.label}</dd>
+          </div>
+        ))}
+      </dl>
+      {breakdown.length > 0 && (
+        <p class="mt-3 text-sm text-white/85">Últimamente: {breakdown.map((x, i) => <>{i > 0 && ' · '}<span class="font-semibold text-white">{x.n}</span> {x.label}</>)}</p>
+      )}
+    </div>
+  </PageHeader>
+
+  <section class="bg-white border-b border-black/10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <dl class:list={['grid sm:grid-cols-2 gap-4', details.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3']}>
+        {details.map((d) => (
+          <div class="rounded-xl bg-mist p-5 flex flex-col">
+            <dt class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-dark">
+              <span class="w-8 h-8 rounded-full bg-red-dark text-white flex items-center justify-center"><UiIcon name={d.icon} class="w-4.5 h-4.5" /></span>
+              {d.label}
+            </dt>
+            <dd class="mt-3 font-semibold leading-snug">{d.body}</dd>
+            {d.sub && <dd class="mt-1 text-sm text-black-2">{d.sub}</dd>}
+            {d.access !== undefined && (
+              <dd class="mt-2 text-sm">
+                <span class="font-semibold">Accesibilidad:</span>{' '}
+                {d.access ?? <>¿Preguntas sobre acceso sin escalones, estacionamiento o si puedes traer a tus hijos? <a href={contactHref} class={linkClass}>Pregúntanos</a>.</>}
+              </dd>
+            )}
+            {d.link && (
+              <dd class="mt-auto pt-3 text-sm">
+                <a href={d.link.href} target={d.link.external ? '_blank' : undefined} rel={d.link.external ? 'noopener' : undefined} class:list={[linkClass, 'break-all']}>{d.link.text}{d.link.external && ' ↗'}</a>
+              </dd>
+            )}
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section class="py-14 sm:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14">
+      <div class="lg:col-span-7">
+        <SectionHeading eyebrow="Sobre la rama" title={`Organizándonos en ${b.name}.`} />
+        <div class="mt-6 space-y-4 text-lg leading-relaxed text-black-1">
+          {t.body.map((p) => <p>{p}</p>)}
+        </div>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href={href('/es/eventos/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors"><UiIcon name="calendar" /> Ver la próxima reunión</a>
+          <a href={href('/es/bienvenida/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-md transition-colors">¿Eres nuevo? Empieza aquí</a>
+        </div>
+      </div>
+      <aside class="lg:col-span-5">
+        <div class="rounded-2xl ring-1 ring-black/10 p-6">
+          <p class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-dark"><UiIcon name="clock" class="w-4 h-4" /> Próximos eventos de la rama</p>
+          <div class="mt-4"><EventList events={upcomingOwn.slice(0, 3)} lang="es" compact empty="No hay nada programado todavía. Revisa el calendario del capítulo." /></div>
+          {upcomingCivic.length > 0 && (
+            <div class="mt-6">
+              <p class="text-xs font-semibold tracking-[0.16em] uppercase text-black-2">Reuniones del gobierno local</p>
+              <ul class="mt-2 space-y-2 text-sm">
+                {upcomingCivic.map((e) => (
+                  <li class="flex gap-3">
+                    <span class="w-14 shrink-0 font-semibold text-black-2">{formatShortDate(e.start, 'es')}</span>
+                    {e.url ? <a href={e.url} target="_blank" rel="noopener" lang="en" class="hover:text-red-dark hover:underline underline-offset-4">{e.title}</a> : <span lang="en">{e.title}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <p class="mt-5 text-sm text-black-2">{esText.events.titlesNote}</p>
+          <p class="mt-2 text-sm"><a href={href('/es/eventos/')} class={linkClass}>Todos los eventos del capítulo →</a></p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {recent.length > 0 && (
+    <section class="py-14 sm:py-20 bg-mist">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Recientemente" title="Lo que hemos hecho." />
+        <ul class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3">
+          {recent.map((e) => {
+            const type = typeOf(e);
+            const where = shortLocation(e, 'es');
+            return (
+              <li class="flex gap-4 rounded-xl bg-white ring-1 ring-black/10 p-4">
+                <span class="w-12 shrink-0 text-center" aria-hidden="true">
+                  <span class="block text-xs font-semibold uppercase text-red-dark">{day(e.start, { month: 'short' })}</span>
+                  <span class="block font-display font-black text-3xl leading-none">{day(e.start, { day: 'numeric' })}</span>
+                </span>
+                <span class="min-w-0">
+                  <span class="sr-only">{formatShortDate(e.start, 'es')}: </span>
+                  {e.url ? <a href={e.url} target="_blank" rel="noopener" lang="en" class="font-semibold leading-snug hover:text-red-dark hover:underline underline-offset-4">{e.title}</a> : <span lang="en" class="font-semibold leading-snug">{e.title}</span>}
+                  <span class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-black-2">
+                    <span class:list={['px-2 py-0.5 rounded-full text-xs font-bold', badge[type]]}>{typeLabel(e, 'es')}</span>
+                    {where && <span class="truncate min-w-0 max-w-full">{where}</span>}
+                  </span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <section class="py-14 sm:py-20 bg-black text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+      <div class="lg:col-span-5">
+        <SectionHeading eyebrow="En todo el capítulo" title={`Una de ${allBranches.length} ramas.`} tone="dark" lede="Todas las ramas están abiertas a todos. Ve a la que te quede mejor." />
+        <ul class="mt-8 space-y-2">
+          {others.map(({ o, n }) => (
+            <li>
+              <a href={href(`/es/ramas/${o.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white/5 ring-1 ring-white/10 hover:bg-red-dark hover:ring-red-dark transition-colors">
+                <span class="w-8 h-8 shrink-0 rounded-full bg-white text-black font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{n}</span>
+                <span class="flex-1 min-w-0">
+                  <span class="block font-display font-bold">{o.data.name}</span>
+                  <span class="block text-sm text-white/65 group-hover:text-white/90">{branchEs(o.id).area}</span>
+                </span>
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-5"><a href={href('/es/ramas/#mas-cercana')} class="font-semibold text-red-2 hover:text-white underline underline-offset-4">Busca la rama más cercana a tu pueblo →</a></p>
+      </div>
+      <div class="lg:col-span-7 text-black"><BranchMap highlight={branch.id} lang="es" /></div>
+    </div>
+  </section>
+</Base>

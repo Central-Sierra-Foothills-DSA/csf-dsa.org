@@ -3,22 +3,23 @@ import { Image } from 'astro:assets';
 import site from '../data/site.json';
 import badge from '../assets/logos/csf-dsa-white.png';
 import { href, currentPath } from '../lib/paths';
+import { ui, otherLanguagePath, type Lang } from '../lib/i18n';
 
-const links = [
-  { path: '/about/', label: 'About' },
-  { path: '/events/', label: 'Events' },
-  { path: '/branches/', label: 'Branches' },
-  { path: '/campaigns/', label: 'Campaigns' },
-  { path: '/learn/', label: 'Learn' },
-  { path: '/member-resources/', label: 'Members' },
-];
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const t = ui[lang];
+
+const links = t.nav;
 const here = currentPath(Astro.url);
 const isActive = (p: string) => here.startsWith(p);
+// The same page in the other language (or its home page).
+const switchHref = href(otherLanguagePath(here, lang));
+const home = lang === 'es' ? '/es/' : '/';
 ---
 <header class="sticky top-0 z-50 bg-black/95 backdrop-blur text-white border-b border-white/10" id="site-header">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <a href={href('/')} class="flex items-center gap-3 font-display font-bold tracking-tight hover:text-red-2 transition-colors">
+      <a href={href(home)} class="flex items-center gap-3 font-display font-bold tracking-tight hover:text-red-2 transition-colors">
         <Image src={badge} alt="" width={96} height={96} loading="eager" class="w-12 h-12" />
         <span class="hidden lg:inline text-base">{site.orgName}</span>
         <span class="lg:hidden text-base">{site.orgNameShort}</span>
@@ -29,10 +30,11 @@ const isActive = (p: string) => here.startsWith(p);
           <a href={href(l.path)} aria-current={isActive(l.path) ? 'page' : undefined}
              class:list={['py-1 border-b-2 transition-colors hover:text-red-2', isActive(l.path) ? 'border-red text-white' : 'border-transparent']}>{l.label}</a>
         ))}
-        <a href={href('/new-members/')} class="px-4 py-2 bg-red hover:bg-red-dark rounded-md font-semibold whitespace-nowrap transition-colors">Join us</a>
+        <a href={switchHref} hreflang={t.switchLang} lang={t.switchLang} class="py-1 text-white/80 hover:text-red-2 whitespace-nowrap">{t.switchLabel}</a>
+        <a href={href(t.join.path)} class="px-4 py-2 bg-red-dark hover:bg-black-1 ring-1 ring-red-dark rounded-md font-semibold whitespace-nowrap transition-colors">{t.join.label}</a>
       </nav>
 
-      <button id="menu-btn" class="md:hidden p-2 -mr-2 rounded-md hover:bg-white/10 transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <button id="menu-btn" class="md:hidden p-2 -mr-2 rounded-md hover:bg-white/10 transition-colors" aria-label={t.menuOpen} data-label-open={t.menuOpen} data-label-close={t.menuClose} aria-expanded="false" aria-controls="mobile-menu">
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path class="icon-open" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
           <path class="icon-close hidden" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
@@ -47,7 +49,8 @@ const isActive = (p: string) => here.startsWith(p);
         <a href={href(l.path)} aria-current={isActive(l.path) ? 'page' : undefined}
            class:list={['px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors', isActive(l.path) && 'bg-white/10']}>{l.label}</a>
       ))}
-      <a href={href('/new-members/')} class="mt-2 px-4 py-3 bg-red hover:bg-red-dark rounded-md font-semibold text-center transition-colors">New here? Join us</a>
+      <a href={switchHref} hreflang={t.switchLang} lang={t.switchLang} class="px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors">{t.switchLabel}</a>
+      <a href={href(t.join.path)} class="mt-2 px-4 py-3 bg-red-dark hover:bg-black-1 ring-1 ring-red-dark rounded-md font-semibold text-center transition-colors">{t.join.mobile}</a>
     </div>
   </nav>
 </header>
@@ -60,7 +63,7 @@ const isActive = (p: string) => here.startsWith(p);
 
   function setOpen(open: boolean) {
     btn?.setAttribute('aria-expanded', String(open));
-    btn?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    btn?.setAttribute('aria-label', (open ? btn.dataset.labelClose : btn.dataset.labelOpen) ?? '');
     menu?.classList.toggle('hidden', !open);
     openIcon?.classList.toggle('hidden', open);
     closeIcon?.classList.toggle('hidden', !open);

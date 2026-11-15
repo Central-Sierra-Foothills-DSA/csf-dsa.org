@@ -15,7 +15,7 @@ const next = upcomingEvents().find((e) => typeOf(e) === 'meeting' && matches(e, 
 ---
 <article class="group relative bg-white rounded-xl ring-1 ring-black/10 shadow-sm hover:shadow-lg hover:ring-red transition-all overflow-hidden flex flex-col">
   <div class="flex items-center gap-4 px-6 pt-6">
-    {number && <span class="shrink-0 w-12 h-12 rounded-full bg-red text-white font-display font-black text-xl flex items-center justify-center" aria-hidden="true">{number}</span>}
+    {number && <span class="shrink-0 w-12 h-12 rounded-full bg-red-dark text-white font-display font-black text-xl flex items-center justify-center" aria-hidden="true">{number}</span>}
     <div class="min-w-0">
       <h3 class="font-display font-extrabold text-2xl leading-tight">
         <a href={href(`/branches/${branch.id}/`)} class="after:absolute after:inset-0 group-hover:text-red-dark">{b.name}</a>
@@ -33,7 +33,7 @@ const next = upcomingEvents().find((e) => typeOf(e) === 'meeting' && matches(e, 
       <dd>{b.venue}</dd>
     </div>
   </dl>
-  <div class="px-6 py-3.5 bg-mist group-hover:bg-red group-hover:text-white transition-colors flex items-center justify-between gap-3 text-sm font-semibold">
+  <div class="px-6 py-3.5 bg-mist group-hover:bg-red-dark group-hover:text-white transition-colors flex items-center justify-between gap-3 text-sm font-semibold">
     {next ? (
       <span class="inline-flex items-center gap-2">
         <span class="inline-block w-2 h-2 rounded-full bg-red group-hover:bg-white" aria-hidden="true"></span>

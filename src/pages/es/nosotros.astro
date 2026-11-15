@@ -1,0 +1,210 @@
+---
+// Spanish About page. Mirrors src/pages/about/index.astro.
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import BranchMap from '../../components/BranchMap.astro';
+import site from '../../data/site.json';
+import { workingGroupsEs } from '../../lib/es';
+import { href } from '../../lib/paths';
+
+const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
+const counties = `${site.counties.slice(0, -1).join(', ')} y ${site.counties.at(-1)}`;
+
+const facts = [
+  { n: site.founded, label: 'fundado en Auburn' },
+  { n: `~${site.approxMembers}`, label: 'miembros' },
+  { n: String(branches.length), label: 'ramas locales' },
+  { n: String(site.counties.length), label: 'condados' },
+  { n: '0', label: 'empleados pagados' },
+];
+
+const fightFor = ['Atención médica para todos', 'La vivienda como un derecho humano', 'Sindicatos fuertes', 'El fin de la vigilancia masiva en nuestros pueblos'];
+
+// De la raíz hacia arriba: cada nivel existe para apoyar al de arriba.
+const layers = [
+  { name: 'Los miembros', body: 'Todo lo demás existe para apoyar a la gente en el salón. Cualquier miembro puede traer una propuesta, unirse a un grupo de trabajo o postularse para un cargo.' },
+  { name: 'Las ramas', body: 'Grupos locales donde conoces a tus vecinos en persona. Las ramas llevan sus propias reuniones y proyectos.' },
+  { name: 'El capítulo', body: 'Los cuatro condados juntos. El capítulo se encarga de lo que cruza los límites de los condados y apoya a las ramas.' },
+  { name: 'DSA nacional', body: 'Más de cien mil miembros en todo el país. Los delegados de los capítulos fijan las prioridades nacionales en la convención.' },
+];
+const layerStyle = ['lg:w-full bg-black text-white', 'lg:w-[88%] bg-red-dark text-white', 'lg:w-[76%] bg-red-3 text-black', 'lg:w-[64%] bg-red-4 text-black'];
+
+// Funciones de los cargos, resumidas del Artículo V de los estatutos.
+const roles = [
+  { name: 'Copresidentes (dos)', body: 'Presiden las reuniones del capítulo y del comité directivo, hablan públicamente por el capítulo y coordinan el trabajo diario de las ramas y comités.' },
+  { name: 'Secretaría', body: 'Atiende la correspondencia del capítulo, lleva la lista de miembros y las actas de las reuniones, y mantiene el contacto con DSA nacional.' },
+  { name: 'Tesorería', body: 'Cuida los fondos y registros financieros del capítulo, prepara el presupuesto anual e informa a los miembros sobre las finanzas.' },
+  { name: 'Coordinación de redes sociales', body: 'Maneja las redes sociales del capítulo.' },
+  { name: 'Presidentes de rama', body: 'Cada presidente de rama tiene un lugar en el comité directivo, para que cada rama tenga voz en las decisiones del capítulo.' },
+];
+
+const decide = [
+  { title: 'Cualquiera puede proponer', body: 'Cualquier miembro puede presentar una moción. La discutimos juntos en una reunión del capítulo, donde las preguntas y enmiendas son bienvenidas. Los invitados también pueden hablar.' },
+  { title: 'Todos votan', body: 'Después de la reunión, cada miembro al corriente recibe una boleta anónima en línea. No tienes que estar en el salón para opinar.' },
+  { title: 'Lo local se queda local', body: 'Todo el capítulo vota sobre lo que abarca varios condados, como las elecciones al Congreso y el dinero del capítulo. Las ramas deciden los asuntos locales.' },
+];
+const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
+---
+<Base lang="es" title="Nosotros" description="Quiénes somos en Central Sierra Foothills DSA, en qué creemos y cómo se organizan el capítulo y sus ramas.">
+  <PageHeader eyebrow="Nosotros" title="Quiénes somos y cómo trabajamos." lede="Un capítulo de los Socialistas Democráticos de América en la sierra, dirigido por sus miembros. Sin empleados pagados ni grandes donantes. Solo vecinos que se organizan juntos." />
+
+  <section class="py-14 sm:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-12 gap-10 lg:gap-14">
+        <div class="lg:col-span-7">
+          <SectionHeading eyebrow="Quiénes somos" title="Un capítulo socialista para la sierra." />
+          <div class="mt-6 space-y-5 text-lg leading-relaxed">
+            <p>Central Sierra Foothills DSA es el capítulo local de los Socialistas Democráticos de América, la organización socialista más grande de Estados Unidos. Nuestros miembros viven y trabajan en los condados de {counties}.</p>
+            <p>El capítulo se fundó en Auburn en {site.founded}. Empezó esa primavera como un grupo de lectura que se formó alrededor de la campaña de Bernie Sanders y un Nuevo Pacto Verde local. Hoy tenemos unos {site.approxMembers} miembros y ramas en Grass Valley / Nevada City, Auburn, Placerville y Roseville.</p>
+          </div>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href={href('/es/bienvenida/')} class="inline-flex items-center px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">¿Eres nuevo? Empieza aquí</a>
+            <a href={href('/es/aprender/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-md transition-colors">¿Qué es el socialismo democrático?</a>
+          </div>
+        </div>
+        <div class="lg:col-span-5 rounded-2xl bg-black text-white p-7 sm:p-8 self-start">
+          <p class="text-xs font-semibold tracking-[0.18em] uppercase text-red-2">Por lo que luchamos</p>
+          <ul class="mt-4 space-y-3">
+            {fightFor.map((t) => (
+              <li class="flex gap-3 items-start font-display font-bold text-xl leading-snug"><span class="mt-2 w-2.5 h-2.5 shrink-0 rounded-full bg-red" aria-hidden="true"></span>{t}</li>
+            ))}
+          </ul>
+          <p class="mt-5 text-white/70 leading-relaxed">Cosas que mejoran la vida de la gente trabajadora.</p>
+        </div>
+      </div>
+      <dl class="mt-14 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 border-y-4 border-black">
+        {facts.map((f) => (
+          <div class="px-4 sm:px-6 py-6">
+            <dt class="sr-only">{f.label}</dt>
+            <dd class="font-display font-black text-4xl sm:text-5xl text-red-dark leading-none">{f.n}</dd>
+            <dd class="mt-2 font-semibold text-black-1">{f.label}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section class="py-14 sm:py-20 bg-red-dark text-white overflow-hidden">
+    <figure class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <span class="absolute -top-10 sm:-top-14 left-0 sm:-left-2 font-display font-black text-[10rem] sm:text-[14rem] leading-none text-white/15 select-none" aria-hidden="true">“</span>
+      <blockquote class="relative font-display font-bold text-2xl sm:text-3xl leading-snug">
+        Nuestra idea del socialismo es profundamente democrática. Se basa en la convicción de que los seres humanos deben ser libres para desarrollarse plenamente, de que las políticas públicas deben decidirse no por la riqueza sino por la participación popular, y de que las libertades individuales deben protegerse con cuidado.
+      </blockquote>
+      <figcaption class="relative mt-6 flex items-center gap-3 font-semibold">
+        <span class="h-1 w-10 bg-white" aria-hidden="true"></span>
+        <span>De nuestros <a href={href('/about/bylaws/')} hreflang="en" class="underline underline-offset-4 hover:text-black">estatutos</a>, Artículo II (traducción; los estatutos oficiales están en inglés)</span>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section id="estructura" class="py-14 sm:py-20 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+      <div class="lg:col-span-4">
+        <SectionHeading eyebrow="Cómo nos organizamos" title="Construido desde la raíz." lede="DSA funciona de abajo hacia arriba. Los miembros fijan las prioridades del capítulo, y los delegados de los capítulos fijan las nacionales." />
+      </div>
+      <ol class="lg:col-span-8 flex flex-col-reverse items-center gap-2.5">
+        {layers.map((l, i) => (
+          <li class:list={['w-full rounded-xl px-6 py-5 sm:flex sm:items-baseline sm:gap-6', layerStyle[i]]}>
+            <span class="flex items-baseline gap-3 sm:w-44 shrink-0">
+              <span class="font-display font-black text-sm opacity-70" aria-hidden="true">{i + 1}</span>
+              <span class="font-display font-black text-xl">{l.name}</span>
+            </span>
+            <span class="block mt-1 sm:mt-0 leading-relaxed opacity-90">{l.body}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section id="comite-directivo" class="py-14 sm:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-12 gap-10 lg:gap-14 items-end">
+        <div class="lg:col-span-6">
+          <SectionHeading eyebrow="Comité directivo" title="Quién mantiene todo en marcha." />
+          <div class="mt-6 space-y-4 text-lg leading-relaxed">
+            <p>El comité directivo está formado por los cinco cargos del capítulo más el presidente de cada rama. Los miembros eligen los cargos cada año. Las nominaciones siempre están abiertas, y cualquier miembro al corriente puede postularse.</p>
+            <p>El comité lleva a cabo lo que deciden los miembros y atiende los asuntos entre reuniones. Responde a los miembros, no al revés. Nuestros estatutos lo llaman el Comité Ejecutivo.</p>
+          </div>
+        </div>
+        <div class="lg:col-span-6 flex flex-wrap items-center gap-3 sm:gap-4 font-display" aria-label={`Cinco cargos más ${branches.length} presidentes de rama forman el comité directivo`}>
+          <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">5</span><span class="block mt-1 text-sm font-bold">cargos</span></span>
+          <span class="font-black text-3xl text-red-dark" aria-hidden="true">+</span>
+          <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{branches.length}</span><span class="block mt-1 text-sm font-bold">presidentes de rama</span></span>
+          <span class="font-black text-3xl text-red-dark" aria-hidden="true">=</span>
+          <span class="rounded-xl bg-red-dark text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + branches.length}</span><span class="block mt-1 text-sm font-bold">comité directivo</span></span>
+        </div>
+      </div>
+      <ul class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {roles.map((r, i) => (
+          <li class:list={['rounded-xl p-6', i === roles.length - 1 ? 'bg-red-dark text-white' : 'bg-mist']}>
+            <p class:list={['text-xs font-semibold tracking-[0.16em] uppercase', i === roles.length - 1 ? 'text-white/80' : 'text-red-dark']}>{i === roles.length - 1 ? 'Uno por rama' : 'Cargo'}</p>
+            <h3 class="mt-1 font-display font-extrabold text-xl">{r.name}</h3>
+            <p class:list={['mt-2 leading-relaxed', i === roles.length - 1 ? 'text-white/90' : 'text-black-2']}>{r.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section id="ramas-y-grupos" class="py-14 sm:py-20 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        <div class="lg:col-span-5">
+          <SectionHeading eyebrow="Ramas" title="Locales, y a cargo de lo local." />
+          <p class="mt-6 text-lg leading-relaxed">Una rama es un grupo de al menos cinco miembros organizado alrededor de un pueblo o zona. Las ramas tienen sus propias reuniones, hablan por DSA localmente y pueden respaldar candidatos en elecciones locales por su cuenta. Cada rama elige un presidente, que la representa en el comité directivo.</p>
+          <ol class="mt-6 space-y-2">
+            {branches.map((b, i) => (
+              <li>
+                <a href={href(`/es/ramas/${b.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white ring-1 ring-black/10 hover:ring-red-dark transition-colors">
+                  <span class="w-8 h-8 shrink-0 rounded-full bg-red-dark text-white font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+                  <span class="font-display font-bold flex-1 group-hover:text-red-dark">{b.data.name}</span>
+                  <span class="text-red-dark" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+          <p class="mt-4 text-black-2">¿No hay una rama cerca de ti? Nos encantaría ver una en Truckee y Tahoe. <a href={`mailto:${site.contactEmail}`} class={linkClass}>Escríbenos</a> y te ayudamos a empezarla.</p>
+        </div>
+        <div class="lg:col-span-7"><BranchMap lang="es" /></div>
+      </div>
+
+      <div class="mt-16 sm:mt-20">
+        <SectionHeading eyebrow="Grupos de trabajo" title="Equipos que cruzan los condados." lede="Los grupos de trabajo se encargan de un tipo de trabajo para todo el capítulo. Están abiertos a todos los miembros, y cualquiera puede empezar uno." />
+        <dl class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {workingGroupsEs.map((g) => (
+            <div class="bg-white rounded-xl p-6 ring-1 ring-black/10 border-t-4 border-red">
+              <dt class="font-display font-extrabold text-xl">{g.name}</dt>
+              <dd class="mt-2 text-black-2 leading-relaxed">{g.description}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="decisiones" class="py-14 sm:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="Cómo decidimos" title="Un miembro, un voto." />
+      <ol class="mt-10 grid md:grid-cols-3 gap-4">
+        {decide.map((d, i) => (
+          <li class:list={['rounded-xl p-6', i === 2 ? 'bg-black text-white' : 'bg-mist']}>
+            <span class:list={['font-display font-black text-5xl leading-none', i === 2 ? 'text-red-2' : 'text-red-dark']}>{i + 1}</span>
+            <h3 class="mt-3 font-display font-extrabold text-xl">{d.title}</h3>
+            <p class:list={['mt-2 leading-relaxed', i === 2 ? 'text-white/80' : 'text-black-2']}>{d.body}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="mt-8 text-lg leading-relaxed max-w-3xl">El capítulo tiene una Asamblea General cada año para elegir los cargos, y al menos cuatro reuniones regulares del capítulo al año. La mayoría de las ramas se reúne una vez al mes. Las reglas completas están en nuestros <a href={href('/about/bylaws/')} hreflang="en" class={linkClass}>estatutos (en inglés)</a>.</p>
+    </div>
+  </section>
+
+  <section class="py-14 sm:py-16 bg-black text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="font-display font-black text-3xl sm:text-4xl">¿Preguntas sobre el capítulo?</h2>
+      <p class="mt-4 text-lg text-white/80">Escribe a <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-3 hover:text-white underline underline-offset-4">{site.contactEmail}</a> o ven a una reunión y pregunta en persona.</p>
+      <a href={href('/es/eventos/')} class="mt-8 inline-flex items-center px-6 py-3.5 bg-red-dark hover:bg-red text-white font-semibold rounded-md transition-colors">Ver próximos eventos</a>
+    </div>
+  </section>
+</Base>

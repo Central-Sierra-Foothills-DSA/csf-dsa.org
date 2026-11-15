@@ -1,0 +1,110 @@
+---
+// Spanish branches page. Mirrors src/pages/branches/index.astro.
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import SectionHeading from '../../../components/SectionHeading.astro';
+import BranchMap from '../../../components/BranchMap.astro';
+import UiIcon from '../../../components/UiIcon.astro';
+import site from '../../../data/site.json';
+import towns from '../../../data/towns.json';
+import { milesBetween } from '../../../lib/geo';
+import { upcomingEvents, matches, typeOf, formatLongDate, formatTime } from '../../../lib/events';
+import { branchEs } from '../../../lib/es';
+import { href } from '../../../lib/paths';
+
+const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
+const upcoming = upcomingEvents();
+const nextMeeting = (keywords: string[]) => upcoming.find((e) => typeOf(e) === 'meeting' && matches(e, { keywords }));
+
+// Same closest-branch rules as the English page.
+const FAR_MILES = 30;
+const placed = towns.map((t) => {
+  const inCounty = branches.filter((b) => b.data.counties.includes(t.county));
+  const pool = inCounty.length ? inCounty : branches;
+  const ranked = pool.map((b) => ({ b, miles: milesBetween(t, b.data) })).sort((x, y) => x.miles - y.miles);
+  return { town: t, branch: ranked[0].b, miles: ranked[0].miles };
+});
+const near = (id: string) => placed.filter((p) => p.branch.id === id && p.miles <= FAR_MILES).sort((a, b) => a.town.name.localeCompare(b.town.name));
+const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name.localeCompare(b.town.name));
+const farList = far.length > 1 ? `${far.map((p) => p.town.name).slice(0, -1).join(', ')} o ${far.at(-1)!.town.name}` : far[0]?.town.name;
+---
+<Base lang="es" title="Ramas" description="Encuentra la rama de Central Sierra Foothills DSA más cercana: Grass Valley / Nevada City, Auburn, Placerville o Roseville.">
+  <PageHeader eyebrow="Ramas" title="Encuentra tu rama." lede="Nuestro capítulo va de Roseville al lago Tahoe, así que nos organizamos localmente. La mayoría de las ramas se reúne una vez al mes, y cada una lleva sus propios proyectos. Ve a la que te quede mejor. Todas están abiertas a todos." />
+
+  <section class="py-14 sm:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+      <div class="lg:sticky lg:top-24"><BranchMap lang="es" /></div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-1 gap-5">
+        {branches.map((b, i) => {
+          const t = branchEs(b.id);
+          const next = nextMeeting(b.data.keywords);
+          return (
+            <article class="group relative bg-white rounded-xl ring-1 ring-black/10 shadow-sm hover:shadow-lg hover:ring-red-dark transition-all overflow-hidden flex flex-col">
+              <div class="flex items-center gap-4 px-6 pt-6">
+                <span class="shrink-0 w-12 h-12 rounded-full bg-red-dark text-white font-display font-black text-xl flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+                <div class="min-w-0">
+                  <h3 class="font-display font-extrabold text-2xl leading-tight"><a href={href(`/es/ramas/${b.id}/`)} class="after:absolute after:inset-0 group-hover:text-red-dark">{b.data.name}</a></h3>
+                  <p class="text-sm text-black-2 mt-0.5">{t.area}</p>
+                </div>
+              </div>
+              <dl class="px-6 py-5 space-y-2.5 text-sm flex-1">
+                <div class="flex gap-2.5"><dt class="text-red-dark mt-px"><UiIcon name="calendar" class="w-4.5 h-4.5" /><span class="sr-only">Cuándo</span></dt><dd>{t.meets}</dd></div>
+                <div class="flex gap-2.5"><dt class="text-red-dark mt-px"><UiIcon name="pin" class="w-4.5 h-4.5" /><span class="sr-only">Dónde</span></dt><dd>{t.venue}</dd></div>
+              </dl>
+              <div class="px-6 py-3.5 bg-mist group-hover:bg-red-dark group-hover:text-white transition-colors flex items-center justify-between gap-3 text-sm font-semibold">
+                <span>{next ? `Próxima reunión: ${formatLongDate(next.start, 'es')}, ${formatTime(next.start, 'es')}` : 'Pronto habrá fecha en el calendario'}</span>
+                <span aria-hidden="true">→</span>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section id="mas-cercana" class="py-14 sm:py-20 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="La rama más cercana" title="Busca tu pueblo." lede="Encuentra tu pueblo abajo para ver qué rama se reúne más cerca de ti. Es solo una sugerencia según la distancia." />
+      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {branches.map((b, i) => (
+          <div class="bg-white rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
+            <a href={href(`/es/ramas/${b.id}/`)} class="group flex items-center gap-3 px-5 py-4 bg-red-dark text-white hover:bg-black-1 transition-colors">
+              <span class="w-8 h-8 shrink-0 rounded-full bg-white text-red-dark font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+              <span class="font-display font-extrabold text-lg leading-tight flex-1">{b.data.name}</span>
+              <span aria-hidden="true">→</span>
+            </a>
+            <ul class="p-4 flex flex-wrap gap-1.5">
+              {near(b.id).map((p) => <li class="px-2.5 py-1 rounded-full bg-mist text-sm">{p.town.name}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      {far.length > 0 && (
+        <div class="mt-6 p-6 sm:p-8 rounded-xl border-2 border-dashed border-red/50 bg-white sm:flex sm:items-center sm:gap-8">
+          <div class="flex-1">
+            <h3 class="font-display font-extrabold text-xl">¿Vives lejos de todas las ramas?</h3>
+            <p class="mt-2 text-black-2 leading-relaxed">
+              Si vives en {farList} o cerca, cualquier rama queda lejos. Las reuniones de todo el capítulo muchas veces son por Zoom, algunas ramas ofrecen un enlace de Zoom, y nos encantaría ayudarte a empezar una rama más cerca de tu casa.
+            </p>
+          </div>
+          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Empezar una rama')}`} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">
+            <UiIcon name="mail" /> Escríbenos
+          </a>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="py-14 sm:py-16 bg-black text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="font-display font-black text-3xl sm:text-4xl">Todas las ramas están abiertas a todos.</h2>
+      <p class="mt-4 text-lg text-white/80">Escoge la que te quede mejor y ven a una reunión. No necesitas ser miembro todavía.</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href={href('/es/eventos/')} class="px-6 py-3 bg-red-dark hover:bg-red rounded-md font-semibold transition-colors">Ver próximas reuniones</a>
+        <a href={href('/es/bienvenida/')} class="px-6 py-3 ring-2 ring-white/40 hover:ring-white rounded-md font-semibold transition-colors">¿Eres nuevo? Empieza aquí</a>
+      </div>
+    </div>
+  </section>
+</Base>

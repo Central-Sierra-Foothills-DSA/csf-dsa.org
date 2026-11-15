@@ -63,7 +63,7 @@ const civic = upcomingEvents().filter((e) => typeOf(e) === 'civic').slice(0, 4);
         <ul class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {tools.map((t) => (
             <li>
-              <a href={t.url} target="_blank" rel="noopener" class="group block h-full p-5 bg-mist rounded-lg hover:bg-red hover:text-white transition-colors">
+              <a href={t.url} target="_blank" rel="noopener" class="group block h-full p-5 bg-mist rounded-lg hover:bg-red-dark hover:text-white transition-colors">
                 <span class="font-display font-bold text-lg">{t.label} <span aria-hidden="true">↗</span></span>
                 <p class="mt-1 text-sm text-black-2 group-hover:text-white leading-relaxed">{t.what}</p>
               </a>
