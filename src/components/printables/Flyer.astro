@@ -26,7 +26,7 @@ const line = 'border-b-[0.25cqw] border-black-3';
 const ready = Object.keys(fields).length === 0;
 ---
 <article class="flyer @container w-full h-full bg-white text-black flex flex-col overflow-hidden">
-  <header class="bg-red text-white flex items-center gap-[3cqw] px-[6cqw] py-[3cqw]">
+  <header class:list={[design.tone === 'black' ? 'bg-black' : 'bg-red', 'text-white flex items-center gap-[3cqw] px-[6cqw] py-[3cqw]']}>
     <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[10cqw] h-[10cqw]" />
     <p class="font-display font-bold text-[3.6cqw] leading-[1.1]">Central Sierra<br />Foothills DSA</p>
   </header>
@@ -57,7 +57,7 @@ const ready = Object.keys(fields).length === 0;
     ) : (
     <div class="mt-[3cqw] flex gap-[3cqw] items-stretch">
       <section class="flex-1 min-w-0 rounded-[2cqw] bg-mist px-[3.5cqw] pt-[2.6cqw] pb-[3cqw]">
-        <p class="font-semibold uppercase tracking-[0.16em] text-[2.5cqw] text-red-dark">{fieldBox.title}</p>
+        <p class="font-semibold uppercase tracking-[0.16em] text-[2.5cqw] text-red-dark">{design.fieldTitle ?? fieldBox.title}</p>
         <dl>
           {(['when', 'where'] as const).filter((k) => fields[k]).map((k) => (
             <div class="flex items-end gap-[2cqw] mt-[1cqw]">

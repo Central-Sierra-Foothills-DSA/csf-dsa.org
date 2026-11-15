@@ -12,6 +12,7 @@ const ready = getReadyMade();
 const flyerSections = [
   { id: 'join', group: 'join', bg: 'bg-mist', eyebrow: 'Join us', title: 'Ready-made recruiting flyers.', lede: 'Nothing to fill in. The QR code goes to the chapter sign-up form. Print sizes are PDFs; social sizes are PNG images.' },
   { id: 'event', group: 'event', bg: 'bg-white', eyebrow: 'Event flyers', title: 'Add your event, then print.', lede: 'Print sizes are PDFs with fill-in boxes for when, where, and a short note. Social sizes are PNG images, ready to post.' },
+  { id: 'hangouts', group: 'hangout', bg: 'bg-mist', eyebrow: 'Hangouts and socials', title: 'Coffee, snacks, and good company.', lede: 'Invitations to socials, with fill-in boxes for when and where. The QR code goes to the events calendar. Social sizes are PNG images that point people to the calendar.' },
 ] as const;
 const items = await getPrintables();
 const { howTo, rules } = printablesText;
@@ -26,7 +27,7 @@ const downloadName = (file: string) => file.split('/').pop();
     back={{ href: href('/member-resources/'), label: 'Member resources' }}
   >
     <nav aria-label="On this page" class="mt-6 flex flex-wrap gap-2">
-      {[['#join', 'Join us flyers'], ['#event', 'Event flyers'], ['#ready', 'Signs, handouts, and images']].map(([to, label]) => (
+      {[['#join', 'Join us flyers'], ['#event', 'Event flyers'], ['#hangouts', 'Hangouts and socials'],['#ready', 'Signs, handouts, and images']].map(([to, label]) => (
         <a href={to} class="px-4 py-2 rounded-full bg-white/10 ring-1 ring-white/40 hover:bg-white hover:text-red-dark font-semibold text-sm transition-colors">{label}</a>
       ))}
     </nav>
@@ -106,7 +107,7 @@ const downloadName = (file: string) => file.split('/').pop();
   </section>
   ))}
 
-  <section id="ready" class="py-12 sm:py-16 bg-mist">
+  <section id="ready" class="py-12 sm:py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Ready to go" title="Nothing to fill in. Print or post." lede="Signs, handouts, and sheets for tables and meetings, plus images to share." />
       {(['print', 'social'] as const).map((group) => (

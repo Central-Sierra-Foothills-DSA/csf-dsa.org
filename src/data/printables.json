@@ -59,6 +59,42 @@
   "joinCta": "Scan to join us",
   "joinSocialCta": "Join us",
 
+  "_hangouts": "Invitations to socials and hangouts. They have fill-in boxes for when and where, and a black header so they look different from the recruiting flyers. The QR code goes to the events calendar.",
+  "hangouts": [
+    {
+      "id": "hangout-come-hang-out",
+      "title": "Come hang out",
+      "eyebrow": "Social",
+      "headline": "Come hang out.",
+      "body": "No agenda, no speeches. Just neighbors who care about the same things, getting to know each other. Bring a friend."
+    },
+    {
+      "id": "hangout-coffee",
+      "title": "Coffee with socialists",
+      "eyebrow": "Social",
+      "headline": "Coffee with socialists.",
+      "body": "Grab a cup and come talk about whatever's on your mind: work, rent, your town, the news. Curious newcomers welcome."
+    },
+    {
+      "id": "hangout-snacks",
+      "title": "Snacks and solidarity",
+      "eyebrow": "Social",
+      "headline": "Snacks and solidarity.",
+      "body": "Good food, good company, and good conversation. Come meet the people organizing in your town."
+    },
+    {
+      "id": "hangout-potluck",
+      "title": "Potluck",
+      "eyebrow": "Potluck",
+      "headline": "Bring a dish. Bring a friend.",
+      "body": "Members, friends, and anyone curious about DSA are invited. There'll be plenty to eat and plenty to talk about."
+    }
+  ],
+  "hangoutCta": "Scan for upcoming events",
+  "hangoutSocialCta": "Upcoming events",
+  "hangoutFieldTitle": "Join us",
+  "hangoutQr": { "path": "/events/" },
+
   "fieldBox": {
     "title": "Our next event",
     "labels": { "when": "When", "where": "Where", "note": "Also" }

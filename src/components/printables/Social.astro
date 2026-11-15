@@ -18,7 +18,7 @@ interface Props {
 const { design, compact = false, tall = false } = Astro.props;
 const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
 ---
-<article class:list={['social @container w-full h-full bg-red text-white flex flex-col overflow-hidden', tall ? 'p-[8cqw] pt-[14cqw] pb-[16cqw]' : 'p-[7cqw]']}>
+<article class:list={['social @container w-full h-full text-white', design.tone === 'black' ? 'bg-black' : 'bg-red', ' flex flex-col overflow-hidden', tall ? 'p-[8cqw] pt-[14cqw] pb-[16cqw]' : 'p-[7cqw]']}>
   <header class="flex items-center gap-[3cqw]">
     <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[13cqw] h-[13cqw]" />
     <p class="font-display font-bold text-[4.2cqw] leading-[1.1]">Central Sierra<br />Foothills DSA</p>
@@ -27,7 +27,7 @@ const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//,
   <div class="flex-1 flex flex-col justify-center py-[4cqw]">
     <p class="font-semibold uppercase tracking-[0.16em] text-[3.2cqw] text-white/85">{design.eyebrow}</p>
     <h1 class:list={['mt-[2cqw] font-display font-black leading-[0.93] tracking-[-0.01em]', tall ? 'text-[15cqw]' : 'text-[12.5cqw]']}>{design.headline}</h1>
-    <div class="mt-[4cqw] h-[1.4cqw] w-[18cqw] bg-white"></div>
+    <div class:list={['mt-[4cqw] h-[1.4cqw] w-[18cqw]', design.tone === 'black' ? 'bg-red' : 'bg-white']}></div>
     {!compact && <p class:list={['mt-[4cqw] leading-[1.35] text-white/90', tall ? 'text-[4.6cqw]' : 'text-[4cqw]']}>{design.body}</p>}
     {!compact && design.meets && (
       <p class="mt-[3cqw] text-[3.8cqw] leading-[1.35]"><span class="font-bold">{design.meets.label}:</span> {design.meets.text}</p>

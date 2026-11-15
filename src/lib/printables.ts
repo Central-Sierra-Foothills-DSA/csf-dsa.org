@@ -59,8 +59,12 @@ export const formatIds = Object.keys(formats) as FormatId[];
 
 export type Design = {
   id: string;
-  /** 'event' flyers have fill-in boxes; 'join' flyers are ready-made. */
-  group: 'event' | 'join';
+  /** 'event' and 'hangout' flyers have fill-in boxes; 'join' flyers are ready-made. */
+  group: 'event' | 'join' | 'hangout';
+  /** Header color. Hangouts use black so they read differently from recruiting flyers. */
+  tone?: 'red' | 'black';
+  /** Heading of the fill-in box, if not the default. */
+  fieldTitle?: string;
   title: string;
   eyebrow: string;
   headline: string;
@@ -127,6 +131,14 @@ export async function getDesigns(): Promise<Design[]> {
       cta: data.joinCta, socialCta: data.joinSocialCta, qrUrl: chapterQr, qrLabel: displayUrl(chapterQr),
     });
   }
+  const eventsQr = linkFor(data.hangoutQr);
+  for (const h of data.hangouts) {
+    designs.push({
+      id: h.id, group: 'hangout', tone: 'black', fieldTitle: data.hangoutFieldTitle,
+      title: h.title, eyebrow: h.eyebrow, headline: h.headline, body: h.body,
+      cta: data.hangoutCta, socialCta: data.hangoutSocialCta, qrUrl: eventsQr, qrLabel: displayUrl(eventsQr),
+    });
+  }
   return designs;
 }
 
@@ -136,7 +148,7 @@ export async function getPrintables(): Promise<Printable[]> {
     formatIds.map((formatId) => {
       const format: Format = formats[formatId];
       const slug = `${design.id}-${formatId}`;
-      const fields = format.kind === 'pdf' && design.group === 'event' ? format.fields : {};
+      const fields = format.kind === 'pdf' && design.group !== 'join' ? format.fields : {};
       return { slug, design, formatId, format, fields, file: `${printablesDir}/csf-dsa-${slug}.${format.kind}` };
     }),
   );
