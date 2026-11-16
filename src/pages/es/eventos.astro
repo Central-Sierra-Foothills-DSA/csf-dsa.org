@@ -5,46 +5,45 @@ import EventSchema from '../../components/EventSchema.astro';
 import ShareLinks from '../../components/ShareLinks.astro';
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import EventList from '../../components/EventList.astro';
+import EventsBrowser from '../../components/EventsBrowser.astro';
 import CalendarSubscribe from '../../components/CalendarSubscribe.astro';
+import CommunityEvents from '../../components/CommunityEvents.astro';
+import SuggestEvent from '../../components/SuggestEvent.astro';
+import UiIcon from '../../components/UiIcon.astro';
 import site from '../../data/site.json';
-import { upcomingEvents, typeOf, EVENT_TYPES, EVENT_TYPES_ES, eventsFetchedAt, formatShortDate } from '../../lib/events';
+import { upcomingEvents, eventsFetchedAt, formatShortDate } from '../../lib/events';
+import { printMonths } from '../../lib/calendar';
 import { esText } from '../../lib/i18n';
+import { href } from '../../lib/paths';
 
-const upcoming = upcomingEvents(new Date());
-const present = EVENT_TYPES.filter((t) => upcoming.some((e) => typeOf(e) === t.key));
-const count = (key: string) => upcoming.filter((e) => typeOf(e) === key).length;
-
-// Same no-JavaScript filter as the English page.
-const filterCss = present
-  .map((t) => `
-.events-filter:has(input[value="${t.key}"]:checked) ~ .events-list .event:not([data-type="${t.key}"]) { display: none; }
-.events-filter:has(input[value="${t.key}"]:checked) ~ .events-list .event-day:not(:has(.event[data-type="${t.key}"])) { display: none; }`)
-  .join('\n');
+const now = new Date();
+const upcoming = upcomingEvents(now);
 ---
-<Base lang="es" title="Eventos" description="Próximas reuniones, convivios, acciones y capacitaciones de Central Sierra Foothills DSA.">
+<Base lang="es" title="Eventos" description="Próximas reuniones, convivios, acciones y capacitaciones de Central Sierra Foothills DSA, con vista de mes y enlaces para agregarlos a tu calendario.">
   <PageHeader eyebrow="Eventos" title="Lo que viene." lede="Reuniones de rama, convivios, acciones y reuniones del gobierno local donde nuestras campañas están en la agenda. No tienes que ser miembro para venir." />
 
   <section class="py-12 sm:py-16 bg-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <p class="mb-6 rounded-lg bg-mist px-4 py-3 text-sm text-black-1">{esText.events.titlesNote} Las fechas, horas y tipos de evento están en español.</p>
-      <style set:html={filterCss}></style>
 
-      <fieldset class="events-filter">
-        <legend class="text-xs font-semibold tracking-[0.18em] uppercase text-black-2 mb-3">Mostrar</legend>
-        <div class="flex flex-wrap gap-2">
-          <label class="chip"><input type="radio" name="type" value="all" class="sr-only" checked /> Todo <span class="chip-count">{upcoming.length}</span></label>
-          {present.map((t) => (
-            <label class="chip"><input type="radio" name="type" value={t.key} class="sr-only" /> {EVENT_TYPES_ES[t.key].plural} <span class="chip-count">{count(t.key)}</span></label>
-          ))}
-        </div>
-      </fieldset>
+      <EventsBrowser events={upcoming} now={now} lang="es" empty={esText.events.empty} />
 
-      <div class="events-list mt-8">
-        <EventList events={upcoming} lang="es" empty={esText.events.empty} />
-      </div>
+      <div class="mt-10"><CommunityEvents now={now} lang="es" /></div>
 
       <div class="mt-10"><CalendarSubscribe lang="es" /></div>
+
+      <div class="mt-4 grid md:grid-cols-2 gap-4">
+        <SuggestEvent lang="es" />
+        <div class="rounded-xl ring-1 ring-black/10 p-6">
+          <h2 class="flex items-center gap-2 font-display font-bold text-lg"><UiIcon name="document" class="w-5 h-5 text-red-dark shrink-0" /> Imprime el mes</h2>
+          <p class="text-sm text-black-2 mt-1 leading-relaxed">Un calendario de una página con código QR, para mesas informativas, reuniones y tableros de anuncios. Se actualiza cada mañana. Está en inglés.</p>
+          <p class="mt-3 flex flex-wrap gap-2">
+            {printMonths(now).map((m) => (
+              <a href={href(`/events/print/${m.key}/`)} hreflang="en" class="inline-flex items-center px-4 py-2.5 rounded-md bg-white ring-1 ring-black/15 hover:ring-red-dark hover:text-red-dark font-semibold text-sm transition-colors">{m.label}</a>
+            ))}
+          </p>
+        </div>
+      </div>
 
       <div class="mt-4 p-6 rounded-xl bg-mist flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

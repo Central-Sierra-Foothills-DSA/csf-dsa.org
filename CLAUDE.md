@@ -23,7 +23,10 @@ A static site built with Astro 5 and Tailwind CSS 4. No backend, no database.
 | `/about/bylaws/`         | `src/pages/about/bylaws.md`            | Full text of the chapter bylaws             |
 | `/branches/`             | `src/pages/branches/index.astro`       | Branch map, cards, closest-branch lookup    |
 | `/branches/<name>/`      | `src/pages/branches/[slug].astro`      | One page per file in `src/content/branches/`|
-| `/events/`               | `src/pages/events.astro`               | All upcoming events with a type filter      |
+| `/events/`               | `src/pages/events.astro`               | Upcoming events: this week, filters (kind, branch, good first events), list and month views |
+| `/events/print/<YYYY-MM>/` | `src/pages/events/print/[month].astro` | One-page printable calendar for this month and next (built daily; `noindex`) |
+| `/calendar/<feed>.ics`   | `src/pages/calendar/[feed].ics.ts`     | Smaller calendar feeds: one per active branch, one per kind of event |
+| `/calendar/event/<id>.ics` | `src/pages/calendar/event/[id].ics.ts` | One event as a calendar file (the "Apple Calendar" add-to-calendar option) |
 | `/campaigns/`            | `src/pages/campaigns/index.astro`      | Active campaigns and endorsements           |
 | `/campaigns/<name>/`     | `src/pages/campaigns/[slug].astro`     | One page per file in `src/content/campaigns/`|
 | `/learn/`                | `src/pages/learn.astro`                | What democratic socialism is, glossary, quotes |
@@ -43,6 +46,12 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | How soon the chapter replies to sign-ups (optional; shown on New here once set) | `afterSignup.replyTime` in `src/data/getting-started.json` |
 | "Find your fit" quiz options | `src/data/quiz.json` (each points to a working group by exact name) |
 | Search engine data (events in Google, chapter info) | `src/components/EventSchema.astro`, `src/components/OrgSchema.astro` (built from the calendar and site.json) |
+| Events page layout, filters, month view | `src/components/EventsBrowser.astro` (used by `/events/` and `/es/eventos/`) |
+| "Add to calendar" menu on each event | `src/components/AddToCalendar.astro`; links and `.ics` files come from `src/lib/calendar.ts` |
+| Which smaller calendar feeds exist | `getFeeds()` in `src/lib/calendar.ts` |
+| Which events are tagged "Good first event" | `isGoodFirst()` in `src/lib/events.ts` (socials, plus newcomer words in the title) |
+| "Suggest an event" email template | `src/components/SuggestEvent.astro` |
+| Events by other groups ("From the community") | `src/data/community-events.json`. Empty until the steering committee agrees on what to list; the section appears once there's an upcoming entry |
 | "Invite a friend" text/email buttons | `src/components/InviteFriend.astro` |
 | A branch's schedule, venue, or description | `src/content/branches/<name>.md`         |
 | Add a branch                     | New file in `src/content/branches/` (copy an existing one), plus its Spanish entry in `src/data/es/branches.json` |

@@ -10,6 +10,7 @@ import EventList from '../../../components/EventList.astro';
 import BranchMap from '../../../components/BranchMap.astro';
 import SectionHeading from '../../../components/SectionHeading.astro';
 import UiIcon from '../../../components/UiIcon.astro';
+import CalendarSubscribe from '../../../components/CalendarSubscribe.astro';
 import site from '../../../data/site.json';
 import { upcomingEvents, pastEvents, matches, typeLabel, typeOf, formatShortDate, shortLocation, EVENT_TYPES_ES, TIMEZONE } from '../../../lib/events';
 import { branchEs } from '../../../lib/es';
@@ -166,6 +167,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           <p class="mt-5 text-sm text-black-2">{esText.events.titlesNote}</p>
           <p class="mt-2 text-sm"><a href={href('/es/eventos/')} class={linkClass}>Todos los eventos del capítulo →</a></p>
         </div>
+        {!forming && <div class="mt-5"><CalendarSubscribe feed={branch.id} lang="es" stack /></div>}
       </aside>
     </div>
   </section>

@@ -1,6 +1,7 @@
 ---
 // A scannable list of events grouped by day. Used on the home page, the events
 // page, and branch and campaign pages.
+import AddToCalendar from './AddToCalendar.astro';
 import { type ChapterEvent, type Lang, groupByDay, formatTimeRange, shortLocation, isVirtual, typeOf, typeLabel, eventSummary } from '../lib/events';
 
 interface Props {
@@ -13,8 +14,14 @@ interface Props {
   lang?: Lang;
   /** Show a one- or two-line summary from the event's description. */
   summaries?: boolean;
+  /** Show the "Add to calendar" menu on each event. On by default except in compact lists. */
+  calendar?: boolean;
+  /** Extra data attributes for each event (used by the events page filters). */
+  attrs?: (e: ChapterEvent) => Record<string, string>;
+  /** Give each day an id (prefix + YYYY-MM-DD) so the month view can link to it. */
+  dayIds?: string;
 }
-const { events, empty = 'Nothing on the calendar right now.', compact = false, lang = 'en', summaries = !compact } = Astro.props;
+const { events, empty = 'Nothing on the calendar right now.', compact = false, lang = 'en', summaries = !compact, calendar = !compact, attrs, dayIds } = Astro.props;
 const days = groupByDay(events, lang);
 
 const chip: Record<string, string> = {
@@ -33,7 +40,7 @@ const chip: Record<string, string> = {
 ) : (
   <ol class="divide-y divide-black/10 border-y border-black/10">
     {days.map((day) => (
-      <li class:list={['event-day grid gap-4 sm:gap-8', compact ? 'grid-cols-[3.5rem_1fr] py-4' : 'grid-cols-[4.5rem_1fr] sm:grid-cols-[6rem_1fr] py-6']}>
+      <li id={dayIds ? `${dayIds}${day.key}` : undefined} class:list={['event-day scroll-mt-24 grid gap-4 sm:gap-8', compact ? 'grid-cols-[3.5rem_1fr] py-4' : 'grid-cols-[4.5rem_1fr] sm:grid-cols-[6rem_1fr] py-6']}>
         <div class="text-center sm:text-left">
           <div class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">{day.weekday}</div>
           <div class:list={['font-display font-black leading-none mt-1', compact ? 'text-3xl' : 'text-4xl sm:text-5xl']}>{day.day}</div>
@@ -41,7 +48,7 @@ const chip: Record<string, string> = {
         </div>
         <ul class:list={[compact ? 'space-y-4' : 'space-y-5']}>
           {day.events.map((e) => (
-            <li class="event" data-type={typeOf(e)}>
+            <li class="event" data-type={typeOf(e)} {...(attrs ? attrs(e) : {})}>
               <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span class="text-sm font-medium text-black-2 tabular-nums">{formatTimeRange(e, lang)}</span>
                 <span class:list={['text-[0.7rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm', chip[typeOf(e)]]}>{typeLabel(e, lang)}</span>
@@ -64,6 +71,7 @@ const chip: Record<string, string> = {
               {summaries && eventSummary(e) && (
                 <p class="mt-2 text-black-1 leading-relaxed max-w-2xl" lang="en">{eventSummary(e)}</p>
               )}
+              {calendar && <div class="mt-3"><AddToCalendar event={e} lang={lang} /></div>}
             </li>
           ))}
         </ul>

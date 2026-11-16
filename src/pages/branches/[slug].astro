@@ -10,6 +10,7 @@ import BranchMap from '../../components/BranchMap.astro';
 import CampaignCard from '../../components/CampaignCard.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import UiIcon from '../../components/UiIcon.astro';
+import CalendarSubscribe from '../../components/CalendarSubscribe.astro';
 import site from '../../data/site.json';
 import { upcomingEvents, pastEvents, matches, typeLabel, typeOf, formatShortDate, shortLocation, EVENT_TYPES, TIMEZONE } from '../../lib/events';
 import { href } from '../../lib/paths';
@@ -187,6 +188,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           )}
           <p class="mt-5 text-sm"><a href={href('/events/')} class={linkClass}>All chapter events →</a></p>
         </div>
+        {!forming && <div class="mt-5"><CalendarSubscribe feed={branch.id} stack /></div>}
       </aside>
     </div>
   </section>

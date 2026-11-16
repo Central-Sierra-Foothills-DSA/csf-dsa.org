@@ -76,6 +76,15 @@ export function typeOf(e: ChapterEvent): EventType {
   return 'other';
 }
 
+/**
+ * "Good first event": low-pressure ways in for someone new. Socials always count
+ * (New here calls them the easiest way in), plus anything whose title says it's
+ * for newcomers. Add words here to tag more events.
+ */
+export function isGoodFirst(e: ChapterEvent): boolean {
+  return typeOf(e) === 'social' || /new member|newcomer|orientation|welcome|\b101\b|open house|meet and greet|meet & greet/i.test(e.title);
+}
+
 /** Spanish names for the event types, same keys as EVENT_TYPES. */
 export const EVENT_TYPES_ES: Record<EventType, { label: string; plural: string }> = {
   meeting: { label: 'Reunión', plural: 'Reuniones' },

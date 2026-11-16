@@ -1,0 +1,103 @@
+---
+// A printable one-page calendar of the month's events (US Letter), for tabling and
+// bulletin boards. Built with the site every morning, so it's always current; there
+// is no PDF to regenerate. Pages exist for this month and next. Linked from the
+// events page and the flyer library.
+import { Image } from 'astro:assets';
+import Sheet from '../../../layouts/Sheet.astro';
+import QR from '../../../components/QR.astro';
+import site from '../../../data/site.json';
+import badgeWhite from '../../../assets/logos/csf-dsa-white.png';
+import { displayUrl } from '../../../lib/member-guide';
+import { href } from '../../../lib/paths';
+import { printMonths } from '../../../lib/calendar';
+import { allEvents, typeOf, EVENT_TYPES, formatTime, isGoodFirst, TIMEZONE } from '../../../lib/events';
+
+export function getStaticPaths() {
+  return printMonths().map((m) => ({ params: { month: m.key }, props: { label: m.label } }));
+}
+
+const { month } = Astro.params;
+const { label } = Astro.props;
+const [y, mo] = month!.split('-').map(Number);
+
+const dayKey = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+const byDay = new Map<string, typeof allEvents>();
+for (const e of [...allEvents].sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())) {
+  const k = dayKey(new Date(e.start));
+  if (k.startsWith(month!)) byDay.set(k, [...(byDay.get(k) ?? []), e]);
+}
+const days = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+const lead = new Date(Date.UTC(y, mo - 1, 1)).getUTCDay();
+const cells: ({ day: number; key: string } | null)[] = [...Array(lead).fill(null)];
+for (let d = 1; d <= days; d++) cells.push({ day: d, key: `${month}-${String(d).padStart(2, '0')}` });
+while (cells.length % 7) cells.push(null);
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const count = [...byDay.values()].flat().length;
+
+const eventsUrl = new URL(href('/events/'), Astro.site ?? 'https://csf-dsa.org').href;
+const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
+const dot: Record<string, string> = { action: '#C4161D', social: '#EC1F27', meeting: '#231F20', civic: '#7d7a7b', training: '#4f4c4d', other: '#a7a5a6' };
+const others = printMonths().filter((m) => m.key !== month);
+---
+<Sheet title={`${label} events calendar`}>
+  <nav class="print:hidden max-w-[8.5in] mx-auto mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 text-sm">
+    <span>Print this page on Letter paper (<kbd>Ctrl</kbd>+<kbd>P</kbd> or <kbd>⌘</kbd>+<kbd>P</kbd>), with margins set to none, or save it as a PDF.</span>
+    <span class="flex gap-3 font-semibold">
+      {others.map((m) => <a href={href(`/events/print/${m.key}/`)} class="text-red-dark underline underline-offset-4">{m.label} →</a>)}
+      <a href={href('/events/')} class="text-red-dark underline underline-offset-4">Back to events</a>
+    </span>
+  </nav>
+
+  <div class="sheet w-[8.5in] h-[11in] bg-white flex flex-col font-display text-black">
+    <header class="bg-red text-white px-[0.5in] pt-[0.4in] pb-[0.3in] flex items-center gap-5">
+      <Image src={badgeWhite} alt="" width={160} class="w-[0.95in] h-auto shrink-0" />
+      <div class="flex-1">
+        <p class="text-[11pt] font-bold uppercase tracking-[0.2em]">{site.orgName}</p>
+        <h1 class="text-[34pt] font-black leading-none mt-1">{label} events</h1>
+        <p class="text-[12pt] font-semibold mt-2">Everyone is welcome. You don’t need to be a member to come.</p>
+      </div>
+    </header>
+
+    <div class="flex-1 flex flex-col px-[0.5in] pt-[0.25in]">
+      <div class="grid grid-cols-7 text-center text-[9pt] font-bold uppercase tracking-wider">
+        {weekdays.map((d) => <div class="pb-1">{d}</div>)}
+      </div>
+      <div class="flex-1 grid grid-cols-7 border-l border-t border-black/40" style={`grid-template-rows: repeat(${cells.length / 7}, minmax(0, 1fr));`}>
+        {cells.map((c) => (
+          <div class:list={['border-r border-b border-black/40 p-[0.05in] overflow-hidden', !c && 'bg-[#f2f1f1]']}>
+            {c && (
+              <>
+                <p class="text-[10pt] font-black leading-none">{c.day}</p>
+                <ul class="mt-[0.04in] space-y-[0.04in]">
+                  {(byDay.get(c.key) ?? []).map((e) => (
+                    <li class="text-[7pt] leading-[1.15]">
+                      <span class="inline-block w-[0.07in] h-[0.07in] rounded-full mr-[0.03in] align-middle" style={`background:${dot[typeOf(e)]}`}></span>
+                      <span class="font-bold">{formatTime(e.start)}</span> {e.title}{isGoodFirst(e) && ' ★'}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+      <p class="mt-[0.1in] flex flex-wrap gap-x-[0.2in] text-[8pt]">
+        {(['meeting', 'social', 'action', 'civic', 'training'] as const).map((k) => (
+          <span><span class="inline-block w-[0.08in] h-[0.08in] rounded-full mr-[0.04in] align-middle" style={`background:${dot[k]}`}></span>{EVENT_TYPES.find((x) => x.key === k)!.label}</span>
+        ))}
+        <span>★ Good first event</span>
+        {count === 0 && <span class="font-bold">More events are added all the time. Check online for the latest.</span>}
+      </p>
+    </div>
+
+    <footer class="mx-[0.5in] mt-[0.2in] mb-[0.4in] pt-[0.15in] border-t-2 border-red flex items-center gap-5">
+      <QR url={eventsUrl} class="w-[1in] h-[1in]" label="QR code for the chapter events page" />
+      <div class="flex-1 text-[10pt] leading-snug">
+        <p class="text-[13pt] font-black">Times, places, and RSVP: scan the code.</p>
+        <p class="mt-1 font-semibold">{displayUrl(eventsUrl)}</p>
+        <p class="mt-1">{site.contactEmail} · Instagram {instagram}</p>
+      </div>
+    </footer>
+  </div>
+</Sheet>

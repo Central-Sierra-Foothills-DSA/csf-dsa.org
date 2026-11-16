@@ -1,0 +1,245 @@
+---
+// The events page body, shared by /events/ and /es/eventos/:
+//   - "This week": the next seven days at a glance.
+//   - Filters by kind of event, by branch, and "Good first events". They combine.
+//   - A list view and a month view.
+// No JavaScript. Every control is a radio button or checkbox, and generated CSS
+// (`:has()`) shows and hides events. Because filters combine, the rules that hide
+// empty days and show "nothing matches" are written out for each combination;
+// there are only a few dozen.
+import { getCollection } from 'astro:content';
+import EventList from './EventList.astro';
+import {
+  type ChapterEvent, type Lang, EVENT_TYPES, EVENT_TYPES_ES, TIMEZONE,
+  typeOf, typeLabel, matches, isGoodFirst, groupByMonth, formatTimeRange, formatTime,
+} from '../lib/events';
+
+interface Props {
+  events: ChapterEvent[];
+  lang?: Lang;
+  /** "Now" for this build. The site rebuilds every morning. */
+  now?: Date;
+  empty: string;
+}
+const { events, lang = 'en', now = new Date(), empty } = Astro.props;
+const es = lang === 'es';
+const locale = es ? 'es-US' : 'en-US';
+
+const t = es
+  ? { week: 'Esta semana', kind: 'Tipo', branch: 'Rama', all: 'Todo', allBranches: 'Todas', chapter: 'Todo el capítulo', first: 'Buenos primeros eventos', firstHint: 'Eventos sociales y eventos para gente nueva: la forma más fácil de empezar.', view: 'Vista', list: 'Lista', month: 'Mes', nomatch: 'Nada coincide con esos filtros por ahora. Prueba con menos.', legend: 'Tipos de evento', tapDay: 'Toca un día para ver sus eventos abajo.' }
+  : { week: 'This week', kind: 'Kind', branch: 'Branch', all: 'Everything', allBranches: 'All', chapter: 'Chapter-wide', first: 'Good first events', firstHint: 'Socials and newcomer events: the easiest way in.', view: 'View', list: 'List', month: 'Month', nomatch: 'Nothing matches those filters right now. Try fewer.', legend: 'Kinds of event', tapDay: 'Tap a day to jump to its events below.' };
+
+// ---- What each event belongs to -------------------------------------------
+const branches = (await getCollection('branches'))
+  .filter((b) => b.data.status !== 'forming')
+  .sort((a, b) => a.data.order - b.data.order);
+const branchIds = new Map(events.map((e) => [e, branches.filter((b) => matches(e, { keywords: b.data.keywords, cities: b.data.cities })).map((b) => b.id)]));
+const tags = (e: ChapterEvent) => {
+  const ids = branchIds.get(e) ?? [];
+  return { 'data-branches': ids.length ? ids.join(' ') : 'chapter', ...(isGoodFirst(e) ? { 'data-first': '' } : {}) };
+};
+
+const typeName = (key: string, plural = true) => {
+  const en = EVENT_TYPES.find((x) => x.key === key)!;
+  const s = EVENT_TYPES_ES[key as keyof typeof EVENT_TYPES_ES];
+  return es ? (plural ? s.plural : s.label) : (plural ? en.plural : en.label);
+};
+const types = EVENT_TYPES.filter((x) => events.some((e) => typeOf(e) === x.key)).map((x) => x.key);
+const branchChips = [
+  ...branches.filter((b) => events.some((e) => branchIds.get(e)!.includes(b.id))).map((b) => ({ id: b.id, label: b.data.name })),
+  ...(events.some((e) => branchIds.get(e)!.length === 0) ? [{ id: 'chapter', label: t.chapter }] : []),
+];
+const firstCount = events.filter(isGoodFirst).length;
+
+// ---- Generated filter CSS --------------------------------------------------
+const on = (name: string, value: string) => `:has(input[name="eb-${name}"][value="${value}"]:checked)`;
+const rules: string[] = [];
+for (const k of types) rules.push(`.eb${on('type', k)} .event:not([data-type="${k}"]) { display: none; }`);
+for (const b of branchChips) rules.push(`.eb${on('branch', b.id)} .event:not([data-branches~="${b.id}"]) { display: none; }`);
+rules.push(`.eb:has(input[name="eb-first"]:checked) .event:not([data-first]) { display: none; }`);
+for (const k of ['all', ...types]) {
+  for (const b of ['all', ...branchChips.map((x) => x.id)]) {
+    for (const f of [false, true]) {
+      const sel = (k === 'all' ? '' : `[data-type="${k}"]`) + (b === 'all' ? '' : `[data-branches~="${b}"]`) + (f ? '[data-first]' : '');
+      if (!sel) continue;
+      const cond = `.eb${on('type', k)}${on('branch', b)}${f ? ':has(input[name="eb-first"]:checked)' : ':not(:has(input[name="eb-first"]:checked))'}`;
+      rules.push(`${cond} .eb-list .event-day:not(:has(.event${sel})) { display: none; }`);
+      const n = events.filter((e) => (k === 'all' || typeOf(e) === k) && (b === 'all' || tags(e)['data-branches'].split(' ').includes(b)) && (!f || isGoodFirst(e))).length;
+      if (n === 0) rules.push(`${cond} .eb-nomatch { display: block; }`);
+    }
+  }
+}
+const css = rules.join(' ');
+
+// ---- This week ---------------------------------------------------------------
+const weekEnd = now.getTime() + 7 * 24 * 60 * 60 * 1000;
+const thisWeek = events.filter((e) => new Date(e.start).getTime() < weekEnd).slice(0, 8);
+const dayLabel = (iso: string) => new Intl.DateTimeFormat(locale, { timeZone: TIMEZONE, weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso));
+
+// ---- Month view ---------------------------------------------------------------
+const dayKey = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+const todayKey = dayKey(now);
+const byDay = new Map<string, ChapterEvent[]>();
+for (const e of events) {
+  const k = dayKey(new Date(e.start));
+  byDay.set(k, [...(byDay.get(k) ?? []), e]);
+}
+const months = groupByMonth(events, lang).map((m) => {
+  const [y, mo] = m.key.split('-').map(Number);
+  const days = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+  const lead = new Date(Date.UTC(y, mo - 1, 1)).getUTCDay();
+  const cells: ({ day: number; key: string } | null)[] = [...Array(lead).fill(null)];
+  for (let d = 1; d <= days; d++) cells.push({ day: d, key: `${m.key}-${String(d).padStart(2, '0')}` });
+  while (cells.length % 7) cells.push(null);
+  return { label: m.label, cells };
+});
+// Sunday-first weekday names (Jan 4, 2026 was a Sunday).
+const weekdays = Array.from({ length: 7 }, (_, i) => new Date(Date.UTC(2026, 0, 4 + i, 12)));
+const wd = (d: Date, style: 'short' | 'narrow') => new Intl.DateTimeFormat(locale, { weekday: style, timeZone: 'UTC' }).format(d);
+
+const dot: Record<string, string> = {
+  action: 'bg-red-dark', social: 'bg-red', meeting: 'bg-black', civic: 'bg-black-3', training: 'bg-black-2', other: 'bg-black-4',
+};
+const chipColor: Record<string, string> = {
+  action: 'bg-red-dark text-white', social: 'bg-red-4 text-red-dark', meeting: 'bg-black text-white',
+  civic: 'bg-black-4/50 text-black', training: 'bg-black-4/50 text-black', other: 'bg-black-4/50 text-black',
+};
+---
+<div class="eb">
+  <style set:html={css}></style>
+
+  {thisWeek.length > 0 && (
+    <section aria-labelledby="eb-week" class="mb-10">
+      <h2 id="eb-week" class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">{t.week}</h2>
+      <ul class="tray tray-narrow mt-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {thisWeek.map((e) => (
+          <li class="relative rounded-xl bg-white ring-1 ring-black/10 hover:ring-red-dark hover:shadow-md transition p-4 flex flex-col">
+            <p class="flex items-center justify-between gap-2 text-sm">
+              <span class="font-display font-extrabold text-red-dark">{dayLabel(e.start)}</span>
+              <span class:list={['text-[0.65rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm', chipColor[typeOf(e)]]}>{typeLabel(e, lang)}</span>
+            </p>
+            <p class="mt-0.5 text-sm text-black-2 tabular-nums">{formatTimeRange(e, lang)}</p>
+            <p class="mt-1.5 font-display font-bold leading-snug" lang="en">
+              {e.url ? <a href={e.url} target="_blank" rel="noopener" class="after:absolute after:inset-0 hover:text-red-dark">{e.title}</a> : e.title}
+            </p>
+            {isGoodFirst(e) && <p class="mt-2 text-xs font-bold text-red-dark">★ {t.first}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <div class="flex flex-col gap-4 rounded-xl bg-mist p-4 sm:p-5">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <fieldset>
+        <legend class="eb-legend">{t.kind}</legend>
+        <div class="flex flex-wrap gap-2">
+          <label class="chip"><input type="radio" name="eb-type" value="all" class="sr-only" checked /> {t.all} <span class="chip-count">{events.length}</span></label>
+          {types.map((k) => (
+            <label class="chip"><input type="radio" name="eb-type" value={k} class="sr-only" /> {typeName(k)} <span class="chip-count">{events.filter((e) => typeOf(e) === k).length}</span></label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset class="shrink-0">
+        <legend class="eb-legend">{t.view}</legend>
+        <div class="inline-flex rounded-full bg-white ring-1 ring-black/15 p-1">
+          <label class="seg"><input type="radio" name="eb-view" value="list" class="sr-only" checked /> {t.list}</label>
+          <label class="seg"><input type="radio" name="eb-view" value="month" class="sr-only" /> {t.month}</label>
+        </div>
+      </fieldset>
+    </div>
+    {branchChips.length > 1 && (
+      <fieldset>
+        <legend class="eb-legend">{t.branch}</legend>
+        <div class="flex flex-wrap gap-2">
+          <label class="chip"><input type="radio" name="eb-branch" value="all" class="sr-only" checked /> {t.allBranches}</label>
+          {branchChips.map((b) => (
+            <label class="chip"><input type="radio" name="eb-branch" value={b.id} class="sr-only" /> {b.label} <span class="chip-count">{events.filter((e) => tags(e)['data-branches'].split(' ').includes(b.id)).length}</span></label>
+          ))}
+        </div>
+      </fieldset>
+    )}
+    {firstCount > 0 && (
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <label class="chip chip-first"><input type="checkbox" name="eb-first" class="sr-only" /> <span aria-hidden="true">★</span> {t.first} <span class="chip-count">{firstCount}</span></label>
+        <span class="text-sm text-black-2">{t.firstHint}</span>
+      </div>
+    )}
+  </div>
+
+  <p class="eb-nomatch mt-6 rounded-xl bg-white ring-1 ring-black/10 p-6 text-center font-semibold">{t.nomatch}</p>
+
+  <!-- Month view -->
+  <div class="eb-month mt-8 space-y-10">
+    {months.map((m) => (
+      <section aria-label={m.label}>
+        <h2 class="font-display font-black text-2xl sm:text-3xl">{m.label}</h2>
+        <div class="mt-3 grid grid-cols-7 border-l border-t border-black/10 rounded-lg overflow-hidden text-sm">
+          {weekdays.map((d) => (
+            <div class="border-r border-b border-black/10 bg-black text-white text-center text-xs font-semibold uppercase tracking-wide py-1.5" aria-hidden="true">
+              <span class="sm:hidden">{wd(d, 'narrow')}</span><span class="hidden sm:inline">{wd(d, 'short')}</span>
+            </div>
+          ))}
+          {m.cells.map((c) => {
+            if (!c) return <div class="border-r border-b border-black/10 bg-mist/60" aria-hidden="true"></div>;
+            const list = byDay.get(c.key) ?? [];
+            const past = c.key < todayKey;
+            return (
+              <div class:list={['border-r border-b border-black/10 min-h-14 sm:min-h-24 p-1 sm:p-1.5', past ? 'bg-mist/60 text-black-2' : 'bg-white', c.key === todayKey && 'ring-2 ring-inset ring-red']}>
+                {list.length > 0
+                  ? <a href={`#d-${c.key}`} class="sm:pointer-events-none inline-flex w-6 h-6 items-center justify-center rounded-full bg-red-dark text-white sm:bg-transparent sm:text-current font-bold text-xs">{c.day}</a>
+                  : <span class="inline-flex w-6 h-6 items-center justify-center text-xs font-semibold">{c.day}</span>}
+                {list.length > 0 && (
+                  <ul class="mt-1 flex flex-wrap sm:block gap-1 sm:space-y-1">
+                    {list.map((e) => (
+                      <li class="event" data-type={typeOf(e)} {...tags(e)}>
+                        <a href={e.url ?? `#d-${c.key}`} target={e.url ? '_blank' : undefined} rel={e.url ? 'noopener' : undefined} class="group flex items-start gap-1 sm:rounded sm:px-1 sm:py-0.5 sm:hover:bg-mist">
+                          <span class:list={['mt-1 w-2 h-2 shrink-0 rounded-full', dot[typeOf(e)]]} aria-hidden="true"></span>
+                          <span class="sr-only sm:not-sr-only sm:text-xs sm:leading-tight sm:line-clamp-2 group-hover:text-red-dark">
+                            <span class="font-semibold tabular-nums">{formatTime(e.start, lang)}</span> <span lang="en">{e.title}</span>
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+    <div>
+      <p class="sr-only">{t.legend}</p>
+      <ul class="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-black-2">
+        {types.map((k) => <li class="inline-flex items-center gap-1.5"><span class:list={['w-2.5 h-2.5 rounded-full', dot[k]]} aria-hidden="true"></span>{typeName(k, false)}</li>)}
+      </ul>
+      <p class="sm:hidden mt-2 text-sm text-black-2">{t.tapDay}</p>
+    </div>
+  </div>
+
+  <!-- List view (on phones it also sits under the month grid) -->
+  <div class="eb-list mt-8">
+    <EventList events={events} lang={lang} empty={empty} attrs={tags} dayIds="d-" />
+  </div>
+</div>
+
+<style>
+  .eb-legend { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-black-2); margin-bottom: 0.5rem; }
+  .eb-nomatch { display: none; }
+  .eb-month { display: none; }
+  .eb:has(input[name="eb-view"][value="month"]:checked) .eb-month { display: block; }
+  @media (min-width: 640px) {
+    .eb:has(input[name="eb-view"][value="month"]:checked) .eb-list { display: none; }
+  }
+  .seg {
+    display: inline-flex; align-items: center; padding: 0.35rem 0.9rem; border-radius: 9999px;
+    font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background-color 0.15s;
+  }
+  .seg:hover { background: var(--color-mist); }
+  .seg:has(input:checked) { background: var(--color-black); color: white; }
+  .seg:has(input:focus-visible) { outline: 3px solid var(--color-red); outline-offset: 2px; }
+  .chip:not(:has(input:checked)) { background: white; box-shadow: inset 0 0 0 1px rgb(35 31 32 / 0.12); }
+  .chip:not(:has(input:checked)):hover { box-shadow: inset 0 0 0 1px var(--color-red-dark); }
+  .chip-first:has(input:checked) { background: var(--color-red-dark); }
+</style>
