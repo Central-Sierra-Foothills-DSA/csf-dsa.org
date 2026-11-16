@@ -10,12 +10,15 @@ import { workingGroupsEs } from '../../lib/es';
 import { href } from '../../lib/paths';
 
 const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
+// Forming branches are listed, but don't count yet (no chair on the steering committee).
+const activeCount = branches.filter((b) => b.data.status !== 'forming').length;
+const forming = branches.filter((b) => b.data.status === 'forming');
 const counties = `${site.counties.slice(0, -1).join(', ')} y ${site.counties.at(-1)}`;
 
 const facts = [
   { n: site.founded, label: 'fundado en Auburn' },
   { n: `~${site.approxMembers}`, label: 'miembros' },
-  { n: String(branches.length), label: 'ramas locales' },
+  { n: String(activeCount), label: 'ramas locales' },
   { n: String(site.counties.length), label: 'condados' },
   { n: '0', label: 'empleados pagados' },
 ];
@@ -128,12 +131,12 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
             <p>El comité lleva a cabo lo que deciden los miembros y atiende los asuntos entre reuniones. Responde a los miembros, no al revés. Nuestros estatutos lo llaman el Comité Ejecutivo.</p>
           </div>
         </div>
-        <div class="lg:col-span-6 flex flex-wrap items-center gap-3 sm:gap-4 font-display" aria-label={`Cinco cargos más ${branches.length} presidentes de rama forman el comité directivo`}>
+        <div class="lg:col-span-6 flex flex-wrap items-center gap-3 sm:gap-4 font-display" aria-label={`Cinco cargos más ${activeCount} presidentes de rama forman el comité directivo`}>
           <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">5</span><span class="block mt-1 text-sm font-bold">cargos</span></span>
           <span class="font-black text-3xl text-red-dark" aria-hidden="true">+</span>
-          <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{branches.length}</span><span class="block mt-1 text-sm font-bold">presidentes de rama</span></span>
+          <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{activeCount}</span><span class="block mt-1 text-sm font-bold">presidentes de rama</span></span>
           <span class="font-black text-3xl text-red-dark" aria-hidden="true">=</span>
-          <span class="rounded-xl bg-red-dark text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + branches.length}</span><span class="block mt-1 text-sm font-bold">comité directivo</span></span>
+          <span class="rounded-xl bg-red-dark text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + activeCount}</span><span class="block mt-1 text-sm font-bold">comité directivo</span></span>
         </div>
       </div>
       <ul class="tray mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -158,14 +161,14 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
             {branches.map((b, i) => (
               <li>
                 <a href={href(`/es/ramas/${b.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white ring-1 ring-black/10 hover:ring-red-dark transition-colors">
-                  <span class="w-8 h-8 shrink-0 rounded-full bg-red-dark text-white font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
-                  <span class="font-display font-bold flex-1 group-hover:text-red-dark">{b.data.name}</span>
+                  <span class:list={['w-8 h-8 shrink-0 rounded-full font-display font-black text-sm flex items-center justify-center', b.data.status === 'forming' ? 'bg-white text-red-dark border-2 border-dashed border-red-dark' : 'bg-red-dark text-white']} aria-hidden="true">{i + 1}</span>
+                  <span class="font-display font-bold flex-1 group-hover:text-red-dark">{b.data.name}{b.data.status === 'forming' && <span class="ml-2 align-middle inline-block px-2 py-0.5 rounded-full bg-red-dark text-white text-[0.65rem] font-bold uppercase tracking-wide">Muy pronto</span>}</span>
                   <span class="text-red-dark" aria-hidden="true">→</span>
                 </a>
               </li>
             ))}
           </ol>
-          <p class="mt-4 text-black-2">¿No hay una rama cerca de ti? Nos encantaría ver una en Truckee y Tahoe. <a href={`mailto:${site.contactEmail}`} class={linkClass}>Escríbenos</a> y te ayudamos a empezarla.</p>
+          <p class="mt-4 text-black-2">{forming.map((b) => <>Se está formando la rama de <a href={href(`/es/ramas/${b.id}/`)} class={linkClass}>{b.data.name}</a>. </>)}¿No hay una rama cerca de ti? <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Empezar una rama')}`} class={linkClass}>Escríbenos</a> y te ayudamos a empezarla.</p>
         </div>
         <div class="lg:col-span-7"><BranchMap lang="es" /></div>
       </div>

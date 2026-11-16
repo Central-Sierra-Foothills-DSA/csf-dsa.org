@@ -23,9 +23,11 @@ const placed = towns.map((t) => {
   return { town: t, branch: ranked[0].b, miles: ranked[0].miles };
 });
 const near = (id: string) => placed.filter((p) => p.branch.id === id && p.miles <= FAR_MILES).sort((a, b) => a.town.name.localeCompare(b.town.name));
+const active = branches.filter((b) => b.data.status !== 'forming');
+const forming = branches.filter((b) => b.data.status === 'forming');
 const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name.localeCompare(b.town.name));
 ---
-<Base title="Branches" description="Find the Central Sierra Foothills DSA branch closest to you: Grass Valley / Nevada City, Auburn, Placerville, or Roseville.">
+<Base title="Branches" description="Find the Central Sierra Foothills DSA branch closest to you: Grass Valley / Nevada City, Auburn, Placerville, or Roseville. A Truckee / North Tahoe branch is forming.">
   <PageHeader eyebrow="Branches" title="Find your branch." lede="Our chapter stretches from Roseville to Lake Tahoe, so we organize locally. Most branches meet monthly, and each runs its own projects. Go to whichever suits you. Every branch is open to everyone." />
 
   <section class="py-14 sm:py-20 bg-white">
@@ -43,10 +45,10 @@ const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Closest branch" title="Look up your town." lede="Find your town below to see which branch meets nearest to you. This is only a suggestion based on distance." />
       <div class="tray mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {branches.map((b, i) => (
+        {active.map((b) => (
           <div class="bg-white rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
             <a href={href(`/branches/${b.id}/`)} class="group flex items-center gap-3 px-5 py-4 bg-red-dark text-white hover:bg-red-dark transition-colors">
-              <span class="w-8 h-8 shrink-0 rounded-full bg-white text-red-dark font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+              <span class="w-8 h-8 shrink-0 rounded-full bg-white text-red-dark font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{branches.indexOf(b) + 1}</span>
               <span class="font-display font-extrabold text-lg leading-tight flex-1">{b.data.name}</span>
               <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
@@ -56,6 +58,27 @@ const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name
           </div>
         ))}
       </div>
+
+      {forming.map((b) => (
+        <div class="mt-6 p-6 sm:p-8 rounded-xl border-2 border-dashed border-red-dark/60 bg-white sm:flex sm:items-center sm:gap-8">
+          <div class="flex-1">
+            <p class="flex flex-wrap items-center gap-2">
+              <span class="w-8 h-8 shrink-0 rounded-full bg-white text-red-dark border-2 border-dashed border-red-dark font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{branches.indexOf(b) + 1}</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-red-dark text-white text-xs font-bold uppercase tracking-wide">Coming soon</span>
+            </p>
+            <h3 class="mt-3 font-display font-extrabold text-xl"><a href={href(`/branches/${b.id}/`)} class="hover:text-red-dark underline-offset-4 hover:underline">{b.data.name}</a> is forming.</h3>
+            <p class="mt-2 text-black-2 leading-relaxed">People are organizing a branch here, but it doesn't meet regularly yet. If you live nearby, get in touch and we'll connect you with them.</p>
+            {near(b.id).length > 0 && (
+              <ul class="mt-3 flex flex-wrap gap-1.5">
+                {near(b.id).map((p) => <li class="px-2.5 py-1 rounded-full bg-mist text-sm">{p.town.name}</li>)}
+              </ul>
+            )}
+          </div>
+          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent(`${b.data.name} branch`)}`} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">
+            <UiIcon name="mail" /> I’m interested
+          </a>
+        </div>
+      ))}
 
       {far.length > 0 && (
         <div class="mt-6 p-6 sm:p-8 rounded-xl border-2 border-dashed border-red/50 bg-white sm:flex sm:items-center sm:gap-8">

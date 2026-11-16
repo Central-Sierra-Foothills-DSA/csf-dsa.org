@@ -21,6 +21,8 @@ export async function getStaticPaths() {
 
 const { branch } = Astro.props;
 const b = branch.data;
+// A forming branch is being organized but doesn't meet yet: no stats, an "I'm interested" button instead.
+const forming = b.status === 'forming';
 const { Content } = await render(branch);
 
 const matcher = { keywords: b.keywords, cities: b.cities };
@@ -60,6 +62,7 @@ const mapsUrl = b.address ? `https://www.google.com/maps/search/?api=1&query=${e
 
 // Other branches, for the links at the bottom.
 const allBranches = (await getCollection('branches')).sort((a, c) => a.data.order - c.data.order);
+const activeCount = allBranches.filter((o) => o.data.status !== 'forming').length;
 const others = allBranches.map((o, i) => ({ o, n: i + 1 })).filter(({ o }) => o.id !== branch.id);
 
 const day = (iso: string, opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, ...opts }).format(new Date(iso));
@@ -78,7 +81,7 @@ type Detail = { icon: 'calendar' | 'pin' | 'video' | 'mail'; label: string; body
 const contactHref = `mailto:${site.contactEmail}?subject=${encodeURIComponent(b.name + ' branch')}`;
 const details = [
   { icon: 'calendar', label: 'When', body: b.meets },
-  { icon: 'pin', label: 'Where', body: b.venue, sub: b.address, access: b.access ?? null, link: mapsUrl ? { href: mapsUrl, text: 'Open in maps', external: true } : undefined },
+  { icon: 'pin', label: 'Where', body: b.venue, sub: b.address, access: forming ? undefined : (b.access ?? null), link: mapsUrl ? { href: mapsUrl, text: 'Open in maps', external: true } : undefined },
   b.remote ? { icon: 'video', label: 'Online', body: b.remote } : null,
   { icon: 'mail', label: 'Questions', body: 'Email the chapter and mention this branch.', link: { href: contactHref, text: site.contactEmail, external: false } },
 ].filter(Boolean) as Detail[];
@@ -86,7 +89,16 @@ const details = [
 const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
 ---
 <Base title={`${b.name} branch`} description={`${b.name} branch of Central Sierra Foothills DSA. ${b.meets}`}>
-  <PageHeader eyebrow="Branch" title={b.name} lede={b.area} back={{ href: href('/branches/'), label: 'All branches' }}>
+  <PageHeader eyebrow={forming ? 'Branch · Forming' : 'Branch'} title={b.name} lede={b.area} back={{ href: href('/branches/'), label: 'All branches' }}>
+    {forming ? (
+    <div class="mt-8 max-w-3xl rounded-xl bg-white/10 ring-1 ring-white/25 p-5 sm:p-6 sm:flex sm:items-center sm:gap-6">
+      <div class="flex-1">
+        <p><span class="inline-block px-2.5 py-0.5 rounded-full bg-white text-red-dark text-xs font-bold uppercase tracking-wide">Coming soon</span></p>
+        <p class="mt-3 text-lg leading-snug">This branch is forming. People are organizing, but it doesn’t meet regularly yet. Live nearby? We’d love to hear from you.</p>
+      </div>
+      <a href={contactHref} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-white text-red-dark hover:bg-black hover:text-white font-semibold rounded-md transition-colors"><UiIcon name="mail" /> I’m interested</a>
+    </div>
+    ) : (
     <div class="mt-8">
       <dl class="grid grid-cols-3 gap-2 sm:gap-3 max-w-3xl">
         {stats.map((s) => (
@@ -104,6 +116,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
         </p>
       )}
     </div>
+    )}
   </PageHeader>
 
   <!-- When, where, online, questions -->
@@ -144,16 +157,18 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           <Content />
         </div>
         <div class="mt-8 flex flex-wrap gap-3">
-          <a href={href('/events/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors"><UiIcon name="calendar" /> Find the next meeting</a>
+          {forming
+            ? <a href={contactHref} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors"><UiIcon name="mail" /> I’m interested</a>
+            : <a href={href('/events/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors"><UiIcon name="calendar" /> Find the next meeting</a>}
           <a href={href('/new-members/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-md transition-colors">New here? Start here</a>
         </div>
-        <div class="mt-8"><InviteFriend branch={b.name} event={upcomingOwn[0]} /></div>
+        {!forming && <div class="mt-8"><InviteFriend branch={b.name} event={upcomingOwn[0]} /></div>}
       </div>
       <aside class="lg:col-span-5">
         <div class="rounded-2xl ring-1 ring-black/10 p-6">
           <p class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-dark"><UiIcon name="clock" class="w-4 h-4" /> Next branch events</p>
           <div class="mt-4">
-            <EventList events={upcomingOwn.slice(0, 3)} compact empty="Nothing scheduled yet. Check the chapter calendar." />
+            <EventList events={upcomingOwn.slice(0, 3)} compact empty={forming ? 'No branch events yet. Chapter-wide meetings are on the calendar and are often held on Zoom.' : 'Nothing scheduled yet. Check the chapter calendar.'} />
           </div>
           {upcomingCivic.length > 0 && (
             <div class="mt-6">
@@ -226,14 +241,14 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
   <section class="py-14 sm:py-20 bg-black text-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
       <div class="lg:col-span-5">
-        <SectionHeading eyebrow="Across the chapter" title={`One of ${allBranches.length} branches.`} tone="dark" lede="Every branch is open to everyone. Go to whichever suits you." />
+        <SectionHeading eyebrow="Across the chapter" title={forming ? `${activeCount} branches, and one on the way.` : `One of ${activeCount} branches.`} tone="dark" lede="Every branch is open to everyone. Go to whichever suits you." />
         <ul class="mt-8 space-y-2">
           {others.map(({ o, n }) => (
             <li>
               <a href={href(`/branches/${o.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white/5 ring-1 ring-white/10 hover:bg-red-dark hover:ring-red-dark transition-colors">
                 <span class="w-8 h-8 shrink-0 rounded-full bg-white text-black font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{n}</span>
                 <span class="flex-1 min-w-0">
-                  <span class="block font-display font-bold">{o.data.name}</span>
+                  <span class="block font-display font-bold">{o.data.name}{o.data.status === 'forming' && <span class="ml-2 align-middle px-2 py-0.5 rounded-full bg-white/15 text-xs font-bold uppercase tracking-wide">Coming soon</span>}</span>
                   <span class="block text-sm text-white/65 group-hover:text-white/90">{o.data.area}</span>
                 </span>
                 <span aria-hidden="true">→</span>
@@ -249,7 +264,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
     </div>
   </section>
   <ShareLinks title={`${b.name} branch`} />
-  <EventSchema events={upcomingOwn} />
+  {!forming && <EventSchema events={upcomingOwn} />}
 </Base>
 
 <style>

@@ -111,7 +111,8 @@ export async function getDesigns(): Promise<Design[]> {
   const designs: Design[] = [
     { id: c.id, group: 'event', title: c.title, eyebrow: c.eyebrow, headline: c.headline, body: c.body, cta: c.cta, socialCta: c.socialCta, qrUrl: chapterQr, qrLabel: displayUrl(chapterQr) },
   ];
-  const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
+  // Forming branches don't meet yet, so they get no flyers until they're active.
+  const branches = (await getCollection('branches')).filter((b) => b.data.status !== 'forming').sort((a, b) => a.data.order - b.data.order);
   const t = data.branch;
   for (const b of branches) {
     const vars = { name: b.data.name, area: b.data.area, meets: b.data.meets, slug: b.id };

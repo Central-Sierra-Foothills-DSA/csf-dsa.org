@@ -39,5 +39,14 @@
       "La rama de Roseville reúne a miembros de Roseville y del resto del sur del condado de Placer. Es una de nuestras ramas más nuevas, y hay mucho espacio para ayudar a darle forma.",
       "Todos son bienvenidos a las reuniones de la rama, seas miembro o no."
     ]
+  },
+  "truckee-north-tahoe": {
+    "area": "Truckee, el norte del lago Tahoe y la sierra alta",
+    "meets": "Todavía no se reúne con regularidad.",
+    "venue": "Por decidir.",
+    "body": [
+      "Miembros y vecinos de Truckee y del norte del lago Tahoe están trabajando para formar una rama. Todavía no se reúne con regularidad, pero ya hay gente organizándose.",
+      "Si vives en la zona, nos encantaría saber de ti. Escríbenos y te ponemos en contacto con las personas que la están poniendo en marcha."
+    ]
   }
 }

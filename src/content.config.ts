@@ -11,6 +11,10 @@ const branches = defineCollection({
   schema: z.object({
     name: z.string(),
     order: z.number().default(0),
+    /** 'forming' = people are organizing it but it doesn't meet regularly yet. It is listed
+     *  with a "Forming" label and a coming-soon page, and left out of branch counts,
+     *  the steering committee math, and flyers. Change to 'active' once it meets. */
+    status: z.enum(['active', 'forming']).default('active'),
     /** One line on who the branch is for. */
     area: z.string(),
     /** Counties this branch is the natural home for (used by the branch finder). */

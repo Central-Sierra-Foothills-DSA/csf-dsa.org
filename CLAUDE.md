@@ -45,7 +45,8 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | Search engine data (events in Google, chapter info) | `src/components/EventSchema.astro`, `src/components/OrgSchema.astro` (built from the calendar and site.json) |
 | "Invite a friend" text/email buttons | `src/components/InviteFriend.astro` |
 | A branch's schedule, venue, or description | `src/content/branches/<name>.md`         |
-| Add a branch                     | New file in `src/content/branches/` (copy an existing one) |
+| Add a branch                     | New file in `src/content/branches/` (copy an existing one), plus its Spanish entry in `src/data/es/branches.json` |
+| A branch that is still forming   | `status: forming` in its file (see `truckee-north-tahoe.md`). It is listed with a "Coming soon" label, an outlined map pin, and an "I’m interested" email button, and is left out of branch counts, the steering committee math, and flyers. Change to `active` once it meets |
 | A campaign or endorsement        | `src/content/campaigns/<name>.md`                  |
 | Retire a campaign                | Set `status: completed` in its file. It moves to the archive. |
 | Post news or a win               | New file in `src/content/updates/` named `YYYY-MM-DD-short-title.md` |

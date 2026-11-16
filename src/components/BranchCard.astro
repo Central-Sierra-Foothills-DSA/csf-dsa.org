@@ -11,16 +11,18 @@ interface Props {
 }
 const { branch, number } = Astro.props;
 const b = branch.data;
-const next = upcomingEvents().find((e) => typeOf(e) === 'meeting' && matches(e, { keywords: b.keywords }));
+const forming = b.status === 'forming';
+const next = forming ? undefined : upcomingEvents().find((e) => typeOf(e) === 'meeting' && matches(e, { keywords: b.keywords }));
 ---
-<article class="group relative bg-white rounded-xl ring-1 ring-black/10 shadow-sm hover:shadow-lg hover:ring-red transition-all overflow-hidden flex flex-col">
+<article class:list={['group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all overflow-hidden flex flex-col', forming ? 'border-2 border-dashed border-red-dark/60 hover:border-red-dark' : 'ring-1 ring-black/10 hover:ring-red']}>
   <div class="flex items-center gap-4 px-6 pt-6">
-    {number && <span class="shrink-0 w-12 h-12 rounded-full bg-red-dark text-white font-display font-black text-xl flex items-center justify-center" aria-hidden="true">{number}</span>}
+    {number && <span class:list={['shrink-0 w-12 h-12 rounded-full font-display font-black text-xl flex items-center justify-center', forming ? 'bg-white text-red-dark border-2 border-dashed border-red-dark' : 'bg-red-dark text-white']} aria-hidden="true">{number}</span>}
     <div class="min-w-0">
       <h3 class="font-display font-extrabold text-2xl leading-tight">
         <a href={href(`/branches/${branch.id}/`)} class="after:absolute after:inset-0 group-hover:text-red-dark">{b.name}</a>
       </h3>
       <p class="text-sm text-black-2 mt-0.5">{b.area}</p>
+      {forming && <p class="mt-2"><span class="inline-block px-2.5 py-0.5 rounded-full bg-red-dark text-white text-xs font-bold uppercase tracking-wide">Coming soon</span></p>}
     </div>
   </div>
   <dl class="px-6 py-5 space-y-2.5 text-sm flex-1">
@@ -34,7 +36,9 @@ const next = upcomingEvents().find((e) => typeOf(e) === 'meeting' && matches(e, 
     </div>
   </dl>
   <div class="px-6 py-3.5 bg-mist group-hover:bg-red-dark group-hover:text-white transition-colors flex items-center justify-between gap-3 text-sm font-semibold">
-    {next ? (
+    {forming ? (
+      <span>Live nearby? Get in touch</span>
+    ) : next ? (
       <span class="inline-flex items-center gap-2">
         <span class="inline-block w-2 h-2 rounded-full bg-red group-hover:bg-white" aria-hidden="true"></span>
         Next meeting: {formatLongDate(next.start)}, {formatTime(next.start)}

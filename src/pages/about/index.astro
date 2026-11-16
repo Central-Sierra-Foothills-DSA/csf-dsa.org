@@ -10,12 +10,15 @@ import partners from '../../data/partners.json';
 import { href } from '../../lib/paths';
 
 const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
+// Forming branches are listed, but don't count yet (no chair on the steering committee).
+const activeCount = branches.filter((b) => b.data.status !== 'forming').length;
+const forming = branches.filter((b) => b.data.status === 'forming');
 
 // Quick facts. Each one is stated elsewhere on this page.
 const facts = [
   { n: site.founded, label: 'founded in Auburn' },
   { n: `~${site.approxMembers}`, label: 'members' },
-  { n: String(branches.length), label: 'local branches' },
+  { n: String(activeCount), label: 'local branches' },
   { n: String(site.counties.length), label: 'counties' },
   { n: '0', label: 'paid staff' },
 ];
@@ -158,12 +161,12 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           </div>
         </div>
         <!-- The sum -->
-        <div class="lg:col-span-6 flex flex-wrap items-center gap-3 sm:gap-4 font-display" aria-label={`Five officers plus ${branches.length} branch chairs make up the steering committee`}>
+        <div class="lg:col-span-6 flex flex-wrap items-center gap-3 sm:gap-4 font-display" aria-label={`Five officers plus ${activeCount} branch chairs make up the steering committee`}>
           <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">5</span><span class="block mt-1 text-sm font-bold">officers</span></span>
           <span class="font-black text-3xl text-red" aria-hidden="true">+</span>
-          <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{branches.length}</span><span class="block mt-1 text-sm font-bold">branch chairs</span></span>
+          <span class="rounded-xl bg-black text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{activeCount}</span><span class="block mt-1 text-sm font-bold">branch chairs</span></span>
           <span class="font-black text-3xl text-red" aria-hidden="true">=</span>
-          <span class="rounded-xl bg-red-dark text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + branches.length}</span><span class="block mt-1 text-sm font-bold">steering committee</span></span>
+          <span class="rounded-xl bg-red-dark text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + activeCount}</span><span class="block mt-1 text-sm font-bold">steering committee</span></span>
         </div>
       </div>
 
@@ -195,14 +198,14 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
             {branches.map((b, i) => (
               <li>
                 <a href={href(`/branches/${b.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white ring-1 ring-black/10 hover:ring-red transition-colors">
-                  <span class="w-8 h-8 shrink-0 rounded-full bg-red-dark text-white font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{i + 1}</span>
-                  <span class="font-display font-bold flex-1 group-hover:text-red-dark">{b.data.name}</span>
+                  <span class:list={['w-8 h-8 shrink-0 rounded-full font-display font-black text-sm flex items-center justify-center', b.data.status === 'forming' ? 'bg-white text-red-dark border-2 border-dashed border-red-dark' : 'bg-red-dark text-white']} aria-hidden="true">{i + 1}</span>
+                  <span class="font-display font-bold flex-1 group-hover:text-red-dark">{b.data.name}{b.data.status === 'forming' && <span class="ml-2 align-middle inline-block px-2 py-0.5 rounded-full bg-red-dark text-white text-[0.65rem] font-bold uppercase tracking-wide">Coming soon</span>}</span>
                   <span class="text-red-dark" aria-hidden="true">→</span>
                 </a>
               </li>
             ))}
           </ol>
-          <p class="mt-4 text-black-2">No branch near you yet? We'd love to see one in Truckee and Tahoe. <a href={`mailto:${site.contactEmail}`} class={linkClass}>Email us</a> and we'll help you start one.</p>
+          <p class="mt-4 text-black-2">{forming.map((b) => <><a href={href(`/branches/${b.id}/`)} class={linkClass}>{b.data.name}</a> is forming now. </>)}No branch near you yet? <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Starting a branch')}`} class={linkClass}>Email us</a> and we'll help you start one.</p>
         </div>
         <div class="lg:col-span-7">
           <BranchMap />
