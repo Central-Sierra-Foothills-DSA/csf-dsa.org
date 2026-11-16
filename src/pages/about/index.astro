@@ -167,7 +167,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
         </div>
       </div>
 
-      <ul class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <ul class="tray mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {roles.map((r, i) => (
           <li class:list={['rounded-xl p-6', i === roles.length - 1 ? 'bg-red-dark text-white' : 'bg-mist']}>
             <p class:list={['text-xs font-semibold tracking-[0.16em] uppercase', i === roles.length - 1 ? 'text-white/80' : 'text-red-dark']}>
@@ -211,7 +211,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
 
       <div class="mt-16 sm:mt-20">
         <SectionHeading eyebrow="Working groups" title="Teams that cross county lines." lede="Working groups take on one kind of work for the whole chapter. They're open to every member, and anyone can start one." />
-        <dl class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <dl class="tray mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {groups.map((g) => (
             <div class="bg-white rounded-xl p-6 ring-1 ring-black/10 border-t-4 border-red">
               <dt class="font-display font-extrabold text-xl">{g.name}</dt>
@@ -231,7 +231,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
   <section id="decisions" class="py-14 sm:py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="How we decide" title="One member, one vote." />
-      <ol class="mt-10 grid md:grid-cols-3 gap-4 md:gap-0">
+      <ol class="tray mt-10 grid md:grid-cols-3 gap-4 md:gap-0">
         {decide.map((d, i) => (
           <li class="relative flex md:block">
             <div class:list={['flex-1 h-full rounded-xl p-6', i < decide.length - 1 && 'md:mr-10', i === 2 ? 'bg-black text-white' : 'bg-mist']}>

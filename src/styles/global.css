@@ -105,3 +105,31 @@ details[open] .chevron { transform: rotate(180deg); }
 .chip:has(input:checked) { background: var(--color-black); color: var(--color-white); }
 .chip:has(input:focus-visible) { outline: 3px solid var(--color-red); outline-offset: 3px; }
 .chip-count { font-size: 0.75rem; font-weight: 700; opacity: 0.65; }
+
+/* ---- Phone layouts -------------------------------------------------------
+   Add `tray` to a grid or list of cards: on phones (under 768px) the cards
+   sit in one row you swipe sideways, with the next card peeking in; from 768px
+   up the element's own grid classes take over again. No JavaScript. */
+@media (max-width: 767px) {
+  .tray {
+    display: flex !important;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    /* Run edge to edge, so cards slide in from the side of the screen. */
+    margin-left: -1rem; margin-right: -1rem;
+    padding: 0.25rem 1rem 0.75rem;
+    scroll-padding-left: 1rem;
+    scrollbar-width: thin;
+  }
+  .tray > * {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+  }
+  /* Narrow cards (short items like reading links) can be smaller. */
+  .tray-narrow > * { flex-basis: 68%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tray { scroll-behavior: smooth; }
+}

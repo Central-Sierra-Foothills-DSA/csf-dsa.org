@@ -191,6 +191,10 @@ grouping, and Pacific-time formatting.
 - Keep accessibility: alt text on images, visible focus states, semantic headings.
 - Respect `import.meta.env.BASE_URL` for any absolute path to `public/` files.
 - Write for someone new: plain words, short sentences, no jargon without a definition.
+- Keep phone pages short without cutting content. Two patterns, both CSS only:
+  add `tray` to a grid of cards so it swipes sideways under 768px (`tray-narrow` for small
+  cards), and wrap a long list in `<Fold id label hint>` (`src/components/Fold.astro`) so it is
+  a tap-to-open bar on phones and always open from 768px up. Desktop layout is unchanged.
 
 ## Verify before opening a PR
 

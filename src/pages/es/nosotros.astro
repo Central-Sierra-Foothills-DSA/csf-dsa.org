@@ -136,7 +136,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           <span class="rounded-xl bg-red-dark text-white px-5 py-4 text-center"><span class="block font-black text-4xl leading-none">{5 + branches.length}</span><span class="block mt-1 text-sm font-bold">comité directivo</span></span>
         </div>
       </div>
-      <ul class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <ul class="tray mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {roles.map((r, i) => (
           <li class:list={['rounded-xl p-6', i === roles.length - 1 ? 'bg-red-dark text-white' : 'bg-mist']}>
             <p class:list={['text-xs font-semibold tracking-[0.16em] uppercase', i === roles.length - 1 ? 'text-white/80' : 'text-red-dark']}>{i === roles.length - 1 ? 'Uno por rama' : 'Cargo'}</p>
@@ -172,7 +172,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
 
       <div class="mt-16 sm:mt-20">
         <SectionHeading eyebrow="Grupos de trabajo" title="Equipos que cruzan los condados." lede="Los grupos de trabajo se encargan de un tipo de trabajo para todo el capítulo. Están abiertos a todos los miembros, y cualquiera puede empezar uno." />
-        <dl class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <dl class="tray mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {workingGroupsEs.map((g) => (
             <div class="bg-white rounded-xl p-6 ring-1 ring-black/10 border-t-4 border-red">
               <dt class="font-display font-extrabold text-xl">{g.name}</dt>
@@ -187,7 +187,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
   <section id="decisiones" class="py-14 sm:py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Cómo decidimos" title="Un miembro, un voto." />
-      <ol class="mt-10 grid md:grid-cols-3 gap-4">
+      <ol class="tray mt-10 grid md:grid-cols-3 gap-4">
         {decide.map((d, i) => (
           <li class:list={['rounded-xl p-6', i === 2 ? 'bg-black text-white' : 'bg-mist']}>
             <span class:list={['font-display font-black text-5xl leading-none', i === 2 ? 'text-red-2' : 'text-red-dark']}>{i + 1}</span>

@@ -35,7 +35,7 @@ const farList = far.length > 1 ? `${far.map((p) => p.town.name).slice(0, -1).joi
   <section class="py-14 sm:py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
       <div class="lg:sticky lg:top-24"><BranchMap lang="es" /></div>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-1 gap-5">
+      <div class="tray grid sm:grid-cols-2 lg:grid-cols-1 gap-5">
         {branches.map((b, i) => {
           const t = branchEs(b.id);
           const next = nextMeeting(b.data.keywords);
@@ -66,7 +66,7 @@ const farList = far.length > 1 ? `${far.map((p) => p.town.name).slice(0, -1).joi
   <section id="mas-cercana" class="py-14 sm:py-20 bg-mist">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="La rama más cercana" title="Busca tu pueblo." lede="Encuentra tu pueblo abajo para ver qué rama se reúne más cerca de ti. Es solo una sugerencia según la distancia." />
-      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="tray mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {branches.map((b, i) => (
           <div class="bg-white rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
             <a href={href(`/es/ramas/${b.id}/`)} class="group flex items-center gap-3 px-5 py-4 bg-red-dark text-white hover:bg-black-1 transition-colors">

@@ -60,7 +60,7 @@ const cards = [
   <!-- Where to start -->
   <section class="bg-white border-b border-black/10" aria-label="Por dónde empezar">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-      <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <ul class="tray tray-narrow grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((c) => (
           <li>
             <a href={href(c.path)} class="group flex h-full gap-4 p-5 rounded-xl bg-mist hover:bg-red-dark hover:text-white transition-colors">
@@ -121,7 +121,7 @@ const cards = [
   <section class="py-16 sm:py-20 bg-black text-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading tone="dark" eyebrow="Lo que hacemos" title="Nuestras campañas y respaldos." lede="Las prioridades a las que nuestros miembros votaron dedicar su tiempo y energía. Los detalles de cada campaña están en inglés." />
-      <ul class="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <ul class="tray mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {campaigns.map((c) => (
           <li>
             <a href={href(`/campaigns/${c.id}/`)} hreflang="en" class="block h-full rounded-xl bg-black-1 ring-1 ring-white/10 hover:ring-red-2 p-6 transition-colors">
@@ -158,7 +158,7 @@ const cards = [
           <p class="mt-2 text-sm"><a href={`mailto:${site.contactEmail}`} class="font-semibold hover:text-red-dark">{site.contactEmail}</a> · <a href={site.social.instagram} target="_blank" rel="noopener" class="font-semibold hover:text-red-dark">Instagram</a> · <a href={site.social.facebook} target="_blank" rel="noopener" class="font-semibold hover:text-red-dark">Facebook</a> · <a href={site.social.reddit} target="_blank" rel="noopener" class="font-semibold hover:text-red-dark">Reddit</a></p>
         </div>
       </div>
-      <Image src={tabling} alt="Un miembro del capítulo conversa con gente que pasa junto a una mesa informativa al aire libre" widths={[400, 720]} sizes="(min-width: 1024px) 440px, 100vw" class="lg:col-span-5 w-full h-64 sm:h-96 object-cover rounded-xl shadow-md ring-1 ring-black/10" />
+      <Image src={tabling} alt="Un miembro del capítulo conversa con gente que pasa junto a una mesa informativa al aire libre" widths={[400, 720]} sizes="(min-width: 1024px) 440px, 100vw" class="lg:col-span-5 w-full h-48 sm:h-96 object-cover rounded-xl shadow-md ring-1 ring-black/10" />
     </div>
   </section>
 </Base>

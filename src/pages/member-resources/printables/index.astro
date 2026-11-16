@@ -110,7 +110,7 @@ const pill = 'inline-block px-2.5 py-1 rounded-md bg-mist hover:bg-red-dark hove
         {flyerTabs.map((t) => (
           <section id={t.id} data-panel={t.id} aria-label={t.label}>
             <p class="max-w-3xl text-lg text-black-1 leading-relaxed">{t.lede}</p>
-            <ul class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <ul class="tray mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {designs.filter((d) => d.group === t.group).map((d) => {
                 const files = items.filter((p) => p.design.id === d.id);
                 return (
@@ -148,7 +148,7 @@ const pill = 'inline-block px-2.5 py-1 rounded-md bg-mist hover:bg-red-dark hove
 
         <section id="ready" data-panel="ready" aria-label="Signs and handouts">
           <p class="max-w-3xl text-lg text-black-1 leading-relaxed">Signs, handouts, and sheets for tables and meetings, plus images to share. Nothing to fill in.</p>
-          <ul class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <ul class="tray mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {ready.map((r) => (
               <li class="rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
                 <div class="bg-mist aspect-[4/3] flex items-center justify-center p-4 border-b border-black/10">
@@ -177,7 +177,7 @@ const pill = 'inline-block px-2.5 py-1 rounded-md bg-mist hover:bg-red-dark hove
             </div>
           </div>
           {uploads.length > 0 ? (
-            <ul class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <ul class="tray mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {uploads.map((u) => (
                 <li class="rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
                   <div class="aspect-[4/3] bg-mist flex items-center justify-center p-4 border-b border-black/10">
