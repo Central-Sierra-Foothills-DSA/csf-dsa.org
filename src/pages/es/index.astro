@@ -1,5 +1,6 @@
 ---
 // Spanish home page. Mirrors src/pages/index.astro; text in src/data/es/.
+import OrgSchema from '../../components/OrgSchema.astro';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
@@ -161,4 +162,5 @@ const cards = [
       <Image src={tabling} alt="Un miembro del capítulo conversa con gente que pasa junto a una mesa informativa al aire libre" widths={[400, 720]} sizes="(min-width: 1024px) 440px, 100vw" class="lg:col-span-5 w-full h-48 sm:h-96 object-cover rounded-xl shadow-md ring-1 ring-black/10" />
     </div>
   </section>
+  <OrgSchema />
 </Base>

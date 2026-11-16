@@ -1,6 +1,7 @@
 ---
 // Spanish branch page. Mirrors src/pages/branches/[slug].astro; the branch's
 // Spanish text is in src/data/es/branches.json.
+import InviteFriend from '../../../components/InviteFriend.astro';
 import ShareLinks from '../../../components/ShareLinks.astro';
 import { getCollection } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
@@ -129,6 +130,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
           <a href={href('/es/eventos/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors"><UiIcon name="calendar" /> Ver la próxima reunión</a>
           <a href={href('/es/bienvenida/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-md transition-colors">¿Eres nuevo? Empieza aquí</a>
         </div>
+        <div class="mt-8"><InviteFriend lang="es" branch={b.name} event={upcomingOwn[0]} /></div>
       </div>
       <aside class="lg:col-span-5">
         <div class="rounded-2xl ring-1 ring-black/10 p-6">

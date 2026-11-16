@@ -1,6 +1,7 @@
 ---
 // Spanish events page. Mirrors src/pages/events.astro. Event titles and
 // descriptions come from the calendar and stay in English.
+import EventSchema from '../../components/EventSchema.astro';
 import ShareLinks from '../../components/ShareLinks.astro';
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
@@ -57,4 +58,5 @@ const filterCss = present
     </div>
   </section>
   <ShareLinks title="Próximos eventos" lang="es" />
+  <EventSchema events={upcoming} />
 </Base>

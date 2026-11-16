@@ -1,4 +1,5 @@
 ---
+import OrgSchema from '../components/OrgSchema.astro';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
@@ -78,4 +79,5 @@ const nextMeeting = (keywords: string[]) => upcoming.find((e) => typeOf(e) === '
   </section>
 
   <GetInvolved />
+  <OrgSchema />
 </Base>

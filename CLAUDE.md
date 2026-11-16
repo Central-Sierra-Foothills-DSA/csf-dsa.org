@@ -40,6 +40,10 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 |----------------------------------|----------------------------------------------------|
 | Org name, tagline, links, social, email, approximate member count (`approxMembers`) | `src/data/site.json` |
 | Getting-started steps (New here and the home page) | `src/data/getting-started.json` |
+| How soon the chapter replies to sign-ups (optional; shown on New here once set) | `afterSignup.replyTime` in `src/data/getting-started.json` |
+| "Find your fit" quiz options | `src/data/quiz.json` (each points to a working group by exact name) |
+| Search engine data (events in Google, chapter info) | `src/components/EventSchema.astro`, `src/components/OrgSchema.astro` (built from the calendar and site.json) |
+| "Invite a friend" text/email buttons | `src/components/InviteFriend.astro` |
 | A branch's schedule, venue, or description | `src/content/branches/<name>.md`         |
 | Add a branch                     | New file in `src/content/branches/` (copy an existing one) |
 | A campaign or endorsement        | `src/content/campaigns/<name>.md`                  |

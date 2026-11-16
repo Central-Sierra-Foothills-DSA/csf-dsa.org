@@ -1,4 +1,5 @@
 ---
+import EventSchema from '../components/EventSchema.astro';
 import ShareLinks from '../components/ShareLinks.astro';
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
@@ -58,4 +59,5 @@ const filterCss = present
     </div>
   </section>
   <ShareLinks title="Upcoming events" />
+  <EventSchema events={upcoming} />
 </Base>

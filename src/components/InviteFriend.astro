@@ -1,0 +1,53 @@
+---
+// "Invite a friend": opens a ready-written text message or email on the
+// visitor's own phone or computer. Nothing is sent by the site, and nothing is
+// tracked. Personal invitations are how most people get to a first meeting.
+import UiIcon from './UiIcon.astro';
+import site from '../data/site.json';
+import { href, currentPath } from '../lib/paths';
+import { type ChapterEvent, formatLongDate, formatTime } from '../lib/events';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+  /** Branch name, for an invitation to that branch's meetings. */
+  branch?: string;
+  /** The next event to invite people to, if there is one. */
+  event?: ChapterEvent;
+}
+const { lang = 'en', branch, event } = Astro.props;
+const es = lang === 'es';
+const pageUrl = new URL(href(currentPath(Astro.url)), Astro.site ?? 'https://csf-dsa.org').href;
+const link = event?.url ?? pageUrl;
+
+const when = event ? `${formatLongDate(event.start, lang)}, ${formatTime(event.start, lang)}` : '';
+const message = es
+  ? event
+    ? `¿Vienes conmigo a ${branch ? `la reunión de la rama de ${branch} de DSA` : `"${event.title}"`} el ${when.charAt(0).toLowerCase() + when.slice(1)}? Detalles: ${link}`
+    : branch
+      ? `¿Vienes conmigo a una reunión de la rama de ${branch} de DSA? Aquí dice cuándo se reúnen: ${link}`
+      : `¿Quieres conocer conmigo a ${site.orgName}? Así se empieza: ${link}`
+  : event
+    ? `Want to come with me to ${branch ? `the ${branch} DSA branch meeting` : `"${event.title}"`} on ${when}? Details: ${link}`
+    : branch
+      ? `Want to come with me to a ${branch} DSA branch meeting? Here's when they meet: ${link}`
+      : `Want to check out ${site.orgName} with me? Here's how to get started: ${link}`;
+const subject = es ? (branch ? `Ven conmigo a DSA ${branch}` : 'Ven conmigo a DSA') : branch ? `Come with me to ${branch} DSA` : 'Come with me to DSA';
+
+// "sms:?&body=" opens a new text with the message on both iPhone and Android.
+const sms = `sms:?&body=${encodeURIComponent(message)}`;
+const mail = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+const t = es
+  ? { title: 'Invita a un amigo', body: 'La mayoría llega a su primera reunión porque alguien la invitó. Te dejamos el mensaje escrito.', text: 'Mensaje de texto', email: 'Correo', preview: 'El mensaje dice:' }
+  : { title: 'Invite a friend', body: 'Most people come to their first meeting because someone asked them. We wrote the message for you.', text: 'Text message', email: 'Email', preview: 'The message says:' };
+const btn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semibold text-sm transition-colors';
+---
+<div class="rounded-xl bg-black text-white p-5 sm:p-6">
+  <p class="flex items-center gap-2 font-display font-extrabold text-lg"><UiIcon name="users" class="w-5 h-5 text-red-2" /> {t.title}</p>
+  <p class="mt-1 text-sm text-white/75 leading-relaxed">{t.body}</p>
+  <p class="mt-3 text-sm italic text-white/85 border-l-2 border-red pl-3"><span class="sr-only">{t.preview} </span>"{message}"</p>
+  <div class="mt-4 flex flex-wrap gap-2">
+    <a href={sms} class={`${btn} bg-red-dark hover:bg-red text-white`}><UiIcon name="megaphone" class="w-4 h-4" /> {t.text}</a>
+    <a href={mail} class={`${btn} bg-white/10 hover:bg-white/20 ring-1 ring-white/25`}><UiIcon name="mail" class="w-4 h-4" /> {t.email}</a>
+  </div>
+</div>
