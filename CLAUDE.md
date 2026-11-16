@@ -15,16 +15,25 @@ A static site built with Astro 5 and Tailwind CSS 4. No backend, no database.
 |--------------------------|----------------------------------------|---------------------------------------------|
 | `/`                      | `src/pages/index.astro`                | Home: starting points, next events, wins, news, branches, campaigns |
 | `/new-members/`          | `src/pages/new-members.astro`          | New member guide and FAQ                    |
+| `/member-resources/`     | `src/pages/member-resources/index.astro` | Orientation for new members, conduct, link to the printable packet |
+| `/member-resources/packet/` | `src/pages/member-resources/packet.astro` | Print layout of the new member packet (source of the PDF; not linked, `noindex`) |
+| `/member-resources/printables/` | `src/pages/member-resources/printables/index.astro` | Flyer library: chapter and branch flyers to download |
+| `/member-resources/printables/sheet/<name>/` | `src/pages/member-resources/printables/sheet/[slug].astro` | One flyer sheet or social image (source of the files; not linked, `noindex`) |
 | `/about/`                | `src/pages/about/index.astro`          | Who we are, structure, roles, how we decide |
 | `/about/bylaws/`         | `src/pages/about/bylaws.md`            | Full text of the chapter bylaws             |
 | `/branches/`             | `src/pages/branches/index.astro`       | Branch map, cards, closest-branch lookup    |
 | `/branches/<name>/`      | `src/pages/branches/[slug].astro`      | One page per file in `src/content/branches/`|
-| `/events/`               | `src/pages/events.astro`               | All upcoming events with a type filter      |
+| `/events/`               | `src/pages/events.astro`               | Upcoming events: this week, filters (kind, branch, good first events), list and month views |
+| `/events/print/<YYYY-MM>/` | `src/pages/events/print/[month].astro` | One-page printable calendar for this month and next (built daily; `noindex`) |
+| `/calendar/<feed>.ics`   | `src/pages/calendar/[feed].ics.ts`     | Smaller calendar feeds: one per active branch, one per kind of event |
+| `/calendar/event/<id>.ics` | `src/pages/calendar/event/[id].ics.ts` | One event as a calendar file (the "Apple Calendar" add-to-calendar option) |
 | `/campaigns/`            | `src/pages/campaigns/index.astro`      | Active campaigns and endorsements           |
 | `/campaigns/<name>/`     | `src/pages/campaigns/[slug].astro`     | One page per file in `src/content/campaigns/`|
 | `/learn/`                | `src/pages/learn.astro`                | What democratic socialism is, glossary, quotes |
 | `/local-government/`     | `src/pages/local-government.astro`     | Official council and board meeting pages    |
 | `/archive/`              | `src/pages/archive.astro`              | Past events, news, finished campaigns       |
+| `/events.ics`            | `src/pages/events.ics.ts`              | Calendar feed people subscribe to (built daily with the site) |
+| `/es/…`                  | `src/pages/es/`                        | Spanish versions of Home, New here, About, Branches (+ each branch), Learn, Events. See "Spanish pages" below |
 
 Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up form.
 
@@ -32,22 +41,42 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 
 | You want to change...            | Edit this                                          |
 |----------------------------------|----------------------------------------------------|
-| Org name, tagline, links, social, email | `src/data/site.json`                        |
+| Org name, tagline, links, social, email, approximate member count (`approxMembers`) | `src/data/site.json` |
+| Getting-started steps (New here and the home page) | `src/data/getting-started.json` |
+| How soon the chapter replies to sign-ups (optional; shown on New here once set) | `afterSignup.replyTime` in `src/data/getting-started.json` |
+| "Find your fit" quiz options | `src/data/quiz.json` (each points to a working group by exact name) |
+| Search engine data (events in Google, chapter info) | `src/components/EventSchema.astro`, `src/components/OrgSchema.astro` (built from the calendar and site.json) |
+| Events page layout, filters, month view | `src/components/EventsBrowser.astro` (used by `/events/` and `/es/eventos/`); event cards in `EventCards.astro`, the "Next up" header card in `NextEvent.astro`, the bottom section in `EventsToolkit.astro` |
+| Colors and icons for each kind of event | `src/lib/event-style.ts` |
+| "Add to calendar" menu on each event | `src/components/AddToCalendar.astro`; links and `.ics` files come from `src/lib/calendar.ts` |
+| Which smaller calendar feeds exist | `getFeeds()` in `src/lib/calendar.ts` |
+| Which events are tagged "Good first event" | `isGoodFirst()` in `src/lib/events.ts` (socials, plus newcomer words in the title) |
+| "Suggest an event" email template | `src/components/SuggestEvent.astro` |
+| Events by other groups ("From the community") | `src/data/community-events.json`. Empty until the steering committee agrees on what to list; the section appears once there's an upcoming entry |
+| "Invite a friend" text/email buttons | `src/components/InviteFriend.astro` |
 | A branch's schedule, venue, or description | `src/content/branches/<name>.md`         |
-| Add a branch                     | New file in `src/content/branches/` (copy an existing one) |
+| Add a branch                     | New file in `src/content/branches/` (copy an existing one), plus its Spanish entry in `src/data/es/branches.json` |
+| A branch that is still forming   | `status: forming` in its file (see `truckee-north-tahoe.md`). It is listed with a "Coming soon" label, an outlined map pin, and an "I’m interested" email button, and is left out of branch counts, the steering committee math, and flyers. Change to `active` once it meets |
 | A campaign or endorsement        | `src/content/campaigns/<name>.md`                  |
 | Retire a campaign                | Set `status: completed` in its file. It moves to the archive. |
 | Post news or a win               | New file in `src/content/updates/` named `YYYY-MM-DD-short-title.md` |
 | Headline numbers on the home page | `src/data/wins.json`                              |
 | Working groups                   | `src/data/working-groups.json`                     |
 | Allied organizations             | `src/data/partners.json` (`name`, optional `url` and `blurb`). The section on `/about/` appears once this has entries. |
-| Glossary terms, quotes           | `src/data/glossary.json`, `src/data/quotes.json`   |
+| New member guide and packet text | `src/data/member-guide.json`, then `npm run packet` (see below) |
+| Shared flyers (member uploads)   | Drop files in `src/flyers/` (see its README). Listed automatically by `src/lib/uploads.ts` |
+| Flyer text and sizes             | `src/data/printables.json` and `formats` in `src/lib/printables.ts`, then `npm run printables` (see below) |
+| Glossary terms, quotes           | `src/data/glossary.json` (each term needs a `category`: ideas, organizing, policy, or dsa; groups are defined in `src/pages/learn.astro`), `src/data/quotes.json` |
 | Further-reading links            | `src/data/resources.json`                          |
 | Towns in the closest-branch list | `src/data/towns.json`                              |
 | Council and board links          | `src/data/local-government.json`                   |
 | Bylaws text                      | `src/pages/about/bylaws.md`                        |
+| Spanish wording                  | `src/data/es/` (`common.json` menu/footer, `branches.json`, `shared.json`) and the pages in `src/pages/es/` |
+| Meeting access details (step-free entry, parking, kids) | `access:` in a branch file (English) and in `src/data/es/branches.json` (Spanish) |
 | Page copy or layout              | The page file, or a component in `src/components/` |
 | Nav and footer links             | `src/components/Nav.astro`, `src/components/Footer.astro` |
+| Social accounts (header icons, footer, home) | `social` in `src/data/site.json`; icons in `src/components/SocialIcon.astro` |
+| "Share this page" buttons        | `src/components/ShareLinks.astro` (plain links, no tracking scripts); add `<ShareLinks title="…" />` above `</Base>` |
 | Colors, fonts, global CSS        | `src/styles/global.css` (Tailwind `@theme` block)  |
 | Photos                           | `src/assets/photos/` (imported with `astro:assets`)|
 | Logos                            | `src/assets/logos/` (chapter badge, national logo) |
@@ -76,6 +105,9 @@ The site follows the DSA Design Guide: https://design.dsausa.org
   `red-1` to `red-4`, `black` (#231F20) with tints `black-1` to `black-4`, `white`.
   Two additions that are not guide values: `red-dark` (hover states, small red text
   on white) and `mist` (light section background). Don't introduce other hues.
+- Text on a red background goes on `red-dark`, not `red`: white on DSA Red is about 4.4:1, just
+  under the 4.5:1 needed for normal-size text. Keep `red` for accents (rules, dots, borders,
+  icons) and very large type. Printed flyers and the packet are exempt.
 - Lean on red. Use `red-dark`, not `red`, for small red text on white; use `red-2`
   or `red-3` for red text on black. Check contrast.
 - Font is Manifold DSA for all text, weights 400 to 900. No other typefaces.
@@ -84,6 +116,69 @@ The site follows the DSA Design Guide: https://design.dsausa.org
 - National logo: use `dsa-national-circle.png` (main logo on a DSA Red circle), or
   the all-white or all-black version placed directly on the background. Never
   recolor, stretch, or crop it, and leave at least 20% clear space around it.
+
+## The new member packet PDF
+
+`public/files/csf-dsa-new-member-packet.pdf` is generated, not hand-made. Its text comes
+from `src/data/member-guide.json`, the same file the `/member-resources/` page uses, and
+its layout is `src/pages/member-resources/packet.astro` (US Letter, `src/layouts/Print.astro`).
+To update it: edit the JSON or the layout, start `npm run dev`, then run `npm run packet`
+in a second terminal. The script prints the page to PDF with headless Chrome or Edge
+(set `CHROME_PATH` if it can't find one). Open `/member-resources/packet/` in a browser
+to preview the layout. Commit the regenerated PDF with the change. CI does not rebuild it.
+
+## The flyer library
+
+`public/files/printables/` is generated too. There are event flyers with fill-in boxes
+(one chapter flyer plus one per branch, made automatically from `src/content/branches/`)
+ready-made "join us" flyers with no boxes (the `join` list in `printables.json`), and
+hangout and social invitations with fill-in boxes and a black header (the `hangouts`
+list). Add or reword designs in those lists. Each comes in six formats: letter
+poster, half-page (2 per sheet), quarter-page (4 per sheet), and three social image sizes.
+Text is in `src/data/printables.json`. Sizes and fill-in box limits are in `formats` in
+`src/lib/printables.ts`. The layouts are `src/components/printables/Flyer.astro` and
+`Social.astro`, sized in `cqw` so one design scales to every size. Red designs use
+`src/assets/photos/foresthill-bridge-red.jpg`, a red-tinted copy made with
+`node scripts/make-red-photo.mjs <in> <out>`. Don't tint photos with CSS filters or blend
+modes in these layouts: Chrome turns them into huge images and the PDFs balloon to megabytes.
+Hangout icons are drawn in `src/components/printables/Icon.astro`.
+
+To update: edit, start `npm run dev`, then run `npm run printables` (or
+`npm run printables -- auburn` for matching files only). The script (puppeteer-core and
+pdf-lib, using your installed Chrome or Edge) saves each sheet, then adds PDF form fields
+over every element marked `data-field`. Copies on one sheet share field names, so they fill
+together. It fails if any text runs off a flyer; shorten the text if that happens. Commit
+the regenerated files. CI does not rebuild them.
+
+The library also has ready-made items with nothing to fill in: a table sign, a "What is
+democratic socialism?" handout and post, a sign-in sheet, a community standards poster,
+and a quote card per entry in `src/data/quotes.json`. They're listed in `getReadyMade()`
+in `src/lib/printables.ts`, with layouts in `src/components/printables/ready/`. Most of
+their text comes from existing data (`member-guide.json`, `glossary.json`, `quotes.json`,
+`working-groups.json`), so editing those changes the printables too. Rerun
+`npm run printables` after.
+
+The fill-in boxes are deliberately limited to event details (when, where, a short note,
+each with a character limit). Headlines, logos, QR codes, and links stay fixed. Don't add
+a free-form headline field or an in-browser flyer editor without discussing it first.
+
+## Spanish pages
+
+The pages a newcomer needs also exist in Spanish under `/es/`, with a language switch in the
+menu (`src/lib/i18n.ts` pairs each English page with its Spanish one). Member-only pages
+(member resources, packet, archive, bylaws, campaigns) stay in English and are labeled "en inglés".
+Event titles and descriptions come from Solidarity Tech, so they stay in English; dates, times,
+and event types are translated.
+
+- Spanish is informal (tú). Keep the same facts as the English; don't add new ones.
+- When English text changes on one of these pages, change the Spanish page or data file too.
+  Branch text is in `src/data/es/branches.json`; glossary, quotes, working groups, and
+  getting-started steps are in `src/data/es/shared.json`. The build fails if a branch, glossary
+  term, quote, working group, or step has no Spanish version, so new entries can't slip through.
+- Every Spanish page shows a "Traducción en revisión" note until `reviewed` is set to `true` in
+  `src/data/es/common.json`. Set it once a fluent member has checked the pages.
+- Shared components take a `lang` prop (`Base`, `Nav`, `Footer`, `EventList`, `BranchMap`,
+  `CalendarSubscribe`). Event helpers in `src/lib/events.ts` take an optional `lang` too.
 
 ## Events are generated, don't hand-edit them
 
@@ -111,6 +206,10 @@ grouping, and Pacific-time formatting.
 - Keep accessibility: alt text on images, visible focus states, semantic headings.
 - Respect `import.meta.env.BASE_URL` for any absolute path to `public/` files.
 - Write for someone new: plain words, short sentences, no jargon without a definition.
+- Keep phone pages short without cutting content. Two patterns, both CSS only:
+  add `tray` to a grid of cards so it swipes sideways under 768px (`tray-narrow` for small
+  cards), and wrap a long list in `<Fold id label hint>` (`src/components/Fold.astro`) so it is
+  a tap-to-open bar on phones and always open from 768px up. Desktop layout is unchanged.
 
 ## Verify before opening a PR
 

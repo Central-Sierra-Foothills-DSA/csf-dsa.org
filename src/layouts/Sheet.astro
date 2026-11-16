@@ -1,0 +1,42 @@
+---
+// Layout for one flyer sheet or social image in the flyer library. No margins, no
+// nav, no footer. `npm run printables` opens these pages and saves them as PDF or PNG.
+import '../styles/global.css';
+import site from '../data/site.json';
+
+interface Props {
+  title: string;
+  /** CSS page size, e.g. "8.5in 11in". Only used for PDFs. */
+  pageSize?: string;
+}
+const { title, pageSize = 'letter' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} — {site.orgName}</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <style set:html={`@page { size: ${pageSize}; margin: 0; }`}></style>
+  </head>
+  <body class="sheet-doc">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  .sheet-doc {
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .sheet { position: relative; overflow: hidden; }
+  @media screen {
+    html { background: #c1c0bf; }
+    .sheet-doc { padding: 0.4in; }
+    .sheet { margin: 0 auto; box-shadow: 0 4px 30px rgb(0 0 0 / 0.25); }
+  }
+</style>

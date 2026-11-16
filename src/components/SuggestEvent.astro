@@ -1,0 +1,36 @@
+---
+// "Suggest an event": opens an email to the chapter with a short form to fill in.
+// There's no submission backend on purpose. Whoever runs the Solidarity Tech
+// calendar reads the email and posts the event, so nothing reaches the site
+// without a person checking it first.
+import UiIcon from './UiIcon.astro';
+import site from '../data/site.json';
+import type { Lang } from '../lib/i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const es = lang === 'es';
+
+const t = es
+  ? {
+      title: '¿Estás organizando algo?',
+      body: 'Sugiere un evento para el calendario del capítulo. Toca el botón, llena los espacios del correo y envíalo. Las personas que llevan el calendario lo revisan y lo publican. Los grupos aliados también pueden sugerir eventos de la comunidad.',
+      button: 'Sugerir un evento',
+      subject: 'Sugerencia de evento para el calendario',
+      lines: ['Nombre del evento:', 'Fecha y hora:', 'Lugar (o en línea):', 'Quién lo organiza (una rama, un grupo de trabajo o un grupo aliado):', '¿Es un evento del capítulo o de un grupo aliado?:', 'Descripción breve:', 'Contacto para preguntas:'],
+    }
+  : {
+      title: 'Planning something?',
+      body: 'Suggest an event for the chapter calendar. Tap the button, fill in the blanks in the email, and send it. The people who run the calendar review it and post it. Partner groups can suggest community events too.',
+      button: 'Suggest an event',
+      subject: 'Event suggestion for the calendar',
+      lines: ['Event name:', 'Date and time:', 'Place (or online):', 'Who’s hosting (a branch, working group, or partner group):', 'Chapter event or partner event?:', 'Short description:', 'Contact for questions:'],
+    };
+const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent(t.subject)}&body=${encodeURIComponent(t.lines.join('\n\n') + '\n')}`;
+---
+<div class="h-full rounded-2xl bg-white ring-1 ring-black/10 shadow-sm p-6 flex flex-col">
+  <span class="w-11 h-11 rounded-full bg-red-dark text-white flex items-center justify-center"><UiIcon name="mail" /></span>
+  <h3 class="mt-4 font-display font-extrabold text-xl">{t.title}</h3>
+  <p class="mt-2 text-sm text-black-2 leading-relaxed">{t.body}</p>
+  <p class="mt-auto pt-5"><a href={mailto} class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">{t.button}</a></p>
+</div>

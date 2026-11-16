@@ -1,0 +1,36 @@
+---
+// "From the community": events run by other groups, from src/data/community-events.json.
+// Renders nothing until that file has an upcoming entry.
+import data from '../data/community-events.json';
+import { type Lang, formatLongDate, formatTime } from '../lib/events';
+
+interface CommunityEvent { title: string; host: string; start: string; end?: string; location?: string; url?: string; note?: string }
+
+interface Props { lang?: Lang; now?: Date }
+const { lang = 'en', now = new Date() } = Astro.props;
+const es = lang === 'es';
+const events = (data.events as CommunityEvent[])
+  .filter((e) => new Date(e.end ?? e.start).getTime() >= now.getTime())
+  .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+const t = es
+  ? { eyebrow: 'De la comunidad', note: 'Eventos de otros grupos que creemos que te pueden interesar. No los organiza el capítulo.', by: 'Organiza' }
+  : { eyebrow: 'From the community', note: 'Events by other groups we think you’ll want to know about. They aren’t run by the chapter.', by: 'Hosted by' };
+---
+{events.length > 0 && (
+  <section aria-labelledby="community-events" class="rounded-xl bg-mist p-6">
+    <h2 id="community-events" class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">{t.eyebrow}</h2>
+    <p class="mt-1 text-sm text-black-2">{t.note}</p>
+    <ul class="mt-4 grid sm:grid-cols-2 gap-3">
+      {events.map((e) => (
+        <li class="rounded-lg bg-white ring-1 ring-black/10 p-4">
+          <p class="text-sm font-semibold text-red-dark">{formatLongDate(e.start, lang)}, {formatTime(e.start, lang)}</p>
+          <p class="mt-1 font-display font-bold leading-snug" lang="en">
+            {e.url ? <a href={e.url} target="_blank" rel="noopener" class="hover:text-red-dark hover:underline underline-offset-4">{e.title} ↗</a> : e.title}
+          </p>
+          <p class="mt-1 text-sm text-black-2">{t.by}: <span lang="en">{e.host}</span>{e.location && <> · <span lang="en">{e.location}</span></>}</p>
+          {e.note && <p class="mt-2 text-sm" lang="en">{e.note}</p>}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

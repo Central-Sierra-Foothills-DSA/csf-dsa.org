@@ -1,0 +1,34 @@
+---
+// "What is democratic socialism?" social image (portrait). Sizes in cqw.
+import { Image } from 'astro:assets';
+import site from '../../../data/site.json';
+import glossary from '../../../data/glossary.json';
+import { guide, displayUrl } from '../../../lib/member-guide';
+import badgeWhite from '../../../assets/logos/csf-dsa-white.png';
+
+const definition = glossary.find((g) => g.term === 'Democratic socialism')?.definition;
+if (!definition) throw new Error('glossary.json needs a "Democratic socialism" entry');
+const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
+---
+<article class="@container w-full h-full bg-red text-white flex flex-col overflow-hidden p-[7cqw]">
+  <header class="flex items-center gap-[3cqw]">
+    <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[12cqw] h-[12cqw]" />
+    <p class="font-display font-bold text-[4cqw] leading-[1.1]">Central Sierra<br />Foothills DSA</p>
+  </header>
+  <div class="flex-1 flex flex-col justify-center py-[4cqw]">
+    <h1 class="font-display font-black text-[10.5cqw] leading-[0.95] tracking-[-0.01em]">What is democratic socialism?</h1>
+    <div class="mt-[4cqw] h-[1.3cqw] w-[16cqw] bg-white"></div>
+    <p class="mt-[4cqw] text-[4.3cqw] leading-[1.35] font-semibold">{definition}</p>
+    <ul class="mt-[4cqw] space-y-[2.6cqw]">
+      {guide.democraticSocialism.points.map((p) => (
+        <li class="flex gap-[3cqw] text-[3.6cqw] leading-[1.35] text-white/90">
+          <span class="mt-[1.5cqw] w-[1.8cqw] h-[1.8cqw] shrink-0 rounded-full bg-white"></span><span>{p}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <footer class="flex justify-between items-end text-[3.6cqw]">
+    <p><span class="text-white/85">Learn more at</span><br /><span class="font-bold text-[4.4cqw]">csf-dsa.org/learn</span></p>
+    <p class="font-semibold">{instagram}</p>
+  </footer>
+</article>

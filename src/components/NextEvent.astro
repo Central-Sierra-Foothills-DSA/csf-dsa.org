@@ -1,0 +1,65 @@
+---
+// "Next up": the soonest upcoming event as a big card, for the events page header.
+// Below it, a row of counts by kind of event.
+import AddToCalendar from './AddToCalendar.astro';
+import UiIcon from './UiIcon.astro';
+import {
+  type ChapterEvent, type Lang, EVENT_TYPES, EVENT_TYPES_ES, TIMEZONE,
+  typeOf, typeLabel, formatTimeRange, shortLocation, isVirtual, eventSummary, isGoodFirst,
+} from '../lib/events';
+import { EVENT_STYLE } from '../lib/event-style';
+
+interface Props { events: ChapterEvent[]; lang?: Lang }
+const { events, lang = 'en' } = Astro.props;
+const es = lang === 'es';
+const e = events[0];
+const locale = es ? 'es-US' : 'en-US';
+const part = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(locale, { timeZone: TIMEZONE, ...opts }).format(new Date(e.start));
+const s = e ? EVENT_STYLE[typeOf(e)] : undefined;
+const counts = EVENT_TYPES
+  .map((x) => ({ key: x.key, n: events.filter((ev) => typeOf(ev) === x.key).length, label: es ? EVENT_TYPES_ES[x.key] : x }))
+  .filter((x) => x.n > 0);
+const t = es
+  ? { next: 'Lo próximo', rsvp: 'Detalles y asistencia', first: 'Buen primer evento', total: (n: number) => `${n} en el calendario` }
+  : { next: 'Next up', rsvp: 'Details & RSVP', first: 'Good first event', total: (n: number) => `${n} on the calendar` };
+---
+{e && s && (
+  <div class="mt-10">
+    <article class="relative max-w-4xl rounded-2xl bg-white text-black shadow-2xl ring-1 ring-black/10 grid sm:grid-cols-[9rem_1fr]">
+      <div class="flex sm:flex-col items-center sm:justify-center gap-3 sm:gap-0 bg-black text-white rounded-t-2xl sm:rounded-tr-none sm:rounded-l-2xl px-5 py-3 sm:py-6 text-center" aria-hidden="true">
+        <span class="text-xs font-bold uppercase tracking-[0.2em] text-red-2">{part({ weekday: 'long' })}</span>
+        <span class="font-display font-black text-4xl sm:text-7xl leading-none sm:my-1">{part({ day: 'numeric' })}</span>
+        <span class="font-display font-bold sm:text-lg uppercase">{part({ month: 'short' })}</span>
+      </div>
+      <div class="p-5 sm:p-7 min-w-0">
+        <p class="flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.18em] text-red-dark">
+            <span class="relative flex w-2 h-2"><span class="absolute inline-flex h-full w-full rounded-full bg-red opacity-60 motion-safe:animate-ping"></span><span class="relative inline-flex w-2 h-2 rounded-full bg-red"></span></span>
+            {t.next}
+          </span>
+          <span class:list={['text-[0.7rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm', s.chip]}>{typeLabel(e, lang)}</span>
+          {isGoodFirst(e) && <span class="text-xs font-bold text-red-dark">★ {t.first}</span>}
+        </p>
+        <h2 class="mt-2 font-display font-black text-2xl sm:text-4xl leading-tight" lang="en">{e.title}</h2>
+        <p class="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-black-1">
+          <span class="sr-only">{part({ weekday: 'long', month: 'long', day: 'numeric' })},</span>
+          <span class="inline-flex items-center gap-1.5 font-semibold"><UiIcon name="clock" class="w-4.5 h-4.5 text-red-dark" />{formatTimeRange(e, lang)}</span>
+          {shortLocation(e, lang) && <span class="inline-flex items-center gap-1.5"><UiIcon name={isVirtual(e) ? 'video' : 'pin'} class="w-4.5 h-4.5 text-red-dark" />{shortLocation(e, lang)}</span>}
+        </p>
+        {eventSummary(e, 140) && <p class="mt-3 text-black-2 leading-relaxed line-clamp-2" lang="en">{eventSummary(e, 140)}</p>}
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+          {e.url && <a href={e.url} target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-red-dark hover:bg-black text-white font-semibold transition-colors">{t.rsvp} ↗</a>}
+          <AddToCalendar event={e} lang={lang} />
+        </div>
+      </div>
+    </article>
+    <ul class="mt-5 flex flex-wrap gap-2 text-sm font-semibold">
+      <li class="px-3 py-1.5 rounded-full bg-white text-red-dark">{t.total(events.length)}</li>
+      {counts.map((c) => (
+        <li class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 ring-1 ring-white/25">
+          <UiIcon name={EVENT_STYLE[c.key].icon} class="w-4 h-4" /><span>{`${c.n} ${(c.n === 1 ? c.label.label : c.label.plural).toLowerCase()}`}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}

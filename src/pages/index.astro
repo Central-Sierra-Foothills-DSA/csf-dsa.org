@@ -1,4 +1,5 @@
 ---
+import OrgSchema from '../components/OrgSchema.astro';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
@@ -40,18 +41,19 @@ const nextMeeting = (keywords: string[]) => upcoming.find((e) => typeOf(e) === '
 
   <section id="branches" class="py-16 sm:py-20 bg-mist">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <SectionHeading eyebrow="Branches" title="Four counties is a lot of ground. Find the branch near you." lede="We organize locally. Each branch meets monthly and runs its own projects." />
+      <SectionHeading eyebrow="Branches" title="Four counties is a lot of ground. Find the branch near you." lede="We organize locally. Most branches meet monthly, and each runs its own projects." />
       <div class="mt-10 grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <BranchMap />
         <ol class="divide-y divide-black/10 border-y border-black/10">
           {branches.map((b, i) => {
-            const m = nextMeeting(b.data.keywords);
+            const isForming = b.data.status === 'forming';
+            const m = isForming ? undefined : nextMeeting(b.data.keywords);
             return (
               <li class="relative flex gap-4 py-5 group">
-                <span class="shrink-0 w-9 h-9 rounded-full bg-red text-white font-display font-black flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+                <span class:list={['shrink-0 w-9 h-9 rounded-full font-display font-black flex items-center justify-center', isForming ? 'bg-white text-red-dark border-2 border-dashed border-red-dark' : 'bg-red-dark text-white']} aria-hidden="true">{i + 1}</span>
                 <div class="min-w-0">
                   <h3 class="font-display font-extrabold text-xl leading-tight">
-                    <a href={href(`/branches/${b.id}/`)} class="after:absolute after:inset-0 group-hover:text-red-dark">{b.data.name}</a>
+                    <a href={href(`/branches/${b.id}/`)} class="after:absolute after:inset-0 group-hover:text-red-dark">{b.data.name}</a>{b.data.status === 'forming' && <span class="ml-2 align-middle inline-block px-2 py-0.5 rounded-full bg-red-dark text-white text-[0.65rem] font-bold uppercase tracking-wide">Coming soon</span>}
                   </h3>
                   <p class="text-sm text-black-2 mt-0.5">{b.data.meets}</p>
                   {m && <p class="text-sm font-semibold text-red-dark mt-1">Next meeting: {formatShortDate(m.start)}</p>}
@@ -71,11 +73,12 @@ const nextMeeting = (keywords: string[]) => upcoming.find((e) => typeOf(e) === '
   <section id="campaigns" class="py-16 sm:py-20 bg-black text-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading tone="dark" eyebrow="What we're doing" title="Our campaigns and endorsements." lede="The priorities our members voted to put our time and energy behind." />
-      <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="tray mt-10 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {campaigns.map((c) => <CampaignCard campaign={c} tone="dark" />)}
       </div>
     </div>
   </section>
 
   <GetInvolved />
+  <OrgSchema />
 </Base>

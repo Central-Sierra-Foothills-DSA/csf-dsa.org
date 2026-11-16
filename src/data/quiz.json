@@ -1,0 +1,11 @@
+{
+  "_comment": "The 'Find your fit' quiz on New here (/new-members/ and /es/bienvenida/). Each option points to a working group by its exact name in working-groups.json (the build fails if a name doesn't match), or to null for the 'not sure yet' answer. The group's description is shown with the result.",
+  "options": [
+    { "group": "Electoral", "en": "I want to help get good people elected.", "es": "Quiero ayudar a elegir a buena gente." },
+    { "group": "DeFlock / Anti-surveillance", "en": "Surveillance cameras in my town worry me.", "es": "Me preocupan las cámaras de vigilancia en mi pueblo." },
+    { "group": "Political Education", "en": "I like reading and talking about ideas.", "es": "Me gusta leer y conversar sobre ideas." },
+    { "group": "Membership Outreach", "en": "I like meeting people and starting conversations.", "es": "Me gusta conocer gente y empezar conversaciones." },
+    { "group": "Mutual Aid", "en": "I want to help my neighbors directly.", "es": "Quiero ayudar a mis vecinos directamente." },
+    { "group": null, "en": "I'm not sure yet.", "es": "Todavía no sé." }
+  ]
+}

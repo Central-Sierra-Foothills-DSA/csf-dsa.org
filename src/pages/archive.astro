@@ -2,69 +2,198 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
-import { pastEvents, groupByMonth, typeLabel, shortLocation, formatShortDate, formatFullDate, dateOnly } from '../lib/events';
+import SectionHeading from '../components/SectionHeading.astro';
+import {
+  pastEvents, groupByMonth, typeOf, typeLabel, shortLocation, formatFullDate, dateOnly, matches, EVENT_TYPES, TIMEZONE,
+  type ChapterEvent,
+} from '../lib/events';
 import { href } from '../lib/paths';
 
-const months = groupByMonth(pastEvents());
-const total = months.reduce((n, m) => n + m.events.length, 0);
-const pastCampaigns = (await getCollection('campaigns')).filter((c) => c.data.status === 'completed').sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0));
+const past = pastEvents();
+const months = groupByMonth(past);
+const pastCampaigns = (await getCollection('campaigns'))
+  .filter((c) => c.data.status === 'completed')
+  .sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0));
 const updates = (await getCollection('updates')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const branches = (await getCollection('branches')).sort((a, b) => a.data.order - b.data.order);
+
+// Event types that actually appear, with counts, for the stats and the filter.
+const typeCount = (key: string) => past.filter((e) => typeOf(e) === key).length;
+const present = EVENT_TYPES.filter((t) => typeCount(t.key) > 0);
+const stats = [
+  { n: past.length, label: 'events held' },
+  ...present
+    .filter((t) => t.key !== 'other')
+    .sort((a, b) => typeCount(b.key) - typeCount(a.key))
+    .slice(0, 3)
+    .map((t) => ({ n: typeCount(t.key), label: t.plural.toLowerCase() })),
+];
+
+// Which branch an event belongs to, if any (same rules as the branch pages).
+const branchOf = (e: ChapterEvent) => branches.find((b) => matches(e, { keywords: b.data.keywords, cities: b.data.cities }))?.data.name;
+
+const day = (iso: string, opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, ...opts }).format(new Date(iso));
+
+// Type badges, in brand colors only.
+const badge: Record<string, string> = {
+  meeting: 'bg-black text-white',
+  action: 'bg-red-dark text-white',
+  social: 'bg-red-4 text-red-dark',
+  civic: 'bg-black-4/60 text-black',
+  training: 'bg-white text-black ring-1 ring-black/20',
+  other: 'bg-mist text-black-2',
+};
+
+// The type filter works without JavaScript: each chip is a radio button, and these
+// rules hide events, and then-empty months, that don't match the checked one.
+const filterCss = present
+  .map((t) => `
+.archive-filter:has(input[value="${t.key}"]:checked) ~ .archive-months .ev:not([data-type="${t.key}"]) { display: none; }
+.archive-filter:has(input[value="${t.key}"]:checked) ~ .archive-months .month:not(:has(.ev[data-type="${t.key}"])) { display: none; }`)
+  .join('\n');
 ---
 <Base title="Archive" description="Past events, news, and campaigns from Central Sierra Foothills DSA.">
-  <PageHeader eyebrow="Archive" title="What we've been up to." lede="Past events, news, and finished campaigns. Events are added here automatically once they've happened." />
-
-  <section class="py-12 sm:py-16 bg-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex flex-wrap gap-2 text-sm font-semibold" aria-label="On this page">
-        <a href="#news" class="px-3.5 py-2 rounded-full bg-mist hover:bg-black-4/60">News</a>
-        <a href="#past-campaigns" class="px-3.5 py-2 rounded-full bg-mist hover:bg-black-4/60">Past campaigns</a>
-        <a href="#past-events" class="px-3.5 py-2 rounded-full bg-mist hover:bg-black-4/60">Past events ({total})</a>
-      </nav>
-
-      <h2 id="news" class="font-display font-extrabold text-2xl sm:text-3xl mt-12">News</h2>
-      <ul class="mt-4 divide-y divide-black/10 border-y border-black/10">
-        {updates.map((u) => (
-          <li class="py-4">
-            <time datetime={u.data.date.toISOString()} class="text-sm font-semibold text-black-2">{formatFullDate(dateOnly(u.data.date))}</time>
-            <h3 class="font-display font-bold text-lg leading-snug mt-0.5">
-              {u.data.link ? <a href={u.data.link.startsWith('/') ? href(u.data.link) : u.data.link} class="hover:text-red-dark hover:underline underline-offset-4">{u.data.title}</a> : u.data.title}
-            </h3>
-            <p class="mt-1 text-black-2">{u.data.summary}</p>
-          </li>
-        ))}
-      </ul>
-
-      <h2 id="past-campaigns" class="font-display font-extrabold text-2xl sm:text-3xl mt-14">Past campaigns</h2>
-      {pastCampaigns.length === 0 ? (
-        <p class="mt-4 text-black-2">Nothing here yet. Everything we've taken on is still underway. See our <a href={href('/campaigns/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">current campaigns</a>.</p>
-      ) : (
-        <ul class="mt-4 divide-y divide-black/10 border-y border-black/10">
-          {pastCampaigns.map((c) => (
-            <li class="py-4">
-              <h3 class="font-display font-bold text-lg leading-snug"><a href={href(`/campaigns/${c.id}/`)} class="hover:text-red-dark hover:underline underline-offset-4">{c.data.title}</a></h3>
-              <p class="mt-1 text-black-2">{c.data.summary}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <h2 id="past-events" class="font-display font-extrabold text-2xl sm:text-3xl mt-14">Past events</h2>
-      {months.map((m) => (
-        <div class="mt-8">
-          <h3 class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">{m.label}</h3>
-          <ul class="mt-2 divide-y divide-black/10 border-y border-black/10">
-            {m.events.map((e) => (
-              <li class="flex gap-4 py-3 text-sm">
-                <span class="w-14 shrink-0 font-semibold text-black-2">{formatShortDate(e.start)}</span>
-                <span>
-                  {e.url ? <a href={e.url} target="_blank" rel="noopener" class="font-semibold hover:text-red-dark hover:underline underline-offset-4">{e.title}</a> : <span class="font-semibold">{e.title}</span>}
-                  <span class="text-black-2"> · {typeLabel(e)}{shortLocation(e) ? ` · ${shortLocation(e)}` : ''}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
+  <PageHeader eyebrow="Archive" title="What we've been up to." lede="Past events, news, and finished campaigns. Events are added here automatically once they've happened.">
+    <dl class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl">
+      {stats.map((s) => (
+        <div class="rounded-lg bg-white/10 ring-1 ring-white/25 px-4 py-3">
+          <dt class="sr-only">{s.label}</dt>
+          <dd class="font-display font-black text-3xl sm:text-4xl leading-none">{s.n}</dd>
+          <dd class="mt-1 text-sm text-white/85">{s.label}</dd>
         </div>
       ))}
+    </dl>
+  </PageHeader>
+
+  <div class="bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid lg:grid-cols-12 gap-10 lg:gap-14">
+      <!-- Side index -->
+      <aside class="lg:col-span-3">
+        <nav aria-label="On this page" class="lg:sticky lg:top-24 rounded-xl bg-mist p-5">
+          <p class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">Jump to</p>
+          <ul class="mt-3 space-y-1.5 font-semibold">
+            <li><a href="#news" class="hover:text-red-dark hover:underline underline-offset-4">News <span class="text-black-3 font-normal">({updates.length})</span></a></li>
+            <li><a href="#past-campaigns" class="hover:text-red-dark hover:underline underline-offset-4">Past campaigns <span class="text-black-3 font-normal">({pastCampaigns.length})</span></a></li>
+            <li><a href="#past-events" class="hover:text-red-dark hover:underline underline-offset-4">Past events <span class="text-black-3 font-normal">({past.length})</span></a></li>
+          </ul>
+          {months.length > 0 && (
+            <ul class="mt-3 ml-1 pl-3 border-l-2 border-black-4 grid sm:grid-cols-2 lg:grid-cols-1 gap-x-8 gap-y-1 text-sm">
+              {months.map((m) => (
+                <li class="flex justify-between gap-3">
+                  <a href={`#m-${m.key}`} class="hover:text-red-dark hover:underline underline-offset-4">{m.label}</a>
+                  <span class="text-black-3">{m.events.length}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </nav>
+      </aside>
+
+      <div class="lg:col-span-9 min-w-0">
+        <!-- News -->
+        <section id="news" class="scroll-mt-24">
+          <SectionHeading eyebrow="News" title="Wins and announcements." />
+          {updates.length === 0 ? (
+            <p class="mt-6 text-black-2">No news yet.</p>
+          ) : (
+            <ul class="mt-8 grid sm:grid-cols-2 gap-4">
+              {updates.map((u) => {
+                const d = dateOnly(u.data.date);
+                const link = u.data.link ? (u.data.link.startsWith('/') ? href(u.data.link) : u.data.link) : undefined;
+                return (
+                  <li class="rounded-xl ring-1 ring-black/10 border-t-4 border-red p-6 flex flex-col">
+                    <time datetime={u.data.date.toISOString()} class="text-xs font-semibold tracking-[0.16em] uppercase text-red-dark">{formatFullDate(d)}</time>
+                    <h3 class="mt-2 font-display font-extrabold text-xl leading-snug">{u.data.title}</h3>
+                    <p class="mt-2 text-black-2 leading-relaxed flex-1">{u.data.summary}</p>
+                    {link && <a href={link} class="mt-4 font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2">Read more →</a>}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        <!-- Past campaigns -->
+        <section id="past-campaigns" class="mt-16 scroll-mt-24">
+          <SectionHeading eyebrow="Past campaigns" title="What we've finished." />
+          {pastCampaigns.length === 0 ? (
+            <p class="mt-6 rounded-xl bg-mist p-6 text-black-1 leading-relaxed">
+              Nothing here yet. Everything we've taken on is still underway. See our <a href={href('/campaigns/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">current campaigns</a>.
+            </p>
+          ) : (
+            <ul class="mt-8 grid sm:grid-cols-2 gap-4">
+              {pastCampaigns.map((c) => (
+                <li class="rounded-xl bg-mist p-6">
+                  {c.data.date && <p class="text-xs font-semibold tracking-[0.16em] uppercase text-black-2">{formatFullDate(dateOnly(c.data.date))}</p>}
+                  <h3 class="mt-1 font-display font-extrabold text-xl leading-snug"><a href={href(`/campaigns/${c.id}/`)} class="hover:text-red-dark hover:underline underline-offset-4">{c.data.title}</a></h3>
+                  <p class="mt-2 text-black-2 leading-relaxed">{c.data.summary}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <!-- Past events -->
+        <section id="past-events" class="mt-16 scroll-mt-24">
+          <SectionHeading eyebrow="Past events" title="Every meeting, social, and action." lede="Pick a type to narrow the list. Click a month to open or close it." />
+          <style set:html={filterCss}></style>
+
+          <fieldset class="archive-filter mt-8">
+            <legend class="text-xs font-semibold tracking-[0.18em] uppercase text-black-2 mb-3">Show</legend>
+            <div class="flex flex-wrap gap-2">
+              <label class="chip"><input type="radio" name="type" value="all" class="sr-only" checked /> Everything <span class="chip-count">{past.length}</span></label>
+              {present.map((t) => (
+                <label class="chip"><input type="radio" name="type" value={t.key} class="sr-only" /> {t.plural} <span class="chip-count">{typeCount(t.key)}</span></label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="archive-months mt-8 space-y-3">
+            {months.map((m, i) => (
+              <details id={`m-${m.key}`} class="month group scroll-mt-24 rounded-xl ring-1 ring-black/10 open:ring-black/20 overflow-hidden" open={i === 0}>
+                <summary class="flex items-center gap-4 px-5 py-4 cursor-pointer list-none bg-mist group-open:bg-black group-open:text-white hover:bg-black-4/50 group-open:hover:bg-black transition-colors">
+                  <span class="font-display font-extrabold text-xl flex-1">{m.label}</span>
+                  <span class="month-count text-sm font-semibold opacity-75">{m.events.length} {m.events.length === 1 ? 'event' : 'events'}</span>
+                  <svg class="w-5 h-5 shrink-0 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
+                </summary>
+                <ul class="divide-y divide-black/10">
+                  {m.events.map((e) => {
+                    const type = typeOf(e);
+                    const where = shortLocation(e);
+                    const branch = branchOf(e);
+                    return (
+                      <li class="ev flex gap-4 px-5 py-4" data-type={type}>
+                        <span class="w-12 shrink-0 text-center" aria-hidden="true">
+                          <span class="block text-xs font-semibold uppercase text-black-2">{day(e.start, { weekday: 'short' })}</span>
+                          <span class="block font-display font-black text-2xl leading-none">{day(e.start, { day: 'numeric' })}</span>
+                        </span>
+                        <span class="min-w-0 flex-1">
+                          <span class="sr-only">{formatFullDate(e.start)}: </span>
+                          {e.url
+                            ? <a href={e.url} target="_blank" rel="noopener" class="font-semibold leading-snug hover:text-red-dark hover:underline underline-offset-4">{e.title}</a>
+                            : <span class="font-semibold leading-snug">{e.title}</span>}
+                          <span class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-black-2">
+                            <span class:list={['px-2 py-0.5 rounded-full text-xs font-bold', badge[type]]}>{typeLabel(e)}</span>
+                            {branch && <span class="px-2 py-0.5 rounded-full text-xs font-semibold ring-1 ring-red/40 text-red-dark">{branch}</span>}
+                            {where && <span class="truncate min-w-0 max-w-full">{where}</span>}
+                          </span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </details>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
-  </section>
+  </div>
 </Base>
+
+<style>
+  /* Hide the default disclosure triangle; the chevron replaces it. */
+  summary::-webkit-details-marker { display: none; }
+  /* Month totals count every type, so hide them while a filter is on. */
+  .archive-filter:has(input:not([value="all"]):checked) ~ .archive-months .month-count { display: none; }
+</style>

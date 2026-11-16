@@ -30,7 +30,7 @@ const recent = pastEvents()
 
 const feed = [...updates, ...recent].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 6);
 ---
-<section id="activity" class="bg-red text-white">
+<section id="activity" class="bg-red-dark text-white">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.05] max-w-2xl">This chapter gets things done.</h2>
     <dl class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">

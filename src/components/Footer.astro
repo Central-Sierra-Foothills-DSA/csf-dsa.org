@@ -4,8 +4,15 @@ import site from '../data/site.json';
 import badge from '../assets/logos/csf-dsa-white.png';
 import national from '../assets/logos/dsa-national-circle.png';
 import { href } from '../lib/paths';
+import { esText, type Lang } from '../lib/i18n';
 
-const columns = [
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const es = lang === 'es';
+const f = esText.footer;
+const countyList = `${site.counties.slice(0, -1).join(', ')}${es ? ' y ' : ', and '}${site.counties.at(-1)}`;
+
+const enColumns = [
   {
     title: 'The chapter',
     links: [
@@ -19,6 +26,8 @@ const columns = [
     title: 'Get involved',
     links: [
       { path: '/new-members/', label: 'New here? Start here' },
+      { path: '/member-resources/', label: 'Already a member?' },
+      { path: '/member-resources/printables/', label: 'Flyers and printables' },
       { path: '/events/', label: 'Events' },
       { path: '/learn/', label: 'Learn the basics' },
       { path: '/local-government/', label: 'Local government' },
@@ -26,17 +35,18 @@ const columns = [
     ],
   },
 ];
+const columns = es ? f.columns : enColumns;
 ---
 <footer class="bg-black text-white/75">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
     <div class="grid sm:grid-cols-2 md:grid-cols-12 gap-10">
       <div class="sm:col-span-2 md:col-span-4">
-        <a href={href('/')} class="inline-flex items-center gap-3">
+        <a href={href(es ? '/es/' : '/')} class="inline-flex items-center gap-3">
           <Image src={badge} alt="" width={192} height={192} class="w-24 h-24" />
           <span class="font-display font-bold text-white text-lg leading-tight">{site.orgName}</span>
         </a>
         <p class="mt-4 text-sm leading-relaxed max-w-sm">
-          A chapter of the Democratic Socialists of America organizing in {site.counties.slice(0, -1).join(', ')}, and {site.counties.at(-1)} counties, California.
+          {es ? f.blurb.replace('{counties}', countyList) : `A chapter of the Democratic Socialists of America organizing in ${countyList} counties, California.`}
         </p>
       </div>
 
@@ -50,13 +60,14 @@ const columns = [
       ))}
 
       <div class="md:col-span-4">
-        <h3 class="text-xs font-semibold tracking-[0.18em] uppercase text-white/50 mb-4">Connect</h3>
+        <h3 class="text-xs font-semibold tracking-[0.18em] uppercase text-white/50 mb-4">{es ? f.connect : 'Connect'}</h3>
         <ul class="space-y-2 text-sm">
-          <li><a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="hover:text-red-2 transition-colors">Chapter sign-up form</a></li>
-          <li><a href={site.links.joinDsaNational} target="_blank" rel="noopener" class="hover:text-red-2 transition-colors">Become a DSA member</a></li>
+          <li><a href={site.links.joinChapterForm} target="_blank" rel="noopener" class="hover:text-red-2 transition-colors">{es ? f.signup : 'Chapter sign-up form'}</a></li>
+          <li><a href={site.links.joinDsaNational} target="_blank" rel="noopener" class="hover:text-red-2 transition-colors">{es ? f.member : 'Become a DSA member'}</a></li>
           <li><a href={`mailto:${site.contactEmail}`} class="hover:text-red-2 transition-colors">{site.contactEmail}</a></li>
           <li><a href={site.social.instagram} target="_blank" rel="noopener" class="hover:text-red-2 transition-colors">Instagram</a></li>
           <li><a href={site.social.facebook} target="_blank" rel="noopener" class="hover:text-red-2 transition-colors">Facebook</a></li>
+          <li><a href={site.social.reddit} target="_blank" rel="noopener" class="hover:text-red-2 transition-colors">Reddit (r/CSF_DSA)</a></li>
         </ul>
       </div>
     </div>
@@ -66,9 +77,9 @@ const columns = [
         <a href={site.links.dsaNational} target="_blank" rel="noopener" class="shrink-0">
           <Image src={national} alt="Democratic Socialists of America" width={96} height={96} class="w-12 h-12" />
         </a>
-        <p>&copy; {new Date().getFullYear()} {site.orgName}. A chapter of <a href={site.links.dsaNational} target="_blank" rel="noopener" class="underline hover:text-red-2">Democratic Socialists of America</a>.</p>
+        <p>&copy; {new Date().getFullYear()} {site.orgName}. {es ? f.copyright : 'A chapter of'} <a href={site.links.dsaNational} target="_blank" rel="noopener" class="underline hover:text-red-2">Democratic Socialists of America</a>.</p>
       </div>
-      <p>This site is open source. <a href={site.links.github} target="_blank" rel="noopener" class="underline hover:text-red-2">Improve it on GitHub</a>.</p>
+      <p>{es ? f.openSource : 'This site is open source.'} <a href={site.links.github} target="_blank" rel="noopener" class="underline hover:text-red-2">{es ? f.improve : 'Improve it on GitHub'}</a>.</p>
     </div>
   </div>
 </footer>

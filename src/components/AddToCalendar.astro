@@ -1,0 +1,31 @@
+---
+// "Add to calendar" for one event: a small menu with Google, Outlook, and a
+// calendar file for Apple Calendar and everything else. A <details> element, so
+// it opens and closes without JavaScript. Links are plain; nothing is tracked.
+import UiIcon from './UiIcon.astro';
+import type { ChapterEvent, Lang } from '../lib/events';
+import { eventIcsPath, googleUrl, outlookUrl } from '../lib/calendar';
+import { href } from '../lib/paths';
+
+interface Props { event: ChapterEvent; lang?: Lang }
+const { event, lang = 'en' } = Astro.props;
+const es = lang === 'es';
+const item = 'flex items-center justify-between gap-3 px-3 py-2 rounded-md hover:bg-mist hover:text-red-dark';
+---
+<details class="atc relative inline-block">
+  <summary class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md ring-1 ring-black/15 hover:ring-red-dark hover:text-red-dark text-xs font-semibold cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+    <UiIcon name="calendar" class="w-3.5 h-3.5" />
+    {es ? 'Agregar al calendario' : 'Add to calendar'}
+    <span class="sr-only">: {event.title}</span>
+  </summary>
+  <div class="absolute z-20 left-0 mt-1.5 w-56 rounded-lg bg-white shadow-xl ring-1 ring-black/10 p-1.5 text-sm font-semibold">
+    <a href={googleUrl(event)} target="_blank" rel="noopener" class={item}>Google Calendar <span aria-hidden="true">↗</span></a>
+    <a href={href(eventIcsPath(event))} download={`${event.id}.ics`} class={item}>Apple Calendar <span class="text-xs font-normal text-black-2">.ics</span></a>
+    <a href={outlookUrl(event)} target="_blank" rel="noopener" class={item}>Outlook.com <span aria-hidden="true">↗</span></a>
+    <a href={href(eventIcsPath(event))} download={`${event.id}.ics`} class={item}>{es ? 'Otro (archivo)' : 'Other (file)'} <span class="text-xs font-normal text-black-2">.ics</span></a>
+  </div>
+</details>
+
+<style>
+  .atc:not([open]) > div { display: none; }
+</style>
