@@ -47,6 +47,16 @@ const howTo = [
   { icon: 'megaphone', title: 'Speak up, or just listen', body: 'Most meetings set aside time for public comment. Showing up and watching counts too.' },
 ] as const;
 
+// Phone tabs. A tab only appears if its section has something in it.
+const tabs = [
+  { id: 'councils', label: 'Councils' },
+  ...(civic.length ? [{ id: 'calendar', label: 'Our calendar' }] : []),
+  ...(tools.length ? [{ id: 'reps', label: 'Your reps' }] : []),
+];
+const tabCss = tabs
+  .map((t) => `.lg-tabs:has(input[value="${t.id}"]:checked) [data-panel]:not([data-panel="${t.id}"]) { display: none; }`)
+  .join(' ');
+
 const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semibold text-sm transition-colors';
 ---
 <Base title="Local government" description="Where and when your city council and county board of supervisors meet in Placer, Nevada, El Dorado, and Sierra counties.">
@@ -65,8 +75,9 @@ const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semi
   <!-- How to show up -->
   <section class="py-12 sm:py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <SectionHeading eyebrow="First time?" title="How to show up." />
-      <ol class="tray mt-8 grid md:grid-cols-3 gap-4">
+      <div class="hidden md:block"><SectionHeading eyebrow="First time?" title="How to show up." /></div>
+      <Fold id="how-to" label="First time? How to show up" hint="3 steps">
+      <ol class="tray md:mt-8 grid md:grid-cols-3 gap-4">
         {howTo.map((s, i) => (
           <li class="relative rounded-xl bg-mist p-6 overflow-hidden">
             <span class="absolute -right-2 -top-4 font-display font-black text-8xl text-black/5 leading-none select-none" aria-hidden="true">{i + 1}</span>
@@ -76,11 +87,26 @@ const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semi
           </li>
         ))}
       </ol>
+      </Fold>
     </div>
   </section>
 
+  <style set:html={`@media (max-width: 767px) { ${tabCss} }`}></style>
+  <!-- On phones the next three sections are tabs (one shows at a time); from 768px up they all show. -->
+  <div class="lg-tabs">
+  <div class="md:hidden sticky top-16 z-20 bg-white border-b border-black/10 shadow-sm" role="radiogroup" aria-label="Show">
+    <div class="flex">
+      {tabs.map((t, i) => (
+        <label class="lg-tab flex-1">
+          <input type="radio" name="lg-tab" value={t.id} class="sr-only" checked={i === 0} />
+          <span class="block text-center px-2 py-3 text-sm font-display font-bold">{t.label}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+
   {civic.length > 0 && (
-    <section class="py-12 sm:py-16 bg-red-dark text-white">
+    <section data-panel="calendar" class="py-12 sm:py-16 bg-red-dark text-white">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         <div class="lg:col-span-5">
           <SectionHeading eyebrow="We'll be there" title="Meetings on our calendar." tone="dark" lede="These are the ones where our campaigns are on the agenda. Come along, and bring a friend." />
@@ -94,7 +120,7 @@ const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semi
   )}
 
   <!-- Councils and boards, by county -->
-  <section id="meetings" class="py-12 sm:py-16 bg-mist">
+  <section id="meetings" data-panel="councils" class="py-12 sm:py-16 bg-mist">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Agendas and schedules" title="Find your council or board." lede="Each link goes to the official page for agendas and meeting dates. Schedules change, so always check the official page before you go." />
 
@@ -136,7 +162,7 @@ const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semi
   </section>
 
   {tools.length > 0 && (
-    <section id="representatives" class="py-12 sm:py-16 bg-white">
+    <section id="representatives" data-panel="reps" class="py-12 sm:py-16 bg-white">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow="Who represents you" title="Look up your districts and representatives." lede="District lines are confusing. These official tools find yours from your address." />
         {[{ title: 'Statewide and federal', list: statewide }, { title: 'Your county elections office', list: countyTools }].filter((s) => s.list.length).map((s) => (
@@ -160,6 +186,7 @@ const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semi
       </div>
     </section>
   )}
+  </div>
 
   <section class="py-12 sm:py-16 bg-black text-white">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -173,6 +200,13 @@ const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-md font-semi
   </section>
 </Base>
 
+<style is:global>
+  @media (max-width: 767px) {
+    .lg-tab { cursor: pointer; color: var(--color-black-2); border-bottom: 3px solid transparent; }
+    .lg-tab:has(input:checked) { color: var(--color-red-dark); border-bottom-color: var(--color-red-dark); }
+    .lg-tab:has(input:focus-visible) { outline: 3px solid var(--color-red-dark); outline-offset: -3px; }
+  }
+</style>
 <style>
   .outline-num { color: transparent; -webkit-text-stroke: 2px var(--color-red-dark); }
 </style>
