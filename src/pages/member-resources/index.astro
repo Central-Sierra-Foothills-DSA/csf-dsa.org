@@ -1,11 +1,15 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Fold from '../../components/Fold.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Journey from '../../components/Journey.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
+import UiIcon from '../../components/UiIcon.astro';
 import site from '../../data/site.json';
 import groups from '../../data/working-groups.json';
+import badgeBlack from '../../assets/logos/csf-dsa-black.png';
+import stickers from '../../assets/photos/stickers.jpg';
 import { href } from '../../lib/paths';
 import { guide, resolveLink, packetPath } from '../../lib/member-guide';
 
@@ -13,16 +17,33 @@ import { guide, resolveLink, packetPath } from '../../lib/member-guide';
 const packet = href(packetPath);
 const { membership, structure, participation, tools, standards, workbook, nextSteps } = guide;
 const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
+type Icon = 'check' | 'building' | 'clock' | 'chat' | 'users' | 'book' | 'document' | 'mail' | 'calendar' | 'megaphone' | 'video';
+
 // Jump links at the top of the page. Each id matches a section below.
-const sections = [
-  { id: 'membership', label: 'Voting membership and dues' },
-  { id: 'how-it-works', label: 'Branches and working groups' },
-  { id: 'participation', label: 'Taking part' },
-  { id: 'stay-connected', label: 'Slack, email, and calendars' },
-  { id: 'standards', label: 'Community standards' },
-  { id: 'workbook', label: 'The optional workbook' },
-  { id: 'printables', label: 'Flyers and printables' },
+const sections: { id: string; label: string; hint: string; icon: Icon }[] = [
+  { id: 'membership', label: 'Voting membership and dues', hint: `${membership.length} steps`, icon: 'check' },
+  { id: 'how-it-works', label: 'Branches and working groups', hint: `${groups.length} working groups`, icon: 'building' },
+  { id: 'participation', label: 'Taking part', hint: 'Consistency over perfection', icon: 'clock' },
+  { id: 'stay-connected', label: 'Slack, email, and calendars', hint: `${tools.length} places to plug in`, icon: 'chat' },
+  { id: 'standards', label: 'Community standards', hint: 'How we treat each other', icon: 'users' },
+  { id: 'workbook', label: 'The optional workbook', hint: `${workbook.sections.length} short sections`, icon: 'book' },
+  { id: 'printables', label: 'Flyers and printables', hint: 'For tables and events', icon: 'document' },
 ];
+
+// An icon for each working group, picked from words in its name. Anything new gets "users".
+const groupIcon = (name: string): Icon =>
+  /elect|vote/i.test(name) ? 'check'
+  : /surveil|flock/i.test(name) ? 'video'
+  : /educat|read/i.test(name) ? 'book'
+  : /outreach|member/i.test(name) ? 'megaphone'
+  : 'users';
+
+// An icon for each place to stay connected.
+const toolIcon = (name: string): Icon =>
+  /slack/i.test(name) ? 'chat' : /email|newsletter/i.test(name) ? 'mail' : /calendar/i.test(name) ? 'calendar' : 'document';
+
+// Three flyers from the library, shown fanned out in the printables section.
+const flyerPreviews = ['join-not-alone', 'hangout-coffee', 'grass-valley-nevada-city-branch'].map((slug) => href(`/files/printables/previews/${slug}.jpg`));
 ---
 <Base title="Member resources" description="A guide for new members of Central Sierra Foothills DSA: how the chapter works, how to stay connected, our community standards, and a printable new member packet.">
   <PageHeader eyebrow="For members" title="Welcome to the chapter." lede="You joined. Here's how the chapter works, where the conversation happens, and how to find your place in the work.">
@@ -32,43 +53,71 @@ const sections = [
   </PageHeader>
   <Journey current="joined" />
 
+  <!-- On this page + the packet -->
   <section class="py-12 sm:py-16 bg-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-12 items-start">
       <div class="lg:col-span-7">
         <SectionHeading eyebrow="On this page" title="Everything you need to get going." />
-        <ul class="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-3 text-lg">
-          {sections.map((s) => (
-            <li><a href={`#${s.id}`} class={linkClass}>{s.label}</a></li>
+        <ul class="mt-8 grid grid-cols-2 gap-2 sm:gap-3">
+          {sections.map((s, i) => (
+            <li class:list={[i === sections.length - 1 && sections.length % 2 === 1 && 'col-span-2']}>
+              <a href={`#${s.id}`} class="group flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-4 h-full rounded-xl bg-mist hover:bg-red-dark hover:text-white p-3 sm:p-4 transition-colors">
+                <span class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full bg-white text-red-dark flex items-center justify-center shadow-sm"><UiIcon name={s.icon} /></span>
+                <span class="min-w-0 flex-1">
+                  <span class="block font-display font-bold text-sm sm:text-base leading-snug">{s.label}</span>
+                  <span class="hidden sm:block text-sm text-black-2 group-hover:text-white/80">{s.hint}</span>
+                </span>
+                <span class="hidden sm:inline text-red-dark group-hover:text-white font-display font-black text-sm" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              </a>
+            </li>
           ))}
         </ul>
-        <p class="mt-8 pt-6 border-t border-black/10 text-black-2">
+        <p class="mt-6 text-black-2">
           Background reading:
           <a href={href('/learn/')} class={linkClass}>What is democratic socialism?</a> ·
           <a href={href('/about/')} class={linkClass}>How the chapter is organized</a>
         </p>
       </div>
-      <aside class="lg:col-span-5 rounded-xl bg-black text-white p-6 sm:p-8">
-        <p class="font-semibold tracking-[0.18em] uppercase text-xs text-red-2">Printable</p>
-        <h2 class="mt-2 font-display font-extrabold text-2xl leading-tight">New member packet</h2>
-        <p class="mt-3 text-white/75 leading-relaxed">Everything on this page, plus an optional workbook with reflection questions to fill in at your own pace.</p>
-        <a href={packet} download class="mt-5 inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 rounded-md font-semibold transition-colors">
-          Download the packet <span class="text-white/70 font-normal">(PDF)</span>
-        </a>
+
+      <aside class="lg:col-span-5 rounded-2xl bg-black text-white overflow-hidden">
+        <!-- A little stack of paper, standing in for the packet -->
+        <div class="relative h-56 sm:h-64 bg-[radial-gradient(circle_at_30%_20%,rgb(196_22_29/0.55),transparent_60%)]" aria-hidden="true">
+          <div class="absolute left-1/2 top-8 w-36 sm:w-40 aspect-[8.5/11] -translate-x-[70%] rotate-[-9deg] rounded-sm bg-white/85 shadow-xl"></div>
+          <div class="absolute left-1/2 top-6 w-36 sm:w-40 aspect-[8.5/11] -translate-x-[30%] rotate-[7deg] rounded-sm bg-white/90 shadow-xl"></div>
+          <div class="absolute left-1/2 top-4 w-36 sm:w-40 aspect-[8.5/11] -translate-x-1/2 rounded-sm bg-white shadow-2xl p-3 flex flex-col text-black">
+            <span class="h-1.5 w-full bg-red rounded-full"></span>
+            <Image src={badgeBlack} alt="" width={120} class="mt-3 w-12 h-auto" />
+            <span class="mt-2 font-display font-black text-sm leading-tight">New member packet</span>
+            <span class="mt-2 h-1 w-4/5 bg-black/15 rounded-full"></span>
+            <span class="mt-1 h-1 w-3/5 bg-black/15 rounded-full"></span>
+            <span class="mt-1 h-1 w-2/3 bg-black/15 rounded-full"></span>
+          </div>
+        </div>
+        <div class="p-6 sm:p-8 pt-2 sm:pt-2">
+          <p class="font-semibold tracking-[0.18em] uppercase text-xs text-red-2">Printable</p>
+          <h2 class="mt-2 font-display font-extrabold text-2xl leading-tight">New member packet</h2>
+          <p class="mt-3 text-white/75 leading-relaxed">Everything on this page, plus an optional workbook with reflection questions to fill in at your own pace.</p>
+          <a href={packet} download class="mt-5 inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-white hover:text-black rounded-md font-semibold transition-colors">
+            Download the packet <span class="opacity-70 font-normal">(PDF)</span>
+          </a>
+        </div>
       </aside>
     </div>
   </section>
 
-  <section id="membership" class="py-12 sm:py-16 bg-mist">
+  <!-- Membership -->
+  <section id="membership" class="py-12 sm:py-16 bg-mist scroll-mt-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Membership" title="What it takes to be a voting member." />
       <ol class="tray mt-10 grid md:grid-cols-3 gap-5">
         {membership.map((m, i) => (
-          <li class="bg-white rounded-xl p-6 sm:p-7 ring-1 ring-black/10">
-            <span class="w-11 h-11 rounded-full bg-red-dark text-white font-display font-black text-lg flex items-center justify-center" aria-hidden="true">{i + 1}</span>
-            <h3 class="mt-4 font-display font-extrabold text-xl leading-tight">{m.title}</h3>
-            <p class="mt-2 text-black-2 leading-relaxed">{m.body}</p>
+          <li class="relative overflow-hidden bg-white rounded-2xl p-6 sm:p-7 shadow-sm ring-1 ring-black/10 border-t-4 border-red-dark">
+            <span class="absolute -right-2 -top-6 font-display font-black text-[7rem] leading-none text-mist select-none" aria-hidden="true">{i + 1}</span>
+            <span class="relative w-11 h-11 rounded-full bg-red-dark text-white font-display font-black text-lg flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+            <h3 class="relative mt-4 font-display font-extrabold text-xl leading-tight">{m.title}</h3>
+            <p class="relative mt-2 text-black-2 leading-relaxed">{m.body}</p>
             {i === 0 && (
-              <a href={site.links.joinDsaNational} target="_blank" rel="noopener" class:list={['mt-3 inline-flex', linkClass]}>Join or renew ↗</a>
+              <a href={site.links.joinDsaNational} target="_blank" rel="noopener" class:list={['relative mt-3 inline-flex', linkClass]}>Join or renew ↗</a>
             )}
           </li>
         ))}
@@ -76,69 +125,91 @@ const sections = [
     </div>
   </section>
 
-  <section id="how-it-works" class="py-12 sm:py-16 bg-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-14">
-      <div>
+  <!-- Branches and working groups -->
+  <section id="how-it-works" class="py-12 sm:py-16 bg-white scroll-mt-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14">
+      <div class="lg:col-span-5">
         <SectionHeading eyebrow="How the chapter works" title="Branches, working groups, and you." />
         <div class="mt-6 space-y-4 text-lg leading-relaxed">
           <p>{structure.branches}</p>
           <p>{structure.workingGroups}</p>
-          <p>{structure.encourage}</p>
+          <p class="pl-4 border-l-4 border-red font-semibold">{structure.encourage}</p>
         </div>
         <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2">
           <a href={href('/branches/')} class={linkClass}>Find your branch →</a>
           <a href={href('/about/#decisions')} class={linkClass}>How we make decisions →</a>
         </div>
       </div>
-      <div>
+      <div class="lg:col-span-7">
         <h3 class="hidden md:block font-display font-extrabold text-2xl">Our working groups</h3>
         <Fold id="working-groups" label="Our working groups" hint={`${groups.length}`}>
-        <dl class="md:mt-6 space-y-5">
+        <ul class="md:mt-6 grid sm:grid-cols-2 gap-3">
           {groups.map((g) => (
-            <div class="pl-5 border-l-4 border-red">
-              <dt class="font-display font-extrabold text-lg">{g.name}</dt>
-              <dd class="text-black-2 leading-relaxed">{g.description}</dd>
-            </div>
+            <li class="rounded-xl bg-mist p-5 flex gap-4">
+              <span class="w-10 h-10 shrink-0 rounded-full bg-black text-white flex items-center justify-center"><UiIcon name={groupIcon(g.name)} class="w-5 h-5" /></span>
+              <span>
+                <span class="block font-display font-extrabold text-lg leading-snug">{g.name}</span>
+                <span class="block mt-1 text-sm text-black-2 leading-relaxed">{g.description}</span>
+              </span>
+            </li>
           ))}
-        </dl>
+          <li class="rounded-xl border-2 border-dashed border-black/15 p-5 flex items-center gap-4">
+            <span class="w-10 h-10 shrink-0 rounded-full bg-white ring-1 ring-black/15 text-red-dark flex items-center justify-center"><UiIcon name="chat" class="w-5 h-5" /></span>
+            <span class="text-sm text-black-2 leading-relaxed">To join one, ask in Slack or at your next branch meeting.</span>
+          </li>
+        </ul>
         </Fold>
-        <p class="mt-6 text-black-2">To join one, ask in Slack or at your next branch meeting.</p>
       </div>
     </div>
   </section>
 
-  <section id="participation" class="py-12 sm:py-16 bg-mist">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-14">
+  <!-- Taking part -->
+  <section id="participation" class="py-12 sm:py-16 bg-mist scroll-mt-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
       <div>
         <SectionHeading eyebrow="Taking part" title="Consistency over perfection." />
         <div class="mt-6 space-y-4 text-lg leading-relaxed">
           {participation.intro.map((p) => <p>{p}</p>)}
         </div>
       </div>
-      <div class="bg-white rounded-xl p-6 sm:p-8 ring-1 ring-black/10">
-        <h3 class="font-display font-extrabold text-xl">When we can, we all try to:</h3>
-        <ul class="mt-4 space-y-3">
-          {participation.hopes.map((h) => (
-            <li class="flex gap-3 leading-relaxed"><span class="mt-2 w-2 h-2 shrink-0 rounded-full bg-red" aria-hidden="true"></span>{h}</li>
-          ))}
-        </ul>
-        <h3 class="mt-8 font-display font-extrabold text-xl">What you can expect from us</h3>
-        <p class="mt-3 text-black-2 leading-relaxed">{participation.fromUs}</p>
+      <div class="bg-white rounded-2xl shadow-sm ring-1 ring-black/10 overflow-hidden">
+        <div class="p-6 sm:p-8">
+          <h3 class="font-display font-extrabold text-xl">When we can, we all try to:</h3>
+          <ul class="mt-5 space-y-4">
+            {participation.hopes.map((h) => (
+              <li class="flex gap-3 leading-relaxed">
+                <span class="w-7 h-7 shrink-0 rounded-full bg-red-4 text-red-dark flex items-center justify-center"><UiIcon name="check" class="w-4.5 h-4.5" /></span>
+                <span class="pt-0.5">{h}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="bg-red-dark text-white p-6 sm:p-8">
+          <h3 class="font-display font-extrabold text-xl">What you can expect from us</h3>
+          <p class="mt-3 text-white/90 leading-relaxed">{participation.fromUs}</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="stay-connected" class="py-12 sm:py-16 bg-white">
+  <!-- Stay connected -->
+  <section id="stay-connected" class="py-12 sm:py-16 bg-white scroll-mt-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <SectionHeading eyebrow="Stay connected" title="Where the conversation happens." lede="Tip: turn on notifications. Organizing moves quickly." />
-      <ul class="tray mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {tools.map((t) => {
+      <SectionHeading eyebrow="Stay connected" title="Where the conversation happens." />
+      <p class="mt-4 inline-flex items-center gap-2 rounded-full bg-red-4 text-red-dark px-4 py-1.5 text-sm font-semibold">
+        <span class="relative flex w-2 h-2"><span class="absolute inline-flex h-full w-full rounded-full bg-red opacity-60 motion-safe:animate-ping"></span><span class="relative inline-flex w-2 h-2 rounded-full bg-red"></span></span>
+        Tip: turn on notifications. Organizing moves quickly.
+      </p>
+      <ul class="tray mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {tools.map((t, i) => {
           const link = resolveLink(t);
           return (
-            <li class="rounded-xl p-6 ring-1 ring-black/10 flex flex-col">
-              <h3 class="font-display font-extrabold text-xl">{t.name}</h3>
-              <p class="mt-2 text-black-2 leading-relaxed flex-1">{t.body}</p>
-              <a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener' : undefined} class:list={['mt-4', linkClass]}>
+            <li class:list={['group relative rounded-2xl p-6 flex flex-col transition-shadow hover:shadow-lg', i === 0 ? 'bg-black text-white' : 'bg-white ring-1 ring-black/10']}>
+              <span class:list={['w-12 h-12 rounded-xl flex items-center justify-center', i === 0 ? 'bg-red-dark text-white' : 'bg-mist text-red-dark']}><UiIcon name={toolIcon(t.name)} class="w-6 h-6" /></span>
+              <h3 class="mt-4 font-display font-extrabold text-xl">{t.name}</h3>
+              <p class:list={['mt-2 leading-relaxed flex-1', i === 0 ? 'text-white/75' : 'text-black-2']}>{t.body}</p>
+              <a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener' : undefined}
+                 class:list={['mt-4 font-semibold underline underline-offset-4 decoration-2 after:absolute after:inset-0', i === 0 ? 'text-red-2 group-hover:text-white' : 'text-red-dark group-hover:text-red']}>
                 {t.label} {link.external ? '↗' : '→'}
               </a>
             </li>
@@ -148,14 +219,15 @@ const sections = [
     </div>
   </section>
 
-  <section id="standards" class="py-12 sm:py-16 bg-black text-white">
+  <!-- Community standards -->
+  <section id="standards" class="py-12 sm:py-16 bg-black text-white scroll-mt-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Community standards" title="Solidarity starts with how we treat each other." tone="dark" lede={standards.intro} />
       <div class="mt-8 md:mt-10 grid lg:grid-cols-2 gap-3 md:gap-6">
         <Fold id="std-communication" label="Respectful communication" tone="dark">
-        <div class="rounded-xl bg-white/5 ring-1 ring-white/10 p-6 sm:p-8">
-          <h3 class="hidden md:block font-display font-extrabold text-xl">Respectful communication</h3>
-          <ul class="mt-4 space-y-3 text-white/80">
+        <div class="h-full rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 sm:p-8">
+          <h3 class="hidden md:flex items-center gap-3 font-display font-extrabold text-xl"><span class="w-10 h-10 rounded-full bg-red-dark flex items-center justify-center"><UiIcon name="chat" class="w-5 h-5" /></span>Respectful communication</h3>
+          <ul class="mt-4 md:mt-5 space-y-3 text-white/80">
             {standards.communication.map((c) => (
               <li class="flex gap-3 leading-relaxed"><span class="mt-2 w-2 h-2 shrink-0 rounded-full bg-red" aria-hidden="true"></span>{c}</li>
             ))}
@@ -163,9 +235,9 @@ const sections = [
         </div>
         </Fold>
         <Fold id="std-harassment" label="No harassment, anywhere" tone="dark">
-        <div class="rounded-xl bg-white/5 ring-1 ring-white/10 p-6 sm:p-8">
-          <h3 class="hidden md:block font-display font-extrabold text-xl">No harassment, anywhere</h3>
-          {standards.harassment.map((p, i) => <p class:list={['text-white/80 leading-relaxed', i === 0 ? 'mt-4' : 'mt-3']}>{p}</p>)}
+        <div class="h-full rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 sm:p-8">
+          <h3 class="hidden md:flex items-center gap-3 font-display font-extrabold text-xl"><span class="w-10 h-10 rounded-full bg-red-dark flex items-center justify-center"><UiIcon name="users" class="w-5 h-5" /></span>No harassment, anywhere</h3>
+          {standards.harassment.map((p, i) => <p class:list={['text-white/80 leading-relaxed', i === 0 ? 'mt-4 md:mt-5' : 'mt-3']}>{p}</p>)}
           <p class="mt-4">
             <a href={standards.harassmentPolicyUrl} target="_blank" rel="noopener" class="font-semibold text-red-2 hover:text-white underline underline-offset-4">DSA's national harassment policy ↗</a>
           </p>
@@ -175,11 +247,12 @@ const sections = [
 
       <h3 class="mt-12 font-display font-extrabold text-2xl">If something goes wrong</h3>
       <p class="mt-3 text-white/80 text-lg leading-relaxed max-w-3xl">{standards.conflict}</p>
-      <ol class="tray mt-6 grid md:grid-cols-3 gap-5">
+      <ol class="tray mt-8 grid md:grid-cols-3 gap-5 relative">
         {standards.steps.map((s, i) => (
-          <li class="rounded-xl bg-white/5 ring-1 ring-white/10 p-6">
-            <span class="font-display font-black text-red-2 text-lg">Step {i + 1}</span>
-            <h4 class="mt-1 font-display font-extrabold text-lg">{s.title}</h4>
+          <li class="relative rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 pt-8">
+            <span class="absolute -top-4 left-6 w-9 h-9 rounded-full bg-red-dark ring-4 ring-black font-display font-black flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+            <span class="sr-only">Step {i + 1}: </span>
+            <h4 class="font-display font-extrabold text-lg">{s.title}</h4>
             <p class="mt-2 text-white/80 leading-relaxed">
               {s.body}
               {i === 1 && <> <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-2 hover:text-white underline underline-offset-4">{site.contactEmail}</a>.</>}
@@ -193,45 +266,73 @@ const sections = [
     </div>
   </section>
 
-  <section id="workbook" class="py-12 sm:py-16 bg-mist">
+  <!-- Workbook -->
+  <section id="workbook" class="py-12 sm:py-16 bg-mist scroll-mt-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Going deeper" title="An optional workbook." lede={workbook.intro} />
       <ol class="tray mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {workbook.sections.map((w, i) => (
-          <li class="bg-white rounded-xl p-5 ring-1 ring-black/10">
-            <span class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">Section {i + 1}</span>
-            <h3 class="mt-1 font-display font-extrabold text-lg leading-snug">{w.title}</h3>
-            <p class="mt-2 text-black-2 text-sm leading-relaxed italic">“{w.sample}”</p>
+          <li class="notebook relative rounded-lg shadow-sm ring-1 ring-black/10 pl-10 pr-5 pt-4 pb-5">
+            <span class="absolute left-3 top-4 font-display font-black text-sm text-red-dark" aria-hidden="true">{i + 1}</span>
+            <span class="sr-only">Section {i + 1}: </span>
+            <h3 class="font-display font-extrabold text-lg leading-[28px]">{w.title}</h3>
+            <p class="text-black-1 text-sm leading-[28px] italic">“{w.sample}”</p>
           </li>
         ))}
       </ol>
-      <p class="mt-8 text-lg leading-relaxed max-w-3xl">{workbook.share}</p>
-      <p class="mt-4"><a href={packet} download class={linkClass}>Download the packet (PDF) ↓</a></p>
+      <div class="mt-8 lg:flex lg:items-center lg:gap-8">
+        <p class="text-lg leading-relaxed max-w-3xl flex-1">{workbook.share}</p>
+        <a href={packet} download class="mt-4 lg:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-black hover:bg-red-dark text-white font-semibold rounded-md transition-colors"><UiIcon name="document" /> Download the packet (PDF)</a>
+      </div>
     </div>
   </section>
 
-  <section id="printables" class="py-12 sm:py-16 bg-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-8 items-center">
-      <div class="lg:col-span-8">
+  <!-- Flyers and printables -->
+  <section id="printables" class="py-12 sm:py-16 bg-white scroll-mt-16 overflow-hidden">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+      <div>
         <SectionHeading eyebrow="Tabling and events" title="Flyers and printables." lede="Chapter and branch flyers you can fill in with event details, plus a table sign, a sign-in sheet, a handout, a community standards poster, and images for social media." />
-      </div>
-      <div class="lg:col-span-4 lg:text-right">
-        <a href={href('/member-resources/printables/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white rounded-md font-semibold transition-colors">
+        <a href={href('/member-resources/printables/')} class="mt-6 inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white rounded-md font-semibold transition-colors">
           Browse the flyers →
         </a>
       </div>
+      <a href={href('/member-resources/printables/')} class="group relative block h-72 sm:h-96" aria-label="Browse the flyers">
+        <Image src={stickers} alt="" widths={[500, 900]} sizes="(min-width: 1024px) 520px, 100vw" class="absolute inset-y-0 left-0 w-4/5 h-full object-cover rounded-2xl shadow-lg" />
+        {flyerPreviews.map((src, i) => (
+          <img src={src} alt="" loading="lazy" width="490" height="634"
+               class:list={['absolute bottom-3 w-28 sm:w-36 h-auto rounded-md shadow-2xl ring-1 ring-black/10 bg-white transition-transform duration-300',
+                 i === 0 && 'right-24 sm:right-32 rotate-[-10deg] group-hover:-translate-x-2',
+                 i === 1 && 'right-10 sm:right-14 rotate-[-2deg] group-hover:-translate-y-2',
+                 i === 2 && 'right-0 rotate-[8deg] group-hover:translate-x-2']} />
+        ))}
+      </a>
     </div>
   </section>
 
+  <!-- First steps -->
   <section class="py-12 sm:py-16 bg-red-dark text-white">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 class="font-display font-black text-3xl sm:text-4xl">Your first few steps.</h2>
-      <ul class="mt-8 flex flex-wrap justify-center gap-3">
-        {nextSteps.map((s) => (
-          <li class="px-4 py-2 rounded-full bg-white/10 ring-1 ring-white/30 font-semibold">{s}</li>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="font-display font-black text-3xl sm:text-4xl text-center">Your first few steps.</h2>
+      <ol class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        {nextSteps.map((s, i) => (
+          <li class="flex lg:flex-col items-center lg:items-start gap-3 rounded-xl bg-white/10 ring-1 ring-white/25 p-4">
+            <span class="w-9 h-9 shrink-0 rounded-full bg-white text-red-dark font-display font-black flex items-center justify-center" aria-hidden="true">{i + 1}</span>
+            <span class="font-semibold leading-snug">{s}</span>
+          </li>
         ))}
-      </ul>
-      <p class="mt-8 text-lg">Questions? Email <a href={`mailto:${site.contactEmail}`} class="font-bold underline underline-offset-4">{site.contactEmail}</a>. A real person will write back.</p>
+      </ol>
+      <p class="mt-8 text-lg text-center">Questions? Email <a href={`mailto:${site.contactEmail}`} class="font-bold underline underline-offset-4">{site.contactEmail}</a>. A real person will write back.</p>
     </div>
   </section>
 </Base>
+
+<style>
+  /* Lined notebook paper for the workbook cards, with a red margin line. */
+  .notebook {
+    background-color: white;
+    background-image:
+      linear-gradient(to right, transparent 1.9rem, rgb(236 31 39 / 0.45) 1.9rem, rgb(236 31 39 / 0.45) calc(1.9rem + 1px), transparent calc(1.9rem + 1px)),
+      repeating-linear-gradient(to bottom, transparent 0 27px, rgb(35 31 32 / 0.08) 27px 28px);
+    background-position: 0 0, 0 16px;
+  }
+</style>
