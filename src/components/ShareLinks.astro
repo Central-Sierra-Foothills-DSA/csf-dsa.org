@@ -1,0 +1,45 @@
+---
+// "Share this page" strip. Plain links to each service's own share page: no
+// third-party scripts or tracking load until someone clicks. Place it at the end
+// of a page, just above the footer.
+import SocialIcon from './SocialIcon.astro';
+import UiIcon from './UiIcon.astro';
+import site from '../data/site.json';
+import { href, currentPath } from '../lib/paths';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  /** What the shared post or email subject says; usually the page title. */
+  title: string;
+  lang?: Lang;
+}
+const { title, lang = 'en' } = Astro.props;
+const es = lang === 'es';
+
+const url = new URL(href(currentPath(Astro.url)), Astro.site ?? 'https://csf-dsa.org').href;
+const text = `${title} | ${site.orgName}`;
+const e = encodeURIComponent;
+
+const links = [
+  { label: 'Facebook', icon: 'facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${e(url)}` },
+  { label: 'Bluesky', icon: 'bluesky', href: `https://bsky.app/intent/compose?text=${e(`${text} ${url}`)}` },
+  { label: 'Reddit', icon: 'reddit', href: `https://www.reddit.com/submit?url=${e(url)}&title=${e(text)}` },
+  { label: es ? 'Correo' : 'Email', icon: 'mail', href: `mailto:?subject=${e(text)}&body=${e(url)}` },
+] as const;
+---
+<section class="bg-white border-t border-black/10" aria-label={es ? 'Compartir esta página' : 'Share this page'}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-wrap items-center gap-x-4 gap-y-3">
+    <p class="font-display font-bold">{es ? 'Comparte esta página' : 'Share this page'}</p>
+    <ul class="flex flex-wrap gap-2">
+      {links.map((l) => (
+        <li>
+          <a href={l.href} target={l.icon === 'mail' ? undefined : '_blank'} rel={l.icon === 'mail' ? undefined : 'noopener'}
+             class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-mist hover:bg-black hover:text-white text-sm font-semibold transition-colors">
+            {l.icon === 'mail' ? <UiIcon name="mail" class="w-4 h-4" /> : <SocialIcon name={l.icon} class="w-4 h-4" />}
+            {l.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

@@ -1,4 +1,5 @@
 ---
+import ShareLinks from '../components/ShareLinks.astro';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
@@ -108,4 +109,5 @@ const faqs = [
       <p class="mt-4 text-lg">Email <a href={`mailto:${site.contactEmail}`} class="font-bold underline underline-offset-4">{site.contactEmail}</a>. A real person will write back and help you find your way in.</p>
     </div>
   </section>
+  <ShareLinks title="New here? Start here" />
 </Base>

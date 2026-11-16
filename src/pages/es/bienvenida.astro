@@ -1,5 +1,6 @@
 ---
 // Spanish "New here" page. Mirrors src/pages/new-members.astro.
+import ShareLinks from '../../components/ShareLinks.astro';
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
@@ -95,6 +96,7 @@ const linkClass = 'font-semibold text-red-dark hover:text-red underline underlin
       <p class="mt-4 text-lg">Escríbenos a <a href={`mailto:${site.contactEmail}`} class="font-bold underline underline-offset-4">{site.contactEmail}</a>. Te responde una persona de verdad.</p>
     </div>
   </section>
+  <ShareLinks title="¿Eres nuevo? Empieza aquí" lang="es" />
 </Base>
 
 <style>

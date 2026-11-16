@@ -1,4 +1,5 @@
 ---
+import ShareLinks from '../components/ShareLinks.astro';
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import SectionHeading from '../components/SectionHeading.astro';
@@ -234,6 +235,7 @@ const [featured, ...otherQuotes] = [...quotes].sort((a, b) => b.text.length - a.
       </div>
     </div>
   </section>
+  <ShareLinks title="The basics of democratic socialism" />
 </Base>
 
 <style>

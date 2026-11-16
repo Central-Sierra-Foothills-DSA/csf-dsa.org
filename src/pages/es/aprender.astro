@@ -1,5 +1,6 @@
 ---
 // Spanish Learn page. Mirrors src/pages/learn.astro; glossary and quotes in src/data/es/shared.json.
+import ShareLinks from '../../components/ShareLinks.astro';
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
@@ -182,6 +183,7 @@ const blurbs: Record<string, string> = {
       </ul>
     </div>
   </section>
+  <ShareLinks title="Lo básico del socialismo democrático" lang="es" />
 </Base>
 
 <style>

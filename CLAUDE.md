@@ -60,6 +60,8 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | Meeting access details (step-free entry, parking, kids) | `access:` in a branch file (English) and in `src/data/es/branches.json` (Spanish) |
 | Page copy or layout              | The page file, or a component in `src/components/` |
 | Nav and footer links             | `src/components/Nav.astro`, `src/components/Footer.astro` |
+| Social accounts (header icons, footer, home) | `social` in `src/data/site.json`; icons in `src/components/SocialIcon.astro` |
+| "Share this page" buttons        | `src/components/ShareLinks.astro` (plain links, no tracking scripts); add `<ShareLinks title="…" />` above `</Base>` |
 | Colors, fonts, global CSS        | `src/styles/global.css` (Tailwind `@theme` block)  |
 | Photos                           | `src/assets/photos/` (imported with `astro:assets`)|
 | Logos                            | `src/assets/logos/` (chapter badge, national logo) |
