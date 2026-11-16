@@ -2,11 +2,12 @@
 // Small outline icons for labels (when, where, online, contact). 24 × 24 grid,
 // drawn in the current text color.
 interface Props {
-  name: 'calendar' | 'pin' | 'video' | 'mail' | 'clock' | 'users' | 'book' | 'building' | 'home' | 'check' | 'document' | 'megaphone';
+  name: 'calendar' | 'pin' | 'video' | 'mail' | 'clock' | 'users' | 'book' | 'building' | 'home' | 'check' | 'document' | 'megaphone' | 'cup';
   class?: string;
 }
 const { name, class: className = 'w-5 h-5' } = Astro.props;
 const paths: Record<Props['name'], string> = {
+  cup: 'M4.5 9h12v4.5a5.25 5.25 0 01-5.25 5.25h-1.5A5.25 5.25 0 014.5 13.5V9z M16.5 10.5h1.125a2.625 2.625 0 010 5.25H16.2 M8.25 3.75c0 1.125 1.125 1.125 1.125 2.25 M12 3.75c0 1.125 1.125 1.125 1.125 2.25 M3.75 21h13.5',
   building: 'M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z',
   home: 'M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25',
   check: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',

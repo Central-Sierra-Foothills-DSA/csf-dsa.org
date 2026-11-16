@@ -8,7 +8,8 @@
 // empty days and show "nothing matches" are written out for each combination;
 // there are only a few dozen.
 import { getCollection } from 'astro:content';
-import EventList from './EventList.astro';
+import EventCards from './EventCards.astro';
+import { EVENT_STYLE } from '../lib/event-style';
 import {
   type ChapterEvent, type Lang, EVENT_TYPES, EVENT_TYPES_ES, TIMEZONE,
   typeOf, typeLabel, matches, isGoodFirst, groupByMonth, formatTimeRange, formatTime,
@@ -26,8 +27,8 @@ const es = lang === 'es';
 const locale = es ? 'es-US' : 'en-US';
 
 const t = es
-  ? { week: 'Esta semana', kind: 'Tipo', branch: 'Rama', all: 'Todo', allBranches: 'Todas', chapter: 'Todo el capítulo', first: 'Buenos primeros eventos', firstHint: 'Eventos sociales y eventos para gente nueva: la forma más fácil de empezar.', view: 'Vista', list: 'Lista', month: 'Mes', nomatch: 'Nada coincide con esos filtros por ahora. Prueba con menos.', legend: 'Tipos de evento', tapDay: 'Toca un día para ver sus eventos abajo.' }
-  : { week: 'This week', kind: 'Kind', branch: 'Branch', all: 'Everything', allBranches: 'All', chapter: 'Chapter-wide', first: 'Good first events', firstHint: 'Socials and newcomer events: the easiest way in.', view: 'View', list: 'List', month: 'Month', nomatch: 'Nothing matches those filters right now. Try fewer.', legend: 'Kinds of event', tapDay: 'Tap a day to jump to its events below.' };
+  ? { week: 'También esta semana', kind: 'Tipo', branch: 'Rama', all: 'Todo', allBranches: 'Todas', chapter: 'Todo el capítulo', first: 'Buenos primeros eventos', firstHint: 'Eventos sociales y eventos para gente nueva: la forma más fácil de empezar.', view: 'Vista', list: 'Lista', month: 'Mes', nomatch: 'Nada coincide con esos filtros por ahora. Prueba con menos.', legend: 'Tipos de evento', tapDay: 'Toca un día para ver sus eventos abajo.' }
+  : { week: 'Also this week', kind: 'Kind', branch: 'Branch', all: 'Everything', allBranches: 'All', chapter: 'Chapter-wide', first: 'Good first events', firstHint: 'Socials and newcomer events: the easiest way in.', view: 'View', list: 'List', month: 'Month', nomatch: 'Nothing matches those filters right now. Try fewer.', legend: 'Kinds of event', tapDay: 'Tap a day to jump to its events below.' };
 
 // ---- What each event belongs to -------------------------------------------
 const branches = (await getCollection('branches'))
@@ -64,6 +65,7 @@ for (const k of ['all', ...types]) {
       if (!sel) continue;
       const cond = `.eb${on('type', k)}${on('branch', b)}${f ? ':has(input[name="eb-first"]:checked)' : ':not(:has(input[name="eb-first"]:checked))'}`;
       rules.push(`${cond} .eb-list .event-day:not(:has(.event${sel})) { display: none; }`);
+      rules.push(`${cond} .eb-list .event-month:not(:has(.event${sel})) { display: none; }`);
       const n = events.filter((e) => (k === 'all' || typeOf(e) === k) && (b === 'all' || tags(e)['data-branches'].split(' ').includes(b)) && (!f || isGoodFirst(e))).length;
       if (n === 0) rules.push(`${cond} .eb-nomatch { display: block; }`);
     }
@@ -73,7 +75,8 @@ const css = rules.join(' ');
 
 // ---- This week ---------------------------------------------------------------
 const weekEnd = now.getTime() + 7 * 24 * 60 * 60 * 1000;
-const thisWeek = events.filter((e) => new Date(e.start).getTime() < weekEnd).slice(0, 8);
+// The soonest event is featured in the page header (NextEvent), so start after it.
+const thisWeek = events.slice(1).filter((e) => new Date(e.start).getTime() < weekEnd).slice(0, 8);
 const dayLabel = (iso: string) => new Intl.DateTimeFormat(locale, { timeZone: TIMEZONE, weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso));
 
 // ---- Month view ---------------------------------------------------------------
@@ -97,13 +100,8 @@ const months = groupByMonth(events, lang).map((m) => {
 const weekdays = Array.from({ length: 7 }, (_, i) => new Date(Date.UTC(2026, 0, 4 + i, 12)));
 const wd = (d: Date, style: 'short' | 'narrow') => new Intl.DateTimeFormat(locale, { weekday: style, timeZone: 'UTC' }).format(d);
 
-const dot: Record<string, string> = {
-  action: 'bg-red-dark', social: 'bg-red', meeting: 'bg-black', civic: 'bg-black-3', training: 'bg-black-2', other: 'bg-black-4',
-};
-const chipColor: Record<string, string> = {
-  action: 'bg-red-dark text-white', social: 'bg-red-4 text-red-dark', meeting: 'bg-black text-white',
-  civic: 'bg-black-4/50 text-black', training: 'bg-black-4/50 text-black', other: 'bg-black-4/50 text-black',
-};
+const dot = (k: string) => EVENT_STYLE[k as keyof typeof EVENT_STYLE].dot;
+const chipColor = (k: string) => EVENT_STYLE[k as keyof typeof EVENT_STYLE].chip;
 ---
 <div class="eb">
   <style set:html={css}></style>
@@ -113,10 +111,10 @@ const chipColor: Record<string, string> = {
       <h2 id="eb-week" class="text-xs font-semibold tracking-[0.18em] uppercase text-red-dark">{t.week}</h2>
       <ul class="tray tray-narrow mt-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {thisWeek.map((e) => (
-          <li class="relative rounded-xl bg-white ring-1 ring-black/10 hover:ring-red-dark hover:shadow-md transition p-4 flex flex-col">
+          <li class:list={['relative rounded-xl bg-white ring-1 ring-black/10 border-t-4 shadow-sm hover:shadow-lg transition-shadow p-4 flex flex-col', EVENT_STYLE[typeOf(e)].top]}>
             <p class="flex items-center justify-between gap-2 text-sm">
               <span class="font-display font-extrabold text-red-dark">{dayLabel(e.start)}</span>
-              <span class:list={['text-[0.65rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm', chipColor[typeOf(e)]]}>{typeLabel(e, lang)}</span>
+              <span class:list={['text-[0.65rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm', chipColor(typeOf(e))]}>{typeLabel(e, lang)}</span>
             </p>
             <p class="mt-0.5 text-sm text-black-2 tabular-nums">{formatTimeRange(e, lang)}</p>
             <p class="mt-1.5 font-display font-bold leading-snug" lang="en">
@@ -129,7 +127,7 @@ const chipColor: Record<string, string> = {
     </section>
   )}
 
-  <div class="flex flex-col gap-4 rounded-xl bg-mist p-4 sm:p-5">
+  <div class="flex flex-col gap-4 rounded-2xl bg-white shadow-sm ring-1 ring-black/10 p-4 sm:p-6">
     <div class="flex flex-wrap items-start justify-between gap-4">
       <fieldset>
         <legend class="eb-legend">{t.kind}</legend>
@@ -170,7 +168,7 @@ const chipColor: Record<string, string> = {
   <p class="eb-nomatch mt-6 rounded-xl bg-white ring-1 ring-black/10 p-6 text-center font-semibold">{t.nomatch}</p>
 
   <!-- Month view -->
-  <div class="eb-month mt-8 space-y-10">
+  <div class="eb-month mt-8 space-y-10 rounded-2xl bg-white ring-1 ring-black/10 shadow-sm p-3 sm:p-6">
     {months.map((m) => (
       <section aria-label={m.label}>
         <h2 class="font-display font-black text-2xl sm:text-3xl">{m.label}</h2>
@@ -194,7 +192,7 @@ const chipColor: Record<string, string> = {
                     {list.map((e) => (
                       <li class="event" data-type={typeOf(e)} {...tags(e)}>
                         <a href={e.url ?? `#d-${c.key}`} target={e.url ? '_blank' : undefined} rel={e.url ? 'noopener' : undefined} class="group flex items-start gap-1 sm:rounded sm:px-1 sm:py-0.5 sm:hover:bg-mist">
-                          <span class:list={['mt-1 w-2 h-2 shrink-0 rounded-full', dot[typeOf(e)]]} aria-hidden="true"></span>
+                          <span class:list={['mt-1 w-2 h-2 shrink-0 rounded-full', dot(typeOf(e))]} aria-hidden="true"></span>
                           <span class="sr-only sm:not-sr-only sm:text-xs sm:leading-tight sm:line-clamp-2 group-hover:text-red-dark">
                             <span class="font-semibold tabular-nums">{formatTime(e.start, lang)}</span> <span lang="en">{e.title}</span>
                           </span>
@@ -212,7 +210,7 @@ const chipColor: Record<string, string> = {
     <div>
       <p class="sr-only">{t.legend}</p>
       <ul class="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-black-2">
-        {types.map((k) => <li class="inline-flex items-center gap-1.5"><span class:list={['w-2.5 h-2.5 rounded-full', dot[k]]} aria-hidden="true"></span>{typeName(k, false)}</li>)}
+        {types.map((k) => <li class="inline-flex items-center gap-1.5"><span class:list={['w-2.5 h-2.5 rounded-full', dot(k)]} aria-hidden="true"></span>{typeName(k, false)}</li>)}
       </ul>
       <p class="sm:hidden mt-2 text-sm text-black-2">{t.tapDay}</p>
     </div>
@@ -220,7 +218,7 @@ const chipColor: Record<string, string> = {
 
   <!-- List view (on phones it also sits under the month grid) -->
   <div class="eb-list mt-8">
-    <EventList events={events} lang={lang} empty={empty} attrs={tags} dayIds="d-" />
+    <EventCards events={events} lang={lang} empty={empty} attrs={tags} dayIds="d-" />
   </div>
 </div>
 

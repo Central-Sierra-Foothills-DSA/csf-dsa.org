@@ -46,7 +46,8 @@ Do not add a page at `/join`. That path belongs to the Solidarity Tech sign-up f
 | How soon the chapter replies to sign-ups (optional; shown on New here once set) | `afterSignup.replyTime` in `src/data/getting-started.json` |
 | "Find your fit" quiz options | `src/data/quiz.json` (each points to a working group by exact name) |
 | Search engine data (events in Google, chapter info) | `src/components/EventSchema.astro`, `src/components/OrgSchema.astro` (built from the calendar and site.json) |
-| Events page layout, filters, month view | `src/components/EventsBrowser.astro` (used by `/events/` and `/es/eventos/`) |
+| Events page layout, filters, month view | `src/components/EventsBrowser.astro` (used by `/events/` and `/es/eventos/`); event cards in `EventCards.astro`, the "Next up" header card in `NextEvent.astro`, the bottom section in `EventsToolkit.astro` |
+| Colors and icons for each kind of event | `src/lib/event-style.ts` |
 | "Add to calendar" menu on each event | `src/components/AddToCalendar.astro`; links and `.ics` files come from `src/lib/calendar.ts` |
 | Which smaller calendar feeds exist | `getFeeds()` in `src/lib/calendar.ts` |
 | Which events are tagged "Good first event" | `isGoodFirst()` in `src/lib/events.ts` (socials, plus newcomer words in the title) |

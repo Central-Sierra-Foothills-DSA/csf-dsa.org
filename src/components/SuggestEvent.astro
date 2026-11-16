@@ -28,10 +28,9 @@ const t = es
     };
 const mailto = `mailto:${site.contactEmail}?subject=${encodeURIComponent(t.subject)}&body=${encodeURIComponent(t.lines.join('\n\n') + '\n')}`;
 ---
-<div class="rounded-xl border-2 border-dashed border-red-dark/50 p-6 sm:flex sm:items-center sm:gap-6">
-  <div class="flex-1">
-    <h2 class="flex items-center gap-2 font-display font-bold text-lg"><UiIcon name="mail" class="w-5 h-5 text-red-dark shrink-0" /> {t.title}</h2>
-    <p class="text-sm text-black-2 mt-1 leading-relaxed">{t.body}</p>
-  </div>
-  <a href={mailto} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">{t.button}</a>
+<div class="h-full rounded-2xl bg-white ring-1 ring-black/10 shadow-sm p-6 flex flex-col">
+  <span class="w-11 h-11 rounded-full bg-red-dark text-white flex items-center justify-center"><UiIcon name="mail" /></span>
+  <h3 class="mt-4 font-display font-extrabold text-xl">{t.title}</h3>
+  <p class="mt-2 text-sm text-black-2 leading-relaxed">{t.body}</p>
+  <p class="mt-auto pt-5"><a href={mailto} class="inline-flex items-center gap-2 px-5 py-2.5 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-md transition-colors">{t.button}</a></p>
 </div>
