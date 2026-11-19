@@ -1,0 +1,4 @@
+{
+  "_comment": "Events run by other groups (rallies, mutual aid drives, partner meetings), shown in a 'From the community' section on the events pages. The section appears only when at least one listed event is still upcoming; past ones drop off by themselves. Listing an event can look like an endorsement, so agree with the steering committee on what goes here before adding entries. Fields: title, host (the group running it), start and optional end (ISO with the Pacific offset, e.g. 2027-01-18T10:00:00-08:00), optional location, url, and note (one short sentence).",
+  "events": []
+}

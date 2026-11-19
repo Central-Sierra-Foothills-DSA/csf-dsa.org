@@ -1,0 +1,48 @@
+---
+// Structured data (schema.org JSON-LD) so search engines can show chapter
+// events in results and maps. Not visible on the page; no script runs.
+// https://developers.google.com/search/docs/appearance/structured-data/event
+import site from '../data/site.json';
+import { type ChapterEvent, eventSummary, isVirtual } from '../lib/events';
+
+interface Props {
+  events: ChapterEvent[];
+}
+const { events } = Astro.props;
+const origin = Astro.site ?? new URL('https://csf-dsa.org');
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const image = new URL(`${base}/images/og.png`, origin).href;
+const organizer = { '@type': 'Organization', name: site.orgName, url: new URL(`${base}/`, origin).href };
+
+/** "Briar Patch Food Co-Op - 2505 Bell Rd, Auburn, CA 95603, USA" -> name + address. */
+function place(loc: string) {
+  const [name, address] = loc.split(' - ');
+  // A place with no street address (a member's home) is left out rather than guessed.
+  if (!address) return null;
+  return { '@type': 'Place', name, address };
+}
+
+const items = events.map((e) => {
+  const physical = (e.location && /^\d+ locations$/.test(e.location) ? e.locations.find((l) => !/virtual|zoom|online/i.test(l)) : e.location) ?? null;
+  const inPerson = physical && !isVirtual({ ...e, location: physical }) ? place(physical) : null;
+  const online = isVirtual(e) || (e.location !== null && /^\d+ locations$/.test(e.location));
+  const virtualLoc = online ? { '@type': 'VirtualLocation', url: e.url ?? organizer.url } : null;
+  const location = [inPerson, virtualLoc].filter(Boolean);
+  const mode = inPerson && virtualLoc ? 'MixedEventAttendanceMode' : virtualLoc ? 'OnlineEventAttendanceMode' : 'OfflineEventAttendanceMode';
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: e.title,
+    startDate: e.start,
+    ...(e.end && { endDate: e.end }),
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: `https://schema.org/${mode}`,
+    ...(location.length && { location: location.length === 1 ? location[0] : location }),
+    ...(eventSummary(e, 300) && { description: eventSummary(e, 300) }),
+    ...(e.url && { url: e.url }),
+    image: [image],
+    organizer,
+  };
+}).filter((x) => 'location' in x); // Google requires a location.
+---
+{items.length > 0 && <script type="application/ld+json" set:html={JSON.stringify(items)} />}

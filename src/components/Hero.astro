@@ -1,55 +1,90 @@
 ---
+import Arrow from './Arrow.astro';
+// Home page hero. Used by the English home page and, with `lang="es"`, the Spanish one.
+// Design: Figma "CSF-DSA Design System" > Website: Components > Hero. A halftone photo of the
+// Foresthill Bridge, a red panel (90% opaque) with the animated white rose-and-wheat drawing, and the "Next up" bar.
 import { Image } from 'astro:assets';
 import site from '../data/site.json';
-import bridge from '../assets/photos/foresthill-bridge.jpg';
+import halftone from '../assets/hero/hero-halftone.jpg';
+import roseWheat from '../assets/hero/rose-wheat-white.svg';
+import roseWheatStill from '../assets/hero/rose-wheat-white.png';
 import { upcomingEvents, formatLongDate, formatTime, shortLocation } from '../lib/events';
+import { esText, type Lang } from '../lib/i18n';
 import { href } from '../lib/paths';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+
+const text = lang === 'es'
+  ? {
+      alt: 'El puente de Foresthill sobre el río American cerca de Auburn, California',
+      eyebrow: esText.home.eyebrow,
+      tagline: esText.home.tagline,
+      intro: esText.home.intro,
+      newHere: esText.home.newHere,
+      seeEvents: esText.home.seeEvents,
+      nextUp: esText.home.nextUp,
+      newPath: '/es/bienvenida/',
+      eventsPath: '/es/eventos/',
+    }
+  : {
+      alt: 'The Foresthill Bridge spanning the North Fork of the American River near Auburn, California',
+      eyebrow: 'Democratic Socialists of America',
+      tagline: site.tagline,
+      intro: "We're your neighbors and coworkers in Placer, Nevada, El Dorado, and Sierra counties, organizing for a society run by and for working people. Wherever you're starting from, there's a place for you here.",
+      newHere: "I'm new here",
+      seeEvents: 'See upcoming events',
+      nextUp: 'Next up',
+      newPath: '/new-members/',
+      eventsPath: '/events/',
+    };
 
 const next = upcomingEvents(new Date(), 1)[0];
 ---
 <section class="relative isolate bg-black text-white overflow-hidden">
   <Image
-    src={bridge}
-    alt="The Foresthill Bridge spanning the North Fork of the American River near Auburn, California"
+    src={halftone}
+    alt={text.alt}
     widths={[800, 1200, 1920]}
     sizes="100vw"
     loading="eager"
     fetchpriority="high"
-    class="absolute inset-0 -z-20 w-full h-full object-cover object-[center_40%]"
+    class="absolute inset-0 -z-10 w-full h-full object-cover object-[center_30%]"
   />
-  <div class="absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/80 to-black/30" aria-hidden="true"></div>
 
-  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20 sm:pt-28 sm:pb-28 lg:pt-32 lg:pb-32">
-    <p class="flex items-center gap-3 text-white font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm mb-6">
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-red" aria-hidden="true"></span>
-      Democratic Socialists of America
-    </p>
-    <h1 class="font-display font-black text-5xl sm:text-6xl lg:text-7xl leading-[0.98] max-w-4xl">
-      {site.tagline}
-    </h1>
-    <p class="mt-7 text-lg sm:text-xl text-white/85 max-w-2xl leading-relaxed">
-      We're your neighbors and coworkers in Placer, Nevada, El Dorado, and Sierra counties, organizing for a society run by and for working people. Wherever you're starting from, there's a place for you here.
-    </p>
+  <div class="absolute inset-0 -z-10 bg-red/80" aria-hidden="true"></div>
 
-    <div class="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
-      <a href={href('/new-members/')} class="inline-flex items-center justify-center gap-2 px-7 py-4 bg-red hover:bg-red-dark text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
-        I'm new here
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12" /></svg>
-      </a>
-      <a href={href('/events/')} class="inline-flex items-center justify-center px-7 py-4 border-2 border-white/40 hover:border-white hover:bg-white/5 text-white font-semibold rounded-md text-base sm:text-lg transition-colors">
-        See upcoming events
-      </a>
+  <div class="relative pt-44 pb-12 sm:pt-60 sm:pb-14 lg:pt-[12.5rem] lg:pb-20">
+    <div class="text-white px-6 sm:px-10 lg:px-14">
+      <div class="grid items-end gap-y-8 md:max-[1599px]:grid-cols-[10rem_minmax(0,1fr)] md:max-[1599px]:gap-x-10 md:gap-y-10 min-[1600px]:grid-cols-[10rem_33rem_minmax(0,1fr)] min-[1600px]:gap-x-14">
+        <picture class="block md:max-[1599px]:row-span-2" aria-hidden="true">
+          <source media="(prefers-reduced-motion: reduce)" srcset={roseWheatStill.src} />
+          <img src={roseWheat.src} alt="" width="160" height="250" class="block max-w-none w-28 md:w-[10rem] h-auto" loading="eager" decoding="async" />
+        </picture>
+        <h1 class="font-display font-black text-4xl sm:text-5xl lg:text-[3.56rem] leading-[1.1] tracking-[-0.03em] md:max-[1599px]:col-start-2">{text.tagline}</h1>
+        <div class="flex flex-col gap-8 md:max-[1599px]:col-start-2 lg:flex-row lg:items-start lg:gap-14 min-[1600px]:items-end min-[1600px]:justify-between">
+          <p class="text-lg lg:text-xl leading-relaxed font-medium max-w-[34rem] min-[1600px]:max-w-[23rem]">{text.intro}</p>
+          <div class="flex flex-col sm:flex-row lg:flex-col gap-4 shrink-0 lg:min-w-[17rem]">
+            <a href={href(text.newPath)} class="inline-flex items-center justify-center gap-2 px-7 py-4 bg-white hover:bg-black hover:text-white text-black font-semibold text-base sm:text-lg whitespace-nowrap transition-colors">
+              {text.newHere} <Arrow />
+            </a>
+            <a href={href(text.eventsPath)} class="inline-flex items-center justify-center px-7 py-4 border-2 border-white hover:bg-white hover:text-black font-semibold text-base sm:text-lg whitespace-nowrap transition-colors">
+              {text.seeEvents}
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   {next && (
-    <a href={next.url ?? href('/events/')} target={next.url ? '_blank' : undefined} rel={next.url ? 'noopener' : undefined}
-       class="group relative block bg-red hover:bg-red-dark text-white transition-colors">
+    <a href={next.url ?? href(text.eventsPath)} target={next.url ? '_blank' : undefined} rel={next.url ? 'noopener' : undefined}
+       class="group relative block bg-red-dark hover:bg-black-1 text-white transition-colors">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-        <span class="font-bold tracking-[0.18em] uppercase text-xs px-2 py-0.5 rounded-sm bg-white text-red-dark">Next up</span>
-        <span class="font-bold text-white group-hover:underline underline-offset-4">{next.title}</span>
-        <span class="text-white">{formatLongDate(next.start)} · {formatTime(next.start)}</span>
-        {shortLocation(next) && <span class="text-white/90">· {shortLocation(next)}</span>}
+        <span class="font-bold tracking-[0.18em] uppercase text-xs px-2 py-0.5 rounded-sm bg-white text-red-dark">{text.nextUp}</span>
+        <span class="font-bold text-white group-hover:underline underline-offset-4" lang={lang === 'es' ? 'en' : undefined}>{next.title}</span>
+        <span class="text-white">{formatLongDate(next.start, lang)} · {formatTime(next.start, lang)}</span>
+        {shortLocation(next, lang) && <span class="text-white/90">· {shortLocation(next, lang)}</span>}
       </div>
     </a>
   )}

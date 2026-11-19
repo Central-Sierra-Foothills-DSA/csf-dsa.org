@@ -1,0 +1,30 @@
+---
+// Small hand-drawn, animated icons for campaign cards on the home page.
+// Exported from Figma "CSF-DSA Design System" > Campaign Card as animated SVGs (the motion is CSS
+// inside each file, so it needs no script), shrunk with svgo. Each also has a still PNG that is
+// shown instead to visitors who have asked their device to reduce motion.
+// To replace one: re-export the animated SVG and static PNG (3x) from Figma, then run
+// `npx svgo@3 --config` with floatPrecision 2 on the SVG, and overwrite the files here.
+import eye from '../assets/campaign-icons/eye.svg';
+import eyeStill from '../assets/campaign-icons/eye.png';
+import money from '../assets/campaign-icons/money.svg';
+import moneyStill from '../assets/campaign-icons/money.png';
+import thumb from '../assets/campaign-icons/thumb.svg';
+import thumbStill from '../assets/campaign-icons/thumb.png';
+
+interface Props { name: 'eye' | 'money' | 'thumb' }
+const { name } = Astro.props;
+const icons = {
+  eye: { svg: eye.src, still: eyeStill.src, w: 99, h: 58 },
+  money: { svg: money.src, still: moneyStill.src, w: 95, h: 70 },
+  thumb: { svg: thumb.src, still: thumbStill.src, w: 65, h: 70 },
+};
+// Figma tilts the eye and mirrors the thumbs-up on the card itself, outside the exported art,
+// so the animated SVGs get that here. The still PNGs already include it.
+const turn = { eye: 'motion-safe:rotate-[10.3deg]', money: '', thumb: 'motion-safe:-scale-x-100' }[name];
+const i = icons[name];
+---
+<picture class="block shrink-0" aria-hidden="true">
+  <source media="(prefers-reduced-motion: reduce)" srcset={i.still} />
+  <img src={i.svg} alt="" width={i.w} height={i.h} class={`block max-w-none ${turn}`} style={`width:${i.w}px;height:${i.h}px`} loading="lazy" decoding="async" />
+</picture>

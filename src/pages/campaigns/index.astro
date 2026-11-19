@@ -1,4 +1,5 @@
 ---
+import Arrow from '../../components/Arrow.astro';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
@@ -21,7 +22,7 @@ const past = all.filter((c) => c.data.status === 'completed');
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow="Campaigns" title="Where we put our time and energy." />
         <div class="mt-8 grid md:grid-cols-2 gap-5">
-          {campaigns.map((c) => <CampaignCard campaign={c} />)}
+          {campaigns.map((c) => <CampaignCard campaign={c} showIcon />)}
         </div>
       </div>
     </section>
@@ -32,7 +33,7 @@ const past = all.filter((c) => c.data.status === 'completed');
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow="Endorsements" title="Who and what we stand behind." lede="An endorsement is a vote by members to put the chapter's name behind a candidate or a campaign." />
         <div class="mt-8 grid md:grid-cols-2 gap-5">
-          {endorsements.map((c) => <CampaignCard campaign={c} />)}
+          {endorsements.map((c) => <CampaignCard campaign={c} showIcon />)}
         </div>
       </div>
     </section>
@@ -42,7 +43,7 @@ const past = all.filter((c) => c.data.status === 'completed');
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="font-display font-extrabold text-2xl sm:text-3xl">Have an idea for a campaign?</h2>
       <p class="mt-3 text-lg text-black-2 leading-relaxed">Any member can bring a proposal to the chapter. Come to a branch meeting, talk it over with other members, or email <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">{site.contactEmail}</a>.</p>
-      {past.length > 0 && <p class="mt-4"><a href={href('/archive/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">See past campaigns in the archive →</a></p>}
+      {past.length > 0 && <p class="mt-4"><a href={href('/archive/')} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">See past campaigns in the archive <Arrow /></a></p>}
     </div>
   </section>
 </Base>

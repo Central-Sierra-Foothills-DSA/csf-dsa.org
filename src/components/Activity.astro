@@ -1,4 +1,5 @@
 ---
+import Arrow from './Arrow.astro';
 // "The chapter at work": headline wins, then a feed of news and recent events.
 // News comes from src/content/updates/. Recent events come from the calendar
 // automatically, so this section stays fresh without anyone editing it.
@@ -7,6 +8,19 @@ import wins from '../data/wins.json';
 import { pastEvents, typeOf, typeLabel, formatShortDate, dateOnly } from '../lib/events';
 import { href } from '../lib/paths';
 import SectionHeading from './SectionHeading.astro';
+import art200 from '../assets/wins/200.svg';
+import artDeflocked from '../assets/wins/deflocked.svg';
+import artFirst from '../assets/wins/first.svg';
+import artTrophy from '../assets/wins/trophy.svg';
+
+// Drawings for the wins band (Figma: Wins band). `alt` is read aloud, so it carries
+// the number or word the drawing spells; the trophy is decoration.
+const art = {
+  '200': { src: art200.src, w: 100, h: 54, alt: '200', stack: false },
+  deflocked: { src: artDeflocked.src, w: 222, h: 38, alt: 'Deflocked', stack: true },
+  first: { src: artFirst.src, w: 57, h: 54, alt: '1st', stack: false },
+  trophy: { src: artTrophy.src, w: 83, h: 72, alt: '', stack: false },
+} as const;
 
 const updates = (await getCollection('updates')).map((u) => ({
   date: dateOnly(u.data.date),
@@ -30,20 +44,24 @@ const recent = pastEvents()
 
 const feed = [...updates, ...recent].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 6);
 ---
-<section id="activity" class="bg-red text-white">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-    <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.05] max-w-2xl">This chapter gets things done.</h2>
-    <dl class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-      {wins.map((w) => (
-        <div class="border-t-2 border-white pt-4">
-          <dt class="font-display font-black text-3xl sm:text-4xl leading-none">{w.stat}</dt>
-          <dd class="mt-2">
-            <span class="block font-bold leading-snug">{w.label}</span>
-            <span class="block mt-1 text-sm leading-relaxed">{w.detail}</span>
-          </dd>
-        </div>
-      ))}
-    </dl>
+<section id="activity" class="bg-red text-white" aria-labelledby="activity-heading">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-[4.5rem]">
+    <h2 id="activity-heading" class="font-display font-black text-3xl sm:text-4xl lg:text-5xl leading-[1.05] max-w-2xl">This chapter gets things done.</h2>
+    <ul class="mt-8 sm:mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      {wins.map((w, i) => {
+        const a = art[w.art as keyof typeof art];
+        const gold = i % 2 === 1;
+        return (
+          <li class:list={['flex min-h-[11.9rem] flex-col justify-center gap-2 px-6 pt-4 pb-6', gold ? 'bg-gold text-black' : 'bg-red-dark text-white']}>
+            <div class:list={['flex gap-2', a.stack ? 'flex-col items-start' : 'items-center']}>
+              <img src={a.src} alt={a.alt} width={a.w} height={a.h} class="block shrink-0 max-w-full h-auto" loading="lazy" decoding="async" />
+              <p class="font-bold leading-[1.15] flex-1 min-w-0">{w.label}</p>
+            </div>
+            <p class="text-sm leading-[1.6]">{w.detail}</p>
+          </li>
+        );
+      })}
+    </ul>
   </div>
 </section>
 
@@ -51,7 +69,7 @@ const feed = [...updates, ...recent].sort((a, b) => b.date.getTime() - a.date.ge
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
       <SectionHeading eyebrow="Lately" title="News and recent activity." />
-      <a href={href('/archive/')} class="shrink-0 font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2">Browse the archive →</a>
+      <a href={href('/archive/')} class="shrink-0 font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2">Browse the archive <Arrow /></a>
     </div>
     <ol class="mt-10 grid md:grid-cols-2 gap-x-10">
       {feed.map((item) => (

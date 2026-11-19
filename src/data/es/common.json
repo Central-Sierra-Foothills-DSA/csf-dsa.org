@@ -1,0 +1,69 @@
+{
+  "_comment": "Spanish wording shared across the Spanish pages (/es/). Informal tú. Set `reviewed` to true once a fluent member has checked the Spanish pages; that removes the 'translation under review' note.",
+  "reviewed": false,
+  "review": {
+    "label": "Traducción en revisión",
+    "text": "Estas páginas se tradujeron del inglés y un miembro las está revisando. ¿Ves algo que no suena bien? Escríbenos a"
+  },
+
+  "ui": {
+    "skip": "Saltar al contenido",
+    "nav": [
+      { "path": "/es/nosotros/", "label": "Nosotros" },
+      { "path": "/es/eventos/", "label": "Eventos" },
+      { "path": "/es/ramas/", "label": "Ramas" },
+      { "path": "/es/aprender/", "label": "Aprender" }
+    ],
+    "join": { "path": "/es/bienvenida/", "label": "Únete", "mobile": "¿Eres nuevo? Únete" },
+    "menuOpen": "Abrir menú",
+    "menuClose": "Cerrar menú"
+  },
+
+  "footer": {
+    "blurb": "Un capítulo de los Socialistas Democráticos de América (DSA) que se organiza en los condados de {counties}, California.",
+    "columns": [
+      {
+        "title": "El capítulo",
+        "links": [
+          { "path": "/es/nosotros/", "label": "Quiénes somos" },
+          { "path": "/es/ramas/", "label": "Ramas" },
+          { "path": "/es/eventos/", "label": "Eventos" },
+          { "path": "/es/aprender/", "label": "Lo básico" }
+        ]
+      },
+      {
+        "title": "En inglés",
+        "links": [
+          { "path": "/campaigns/", "label": "Campaigns" },
+          { "path": "/member-resources/", "label": "Member resources" },
+          { "path": "/about/bylaws/", "label": "Bylaws" },
+          { "path": "/archive/", "label": "Archive" }
+        ]
+      }
+    ],
+    "connect": "Contacto",
+    "signup": "Formulario del capítulo",
+    "member": "Hazte miembro de DSA",
+    "copyright": "Un capítulo de",
+    "openSource": "Este sitio es de código abierto.",
+    "improve": "Mejóralo en GitHub"
+  },
+
+  "home": {
+    "eyebrow": "Socialistas Democráticos de América",
+    "tagline": "Construyendo poder obrero en la sierra.",
+    "intro": "Somos tus vecinos y compañeros de trabajo en los condados de Placer, Nevada, El Dorado y Sierra, y nos organizamos por una sociedad dirigida por y para la gente trabajadora. Vengas de donde vengas, aquí hay un lugar para ti.",
+    "newHere": "Soy nuevo aquí",
+    "seeEvents": "Ver próximos eventos",
+    "nextUp": "Lo próximo"
+  },
+
+  "events": {
+    "empty": "No hay nada en el calendario por ahora. Vuelve pronto.",
+    "titlesNote": "Los nombres de los eventos vienen de nuestro calendario y están en inglés."
+  },
+
+  "map": {
+    "alt": "Mapa del área del capítulo en los condados de Placer, Nevada, El Dorado y Sierra, con un número para cada rama"
+  }
+}

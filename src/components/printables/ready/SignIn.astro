@@ -1,0 +1,57 @@
+---
+// Letter-size sign-in sheet for tables and events. Sizes in cqw.
+import { Image } from 'astro:assets';
+import QR from '../../QR.astro';
+import site from '../../../data/site.json';
+import groups from '../../../data/working-groups.json';
+import { displayUrl } from '../../../lib/member-guide';
+import { printablesText } from '../../../lib/printables';
+import badgeBlack from '../../../assets/logos/csf-dsa-black.png';
+
+const t = printablesText.ready.signIn;
+// Column widths, in the same order as t.columns.
+const widths = ['23%', '27%', '17%', '13%', '20%'];
+if (widths.length !== t.columns.length) throw new Error('SignIn.astro: one width per column in printables.json');
+---
+<article class="@container w-full h-full bg-white text-black flex flex-col overflow-hidden px-[7cqw] py-[6cqw]">
+  <header class="flex items-center gap-[3cqw]">
+    <Image loading="eager" src={badgeBlack} alt="" width={240} height={240} class="w-[11cqw] h-[11cqw]" />
+    <div class="flex-1">
+      <h1 class="font-display font-black text-[6.4cqw] leading-none">{t.headline}</h1>
+      <p class="mt-[1cqw] text-[2.4cqw] text-black-2">{t.intro}</p>
+    </div>
+    <p class="self-start font-display font-bold text-[2.2cqw] leading-[1.15] text-right text-red-dark">Central Sierra<br />Foothills DSA</p>
+  </header>
+
+  <table class="mt-[4cqw] w-full table-fixed border-collapse text-[2cqw]">
+    <colgroup>{widths.map((w) => <col style={`width:${w}`} />)}</colgroup>
+    <thead>
+      <tr class="bg-black text-white">
+        {t.columns.map((c) => <th class="text-left font-bold px-[1.2cqw] py-[1.2cqw] uppercase tracking-[0.08em] text-[1.7cqw]">{c}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {Array.from({ length: t.rows }, (_, i) => (
+        <tr class:list={['h-[6.2cqw]', i % 2 ? 'bg-mist' : 'bg-white']}>
+          {t.columns.map(() => <td class="border-b-[0.15cqw] border-r-[0.15cqw] last:border-r-0 border-black-4"></td>)}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <div class="flex-1"></div>
+
+  <footer class="mt-[3cqw] flex items-center gap-[4cqw]">
+    <div class="flex-1 rounded-[1.5cqw] bg-mist px-[3cqw] py-[2.4cqw]">
+      <p class="font-semibold uppercase tracking-[0.14em] text-[1.6cqw] text-red-dark">Our working groups</p>
+      <p class="mt-[0.8cqw] text-[2cqw] leading-[1.4]">{groups.map((g) => g.name).join(' · ')}</p>
+    </div>
+    <div class="flex items-center gap-[2cqw]">
+      <div class="text-right">
+        <p class="font-display font-extrabold text-[2.5cqw] leading-[1.1]">{t.phoneCta}</p>
+        <p class="mt-[0.5cqw] font-bold text-[2cqw] text-red-dark">{displayUrl(site.links.joinChapterForm)}</p>
+      </div>
+      <QR url={site.links.joinChapterForm} class="w-[13cqw] h-[13cqw]" />
+    </div>
+  </footer>
+</article>

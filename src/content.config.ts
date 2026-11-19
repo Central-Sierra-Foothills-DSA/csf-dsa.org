@@ -11,6 +11,10 @@ const branches = defineCollection({
   schema: z.object({
     name: z.string(),
     order: z.number().default(0),
+    /** 'forming' = people are organizing it but it doesn't meet regularly yet. It is listed
+     *  with a "Forming" label and a coming-soon page, and left out of branch counts,
+     *  the steering committee math, and flyers. Change to 'active' once it meets. */
+    status: z.enum(['active', 'forming']).default('active'),
     /** One line on who the branch is for. */
     area: z.string(),
     /** Counties this branch is the natural home for (used by the branch finder). */
@@ -22,6 +26,10 @@ const branches = defineCollection({
     address: z.string().optional(),
     /** How to join remotely, if that is possible. */
     remote: z.string().optional(),
+    /** Access at the meeting place, in plain words: step-free entry, parking, restrooms,
+     *  kids welcome, food. Leave it out until someone has checked; the page then
+     *  invites people to ask. */
+    access: z.string().optional(),
     /** Venue coordinates, for the closest-branch list. */
     lat: z.number(),
     lon: z.number(),
@@ -44,6 +52,8 @@ const campaigns = defineCollection({
     /** 'completed' moves it off the home page and into the archive. */
     status: z.enum(['active', 'completed']).default('active'),
     order: z.number().default(0),
+    /** Animated drawing on the home page card (see CampaignIcon.astro). Optional. */
+    icon: z.enum(['eye', 'money', 'thumb']).optional(),
     /** When the campaign started or the endorsement passed. */
     date: z.coerce.date().optional(),
     /** Branch file names (without .md) this campaign belongs to. Empty means chapter-wide. */

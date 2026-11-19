@@ -1,6 +1,6 @@
 [
-  { "stat": "200", "label": "members and counting", "detail": "Across four counties, and growing fast." },
-  { "stat": "Deflocked", "label": "Grass Valley cancelled its Flock contracts", "detail": "After sustained pressure from our DeFlock campaign." },
-  { "stat": "1st", "label": "federal endorsement", "detail": "Chris Bennett for Congress in CA-3, backed by a supermajority of voting members." },
-  { "stat": "Award", "label": "for chapter growth", "detail": "Recognized by DSA National for how quickly the chapter has grown." }
+  { "art": "200", "label": "members and counting", "detail": "Across four counties, and growing fast." },
+  { "art": "deflocked", "label": "Grass Valley cancelled its Flock contracts", "detail": "After sustained pressure from our DeFlock campaign." },
+  { "art": "first", "label": "federal endorsement", "detail": "Chris Bennett for Congress in CA-3, backed by a supermajority of voting members." },
+  { "art": "trophy", "label": "Award for chapter growth", "detail": "Recognized by DSA National for how quickly the chapter has grown." }
 ]

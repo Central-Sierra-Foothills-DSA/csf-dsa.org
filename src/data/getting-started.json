@@ -1,0 +1,42 @@
+{
+  "_comment": "The steps from curious to member. New here (/new-members/) shows all of them; the home page's Get involved section shows the first three. Each link needs siteLink (a key in site.json links), path (a page on this site), or url.",
+  "steps": [
+    {
+      "title": "Say hello",
+      "body": "Fill out our short chapter form. It tells us where you live so we can point you to your nearest branch and keep you posted on meetings and actions.",
+      "cta": {
+        "label": "Chapter sign-up form",
+        "siteLink": "joinChapterForm"
+      }
+    },
+    {
+      "title": "Come to a meeting or a social",
+      "body": "Every branch meeting is open, whether or not you’re a member. Socials are an even easier way in. Bring a friend if you like.",
+      "cta": {
+        "label": "Find your branch",
+        "path": "/branches/"
+      }
+    },
+    {
+      "title": "Become a member",
+      "body": "Join DSA through the national website. You’re placed in our chapter automatically based on where you live. Dues go to DSA National, with monthly and yearly options and reduced rates if money is tight.",
+      "cta": {
+        "label": "Join DSA",
+        "siteLink": "joinDsaNational"
+      }
+    },
+    {
+      "title": "Find your thing",
+      "body": "Once you’re a member you’ll be invited to the chapter Slack, where the work continues between meetings. Try a working group, help with a campaign, or just keep showing up. Any amount of time is welcome.",
+      "cta": {
+        "label": "Member resources",
+        "path": "/member-resources/"
+      }
+    }
+  ],
+  "afterSignup": {
+    "_comment": "Optional: how soon someone from the chapter usually gets in touch after a sign-up, in plain words (\"a few days\", \"a week\"). Leave empty until the chapter agrees on it; the line is left off the page until then.",
+    "replyTime": "",
+    "replyTimeEs": ""
+  }
+}
