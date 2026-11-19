@@ -1,0 +1,44 @@
+---
+// "What happens after you sign up", for New here. Every step restates something
+// the site already promises (getting-started.json, the member guide). The reply
+// time is optional and only shows once the chapter sets it in getting-started.json.
+import UiIcon from './UiIcon.astro';
+import gs from '../data/getting-started.json';
+import site from '../data/site.json';
+import type { Lang } from '../lib/i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const es = lang === 'es';
+const reply = (es ? gs.afterSignup?.replyTimeEs : gs.afterSignup?.replyTime)?.trim();
+
+const steps = es
+  ? [
+      { icon: 'document', title: 'Llenas el formulario del capítulo', body: 'Te pregunta dónde vives, para saber qué rama te queda más cerca.' },
+      { icon: 'mail', title: 'Te conectamos con tu rama', body: `Te mantenemos al tanto de reuniones y acciones por correo.${reply ? ` Normalmente alguien del capítulo se comunica contigo en ${reply}.` : ''}` },
+      { icon: 'users', title: 'Vienes a una reunión', body: 'Todas las reuniones de rama están abiertas, seas miembro o no. Ven como eres.' },
+      { icon: 'check', title: 'Si te unes a DSA', body: 'Te invitamos al Slack del capítulo, donde el trabajo sigue entre reuniones.' },
+    ]
+  : [
+      { icon: 'document', title: 'You fill out the chapter form', body: 'It asks where you live, so we know which branch is closest to you.' },
+      { icon: 'mail', title: 'We point you to your branch', body: `We keep you posted on meetings and actions by email.${reply ? ` Someone from the chapter usually gets in touch within ${reply}.` : ''}` },
+      { icon: 'users', title: 'You come to a meeting', body: 'Every branch meeting is open, whether or not you’re a member. Come as you are.' },
+      { icon: 'check', title: 'If you join DSA', body: 'You’re invited to the chapter Slack, where the work continues between meetings.' },
+    ];
+---
+<div class="rounded-xl bg-white ring-1 ring-black/10 p-5 sm:p-6">
+  <p class="hidden md:block font-display font-extrabold text-lg">{es ? '¿Qué pasa después de inscribirte?' : 'What happens after you sign up?'}</p>
+  <ol class="md:mt-4 space-y-4">
+    {steps.map((s, i) => (
+      <li class="relative flex gap-3">
+        {i < steps.length - 1 && <span class="absolute left-[17px] top-9 bottom-[-12px] w-0.5 bg-black/10" aria-hidden="true"></span>}
+        <span class="relative w-9 h-9 shrink-0 rounded-full bg-red-dark text-white flex items-center justify-center"><UiIcon name={s.icon as 'document' | 'mail' | 'users' | 'check'} class="w-4.5 h-4.5" /></span>
+        <span>
+          <span class="block font-semibold leading-snug">{s.title}</span>
+          <span class="block mt-0.5 text-sm text-black-2 leading-relaxed">{s.body}</span>
+        </span>
+      </li>
+    ))}
+  </ol>
+  <p class="mt-5 text-sm text-black-2">{es ? '¿Preguntas mientras tanto? Escribe a' : 'Questions in the meantime? Email'} <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-dark underline underline-offset-4">{site.contactEmail}</a>.</p>
+</div>

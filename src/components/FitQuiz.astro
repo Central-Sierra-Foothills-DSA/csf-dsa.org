@@ -1,0 +1,90 @@
+---
+import Arrow from './Arrow.astro';
+// "Find your fit": one question that points to a working group or a first step.
+// Works without JavaScript: the answers are radio buttons, and CSS shows the
+// matching result. Nothing is sent or stored. Options are in src/data/quiz.json.
+import UiIcon from './UiIcon.astro';
+import quiz from '../data/quiz.json';
+import groupsEn from '../data/working-groups.json';
+import { workingGroupsEs } from '../lib/es';
+import { href } from '../lib/paths';
+import type { Lang } from '../lib/i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const es = lang === 'es';
+
+const options = quiz.options.map((o, i) => {
+  if (o.group === null) return { id: `fit-${i}`, text: es ? o.es : o.en, group: null };
+  const idx = groupsEn.findIndex((g) => g.name === o.group);
+  if (idx < 0) throw new Error(`src/data/quiz.json: no working group named "${o.group}" in working-groups.json`);
+  const g = es ? workingGroupsEs[idx] : groupsEn[idx];
+  return { id: `fit-${i}`, text: es ? o.es : o.en, group: g };
+});
+
+const t = es
+  ? { eyebrow: 'Encuentra lo tuyo', title: '¿Qué te suena más a ti?', pick: 'Escoge una respuesta para ver por dónde empezar.', match: 'Te podría gustar', next: 'Siguiente paso: ven a una reunión de rama y pregunta por este grupo.', branch: 'Encuentra tu rama', unsureTitle: 'Empieza con una reunión o un convivio', unsureBody: 'Ahí conocerás a gente de todos los grupos de trabajo, y nadie espera que llegues sabiendo qué hacer.', events: 'Ver próximos eventos', groupsLink: 'Ver todos los grupos de trabajo' }
+  : { eyebrow: 'Find your fit', title: 'Which of these sounds most like you?', pick: 'Pick one to see where you might start.', match: 'You might like', next: 'Next step: come to a branch meeting and ask about this group.', branch: 'Find your branch', unsureTitle: 'Start with a meeting or a social', unsureBody: "You'll meet people from every working group there, and nobody expects you to know what to do yet.", events: 'See upcoming events', groupsLink: 'See all working groups' };
+const branchesPath = es ? '/es/ramas/' : '/branches/';
+const eventsPath = es ? '/es/eventos/' : '/events/';
+const groupsPath = es ? '/es/nosotros/#ramas-y-grupos' : '/about/#branches-and-groups';
+const css = options.map((o) => `.fit-quiz:has(#${o.id}:checked) [data-result="${o.id}"] { display: block; }`).join(' ');
+const btn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-button font-semibold text-sm transition-colors';
+---
+<div class="fit-quiz grid lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+  <style set:html={css}></style>
+  <fieldset class="lg:col-span-7">
+    <legend class="w-full">
+      <span class="flex items-center gap-2 font-semibold tracking-[0.18em] uppercase text-xs sm:text-sm text-red-dark"><span class="inline-block w-6 h-[2px] bg-red" aria-hidden="true"></span>{t.eyebrow}</span>
+      <span class="mt-3 block font-display font-extrabold text-3xl sm:text-4xl leading-[1.05]">{t.title}</span>
+      <span class="mt-3 block text-black-2">{t.pick}</span>
+    </legend>
+    <div class="mt-6 grid sm:grid-cols-2 gap-2.5">
+      {options.map((o) => (
+        <label class="fit-option flex items-center gap-3 rounded-xl bg-white ring-1 ring-black/10 px-4 py-3.5 cursor-pointer hover:ring-red-dark transition-colors">
+          <input type="radio" name={`fit-${lang}`} id={o.id} value={o.id} class="sr-only" />
+          <span class="fit-dot w-5 h-5 shrink-0 rounded-full ring-2 ring-black-3 flex items-center justify-center" aria-hidden="true"></span>
+          <span class="font-semibold leading-snug">{o.text}</span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="lg:col-span-5 lg:sticky lg:top-24" aria-live="polite">
+    <div class="fit-placeholder rounded-2xl border-2 border-dashed border-black/15 p-6 text-black-2 flex items-center gap-3">
+      <UiIcon name="check" class="w-6 h-6 text-black-3" /> {t.pick}
+    </div>
+    {options.map((o) => (
+      <div data-result={o.id} class="hidden rounded-2xl bg-red-dark text-white p-6 shadow-lg">
+        {o.group ? (
+          <>
+            <p class="text-xs font-semibold tracking-[0.16em] uppercase text-white/75">{t.match}</p>
+            <p class="mt-1 font-display font-black text-3xl leading-tight">{o.group.name}</p>
+            <p class="mt-2 text-white/90 leading-relaxed">{o.group.description}</p>
+            <p class="mt-4 font-semibold">{t.next}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <a href={href(branchesPath)} class={`${btn} bg-white text-red-dark hover:bg-black hover:text-white`}>{t.branch} <Arrow /></a>
+              <a href={href(groupsPath)} class={`${btn} ring-1 ring-white/50 hover:bg-white/10`}>{t.groupsLink}</a>
+            </div>
+          </>
+        ) : (
+          <>
+            <p class="font-display font-black text-3xl leading-tight">{t.unsureTitle}</p>
+            <p class="mt-2 text-white/90 leading-relaxed">{t.unsureBody}</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <a href={href(eventsPath)} class={`${btn} bg-white text-red-dark hover:bg-black hover:text-white`}>{t.events} <Arrow /></a>
+              <a href={href(branchesPath)} class={`${btn} ring-1 ring-white/50 hover:bg-white/10`}>{t.branch}</a>
+            </div>
+          </>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .fit-quiz:has(input:checked) .fit-placeholder { display: none; }
+  .fit-option:has(input:checked) { box-shadow: inset 0 0 0 2px var(--color-red-dark); background: color-mix(in srgb, var(--color-red-4) 35%, white); }
+  .fit-option:has(input:checked) .fit-dot { box-shadow: inset 0 0 0 5px white; background: var(--color-red-dark); --tw-ring-color: var(--color-red-dark); }
+  .fit-option:has(input:focus-visible) { outline: 3px solid var(--color-red-dark); outline-offset: 2px; }
+</style>

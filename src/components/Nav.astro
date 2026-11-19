@@ -1,37 +1,71 @@
 ---
 import { Image } from 'astro:assets';
 import site from '../data/site.json';
-import badge from '../assets/logos/csf-dsa-white.png';
+import badge from '../assets/logos/csf-dsa-nav.svg';
 import { href, currentPath } from '../lib/paths';
+import { ui, otherLanguagePath, type Lang } from '../lib/i18n';
+import SocialIcon from './SocialIcon.astro';
 
-const links = [
-  { path: '/about/', label: 'About' },
-  { path: '/events/', label: 'Events' },
-  { path: '/branches/', label: 'Branches' },
-  { path: '/campaigns/', label: 'Campaigns' },
-  { path: '/learn/', label: 'Learn' },
-];
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const t = ui[lang];
+
+const links = t.nav;
 const here = currentPath(Astro.url);
 const isActive = (p: string) => here.startsWith(p);
+// The same page in the other language (or its home page).
+const switchHref = href(otherLanguagePath(here, lang));
+const home = lang === 'es' ? '/es/' : '/';
+// Language switch: the two-letter code of the page you are on, and a link for each language.
+const langCode = lang.toUpperCase();
+const languages = [
+  { code: 'en', label: 'English', href: lang === 'en' ? href(here) : switchHref },
+  { code: 'es', label: 'Español', href: lang === 'es' ? href(here) : switchHref },
+] as const;
+const socials = [
+  { name: 'instagram', label: 'Instagram', url: site.social.instagram },
+  { name: 'facebook', label: 'Facebook', url: site.social.facebook },
+  { name: 'reddit', label: 'Reddit', url: site.social.reddit },
+] as const;
 ---
-<header class="sticky top-0 z-50 bg-black/95 backdrop-blur text-white border-b border-white/10" id="site-header">
+<header class="sticky top-0 z-50 bg-black-pure/95 backdrop-blur text-white border-b border-white/10" id="site-header">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
-      <a href={href('/')} class="flex items-center gap-3 font-display font-bold tracking-tight hover:text-red-2 transition-colors">
-        <Image src={badge} alt="" width={96} height={96} loading="eager" class="w-12 h-12" />
-        <span class="hidden sm:inline text-base">{site.orgName}</span>
-        <span class="sm:hidden text-base">{site.orgNameShort}</span>
+      <a href={href(home)} class="flex items-center gap-3 font-display font-bold tracking-tight hover:text-gold transition-colors">
+        <Image src={badge} alt="" width={54} height={52} loading="eager" class="w-[54px] h-[52px] -mx-[3px] shrink-0" />
+        <span class="hidden lg:inline text-base">{site.orgName}</span>
+        <span class="lg:hidden text-base">{site.orgNameShort}</span>
       </a>
 
-      <nav class="hidden md:flex items-center gap-6 text-sm font-medium" aria-label="Primary">
+      <nav class="hidden md:flex items-center gap-4 lg:gap-6 text-sm font-medium" aria-label="Primary">
         {links.map((l) => (
           <a href={href(l.path)} aria-current={isActive(l.path) ? 'page' : undefined}
-             class:list={['py-1 border-b-2 transition-colors hover:text-red-2', isActive(l.path) ? 'border-red text-white' : 'border-transparent']}>{l.label}</a>
+             class:list={['py-1 border-b-2 transition-colors hover:text-gold', isActive(l.path) ? 'border-red text-white' : 'border-transparent']}>{l.label}</a>
         ))}
-        <a href={href('/new-members/')} class="px-4 py-2 bg-red hover:bg-red-dark rounded-md font-semibold transition-colors">Join us</a>
+        <span class="hidden xl:flex items-center gap-3 pl-4 border-l border-white/15">
+          {socials.map((s) => (
+            <a href={s.url} target="_blank" rel="noopener" aria-label={s.label} title={s.label} class="text-white/75 hover:text-gold transition-colors"><SocialIcon name={s.name} class="w-[18px] h-[18px]" /></a>
+          ))}
+        </span>
+        <details id="lang-menu" class="group relative">
+          <summary aria-label={`${t.langLabel}: ${langCode}`} class="flex items-center gap-1 cursor-pointer list-none [&::-webkit-details-marker]:hidden text-white group-open:text-gold hover:text-gold transition-colors">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12H8M3 12C3 16.9706 7.02944 21 12 21M3 12C3 7.02944 7.02944 3 12 3M8 12H16M8 12C8 16.9706 9.79086 21 12 21M8 12C8 7.02944 9.79086 3 12 3M16 12H21M16 12C16 7.02944 14.2091 3 12 3M16 12C16 16.9706 14.2091 21 12 21M21 12C21 7.02944 16.9706 3 12 3M21 12C21 16.9706 16.9706 21 12 21" /></svg>
+            <span class="text-sm font-medium">{langCode}</span>
+          </summary>
+          <ul class="absolute right-[-0.75rem] top-[calc(100%+1.25rem)] z-50 min-w-[5.25rem] flex flex-col items-center gap-3.5 bg-white text-black rounded-b-[10px] shadow-lg px-4 pt-4 pb-3.5">
+            {languages.map((l) => (
+              <li>
+                {l.code === lang
+                  ? <span aria-current="true" class="block py-2.5 text-sm font-bold border-b-2 border-gold whitespace-nowrap">{l.label}</span>
+                  : <a href={l.href} hreflang={l.code} lang={l.code} class="block py-2.5 text-sm whitespace-nowrap hover:underline underline-offset-4 decoration-2 decoration-gold">{l.label}</a>}
+              </li>
+            ))}
+          </ul>
+        </details>
+        <a href={href(t.join.path)} class="px-4 py-2 bg-red-dark hover:bg-black-1 ring-1 ring-red-dark rounded-button font-semibold whitespace-nowrap transition-colors">{t.join.label}</a>
       </nav>
 
-      <button id="menu-btn" class="md:hidden p-2 -mr-2 rounded-md hover:bg-white/10 transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <button id="menu-btn" class="md:hidden p-2 -mr-2 rounded-button hover:bg-white/10 transition-colors" aria-label={t.menuOpen} data-label-open={t.menuOpen} data-label-close={t.menuClose} aria-expanded="false" aria-controls="mobile-menu">
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path class="icon-open" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
           <path class="icon-close hidden" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
@@ -44,9 +78,20 @@ const isActive = (p: string) => here.startsWith(p);
     <div class="px-4 py-4 flex flex-col gap-1 text-base font-medium">
       {links.map((l) => (
         <a href={href(l.path)} aria-current={isActive(l.path) ? 'page' : undefined}
-           class:list={['px-3 py-2.5 rounded-md hover:bg-white/10 transition-colors', isActive(l.path) && 'bg-white/10']}>{l.label}</a>
+           class:list={['px-3 py-2.5 rounded-button hover:text-gold transition-colors', isActive(l.path) && 'bg-white/10']}>{l.label}</a>
       ))}
-      <a href={href('/new-members/')} class="mt-2 px-4 py-3 bg-red hover:bg-red-dark rounded-md font-semibold text-center transition-colors">New here? Join us</a>
+      <div class="flex items-center gap-4 px-3 py-2" role="group" aria-label={t.langLabel}>
+        <svg class="w-6 h-6 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12H8M3 12C3 16.9706 7.02944 21 12 21M3 12C3 7.02944 7.02944 3 12 3M8 12H16M8 12C8 16.9706 9.79086 21 12 21M8 12C8 7.02944 9.79086 3 12 3M16 12H21M16 12C16 7.02944 14.2091 3 12 3M16 12C16 16.9706 14.2091 21 12 21M21 12C21 7.02944 16.9706 3 12 3M21 12C21 16.9706 16.9706 21 12 21" /></svg>
+        {languages.map((l) => l.code === lang
+          ? <span aria-current="true" class="py-1 font-bold border-b-2 border-gold">{l.label}</span>
+          : <a href={l.href} hreflang={l.code} lang={l.code} class="py-1 border-b-2 border-transparent hover:border-gold transition-colors">{l.label}</a>)}
+      </div>
+      <div class="flex items-center gap-2 px-3 py-2">
+        {socials.map((s) => (
+          <a href={s.url} target="_blank" rel="noopener" aria-label={s.label} class="p-2 rounded-button text-white/80 hover:text-gold transition-colors"><SocialIcon name={s.name} class="w-5 h-5" /></a>
+        ))}
+      </div>
+      <a href={href(t.join.path)} class="mt-2 px-4 py-3 bg-red-dark hover:bg-black-1 ring-1 ring-red-dark rounded-button font-semibold text-center transition-colors">{t.join.mobile}</a>
     </div>
   </nav>
 </header>
@@ -59,7 +104,7 @@ const isActive = (p: string) => here.startsWith(p);
 
   function setOpen(open: boolean) {
     btn?.setAttribute('aria-expanded', String(open));
-    btn?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    btn?.setAttribute('aria-label', (open ? btn.dataset.labelClose : btn.dataset.labelOpen) ?? '');
     menu?.classList.toggle('hidden', !open);
     openIcon?.classList.toggle('hidden', open);
     closeIcon?.classList.toggle('hidden', !open);
@@ -67,5 +112,9 @@ const isActive = (p: string) => here.startsWith(p);
 
   btn?.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
   menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setOpen(false); langMenu?.removeAttribute('open'); } });
+
+  // Language menu: close it when you click elsewhere.
+  const langMenu = document.getElementById('lang-menu');
+  document.addEventListener('click', (e) => { if (langMenu && !langMenu.contains(e.target as Node)) langMenu.removeAttribute('open'); });
 </script>

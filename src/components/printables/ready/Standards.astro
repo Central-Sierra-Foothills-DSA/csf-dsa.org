@@ -1,0 +1,55 @@
+---
+// Community standards poster for meetings. Text from member-guide.json. Sizes in cqw.
+import { Image } from 'astro:assets';
+import QR from '../../QR.astro';
+import site from '../../../data/site.json';
+import { guide } from '../../../lib/member-guide';
+import badgeWhite from '../../../assets/logos/csf-dsa-white.png';
+
+const s = guide.standards;
+const moreUrl = 'https://csf-dsa.org/member-resources/#standards';
+const h2 = 'font-display font-extrabold text-[3.4cqw]';
+---
+<article class="@container w-full h-full bg-white text-black flex flex-col overflow-hidden">
+  <header class="bg-black text-white px-[7cqw] pt-[3.6cqw] pb-[3.6cqw]">
+    <div class="flex items-center gap-[2.5cqw]">
+      <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[7cqw] h-[7cqw]" />
+      <p class="flex-1 font-semibold uppercase tracking-[0.16em] text-[2.2cqw] text-red-2">Community standards</p>
+      <p class="text-right text-[1.9cqw] leading-[1.3] text-white/70">Read more<br /><span class="font-bold text-white">csf-dsa.org/member-resources</span></p>
+      <span class="bg-white rounded-[1cqw] p-[0.8cqw]"><QR url={moreUrl} class="w-[8cqw] h-[8cqw]" /></span>
+    </div>
+    <h1 class="mt-[2.5cqw] font-display font-black text-[6.6cqw] leading-[1] tracking-[-0.01em]">Solidarity starts with how we treat each other.</h1>
+  </header>
+
+  <div class="flex-1 flex flex-col px-[7cqw] pt-[3.5cqw] pb-[3cqw]">
+    <h2 class={h2}>In every conversation</h2>
+    <ul class="mt-[1.5cqw] columns-2 gap-x-[4cqw]">
+      {s.communication.map((c) => (
+        <li class="break-inside-avoid mb-[1.1cqw] flex gap-[2.2cqw] text-[2.55cqw] leading-[1.35]">
+          <span class="mt-[1cqw] w-[1.2cqw] h-[1.2cqw] shrink-0 rounded-full bg-red"></span><span>{c}</span>
+        </li>
+      ))}
+    </ul>
+
+    <h2 class:list={[h2, 'mt-[2.8cqw]']}>No harassment, anywhere</h2>
+    <p class="mt-[1.2cqw] text-[2.45cqw] leading-[1.38] text-black-1">{s.harassment[0]}</p>
+
+    <h2 class:list={[h2, 'mt-[2.8cqw]']}>If something goes wrong</h2>
+    <ol class="mt-[1.5cqw] space-y-[1.4cqw]">
+      {s.steps.map((st, i) => (
+        <li class="flex gap-[2.2cqw] text-[2.45cqw] leading-[1.38]">
+          <span class="w-[4cqw] h-[4cqw] shrink-0 rounded-full bg-red text-white font-display font-black text-[2.3cqw] flex items-center justify-center">{i + 1}</span>
+          <p class="text-black-1">
+            <span class="font-bold text-black">{st.title}.</span> {st.body}{i === 1 && <> <span class="font-semibold text-black">{site.contactEmail}</span>.</>}
+          </p>
+        </li>
+      ))}
+    </ol>
+
+    <div class="flex-1"></div>
+
+    <footer class="mt-[2cqw] pt-[2cqw] border-t-[0.25cqw] border-black-4">
+      <p class="font-display font-black text-[3.5cqw] leading-[1.05] text-red-dark">{s.closing}</p>
+    </footer>
+  </div>
+</article>

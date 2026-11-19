@@ -1,0 +1,22 @@
+---
+// Structured data describing the chapter, for search engines. Goes on the home pages.
+import site from '../data/site.json';
+
+const origin = Astro.site ?? new URL('https://csf-dsa.org');
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const data = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.orgName,
+  alternateName: site.orgNameShort,
+  url: new URL(`${base}/`, origin).href,
+  logo: new URL(`${base}/images/apple-touch-icon.png`, origin).href,
+  description: site.intro,
+  email: site.contactEmail,
+  foundingDate: site.founded,
+  areaServed: site.counties.map((c) => ({ '@type': 'AdministrativeArea', name: `${c} County, California` })),
+  parentOrganization: { '@type': 'Organization', name: 'Democratic Socialists of America', url: site.links.dsaNational },
+  sameAs: Object.values(site.social),
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(data)} />

@@ -1,0 +1,11 @@
+---
+// The → (or ↗ for links that leave the site) used in buttons, links and cards.
+// Drawn as SVG so that on hover or keyboard focus the head can slide right while the
+// tail stretches (see `.arrow` in src/styles/global.css). Put it inside the <a> or
+// <button>, or inside a card that has the `group` class, so the hover reaches it.
+interface Props { external?: boolean; class?: string }
+const { external = false, class: className } = Astro.props;
+---
+<span class:list={['arrow', external && 'arrow-ext', className]} aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false">{external
+  ? <><path class="arrow-tail" d="M3.5 12.5 12 4"/><path class="arrow-head" d="M6.5 3.5h6v6"/></>
+  : <><path class="arrow-tail" d="M1.5 8h12"/><path class="arrow-head" d="M9 3.5 13.5 8 9 12.5"/></>}</svg></span>

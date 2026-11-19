@@ -1,0 +1,47 @@
+---
+// Simple line icons for hangout flyers. Strokes use the current text color;
+// accents use DSA Red. Drawn on a 100 × 100 grid.
+interface Props {
+  name: 'chat' | 'coffee' | 'snack' | 'pot';
+  class?: string;
+}
+const { name, class: className } = Astro.props;
+---
+<svg viewBox="0 0 100 100" class={className} fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  {name === 'chat' && (
+    <>
+      <rect x="38" y="42" width="56" height="36" rx="10" fill="#ec1f27" stroke="#ec1f27" />
+      <path d="M78 78 l4 14 l-16 -14" fill="#ec1f27" stroke="#ec1f27" />
+      <rect x="6" y="10" width="58" height="40" rx="10" />
+      <path d="M20 50 l-4 14 l16 -14" />
+      <path d="M52 60 h28 M52 68 h18" stroke="white" stroke-width="4" />
+      <path d="M18 24 h34 M18 34 h22" />
+    </>
+  )}
+  {name === 'coffee' && (
+    <>
+      <path d="M16 42 h56 v20 a22 22 0 0 1 -22 22 h-12 a22 22 0 0 1 -22 -22 z" />
+      <path d="M72 48 h5 a10 10 0 0 1 0 20 h-6" />
+      <path d="M8 92 h76" />
+      <path d="M30 32 c-6 -7 6 -11 0 -20 M44 32 c-6 -7 6 -11 0 -20 M58 32 c-6 -7 6 -11 0 -20" stroke="#ec1f27" />
+    </>
+  )}
+  {name === 'snack' && (
+    <>
+      <circle cx="30" cy="44" r="10" fill="#ec1f27" stroke="#ec1f27" />
+      <circle cx="50" cy="38" r="11" fill="#ec1f27" stroke="#ec1f27" />
+      <circle cx="70" cy="44" r="10" fill="#ec1f27" stroke="#ec1f27" />
+      <path d="M8 52 h84 a42 34 0 0 1 -84 0 z" />
+      <path d="M30 90 h40" />
+    </>
+  )}
+  {name === 'pot' && (
+    <>
+      <path d="M34 22 c-5 -6 5 -9 0 -16 M50 22 c-5 -6 5 -9 0 -16 M66 22 c-5 -6 5 -9 0 -16" stroke="#ec1f27" />
+      <path d="M16 48 a34 16 0 0 1 68 0" />
+      <circle cx="50" cy="30" r="4" />
+      <path d="M12 48 h76 v26 a12 12 0 0 1 -12 12 h-52 a12 12 0 0 1 -12 -12 z" />
+      <path d="M12 58 h-8 M88 58 h8" />
+    </>
+  )}
+</svg>

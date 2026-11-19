@@ -1,0 +1,95 @@
+---
+import Arrow from './Arrow.astro';
+// The events page list: events as cards, grouped by month, then by day, with a
+// calendar-tile date on the left. Each card has a colored rail and icon for its
+// kind of event, the RSVP link, and "Add to calendar". The smaller list used on
+// other pages is EventList.astro.
+import AddToCalendar from './AddToCalendar.astro';
+import UiIcon from './UiIcon.astro';
+import {
+  type ChapterEvent, type Lang, groupByMonth, groupByDay, formatTimeRange, shortLocation,
+  isVirtual, typeOf, typeLabel, eventSummary, isGoodFirst,
+} from '../lib/events';
+import { EVENT_STYLE } from '../lib/event-style';
+
+interface Props {
+  events: ChapterEvent[];
+  lang?: Lang;
+  empty: string;
+  /** Extra data attributes for each event (used by the filters). */
+  attrs?: (e: ChapterEvent) => Record<string, string>;
+  /** Give each day an id (prefix + YYYY-MM-DD) so the month view can link to it. */
+  dayIds?: string;
+}
+const { events, lang = 'en', empty, attrs, dayIds } = Astro.props;
+const es = lang === 'es';
+const months = groupByMonth(events, lang).map((m) => ({ ...m, days: groupByDay(m.events, lang) }));
+const t = es
+  ? { rsvp: 'Detalles y asistencia', first: 'Buen primer evento', count: (n: number) => `${n} ${n === 1 ? 'evento' : 'eventos'}` }
+  : { rsvp: 'Details & RSVP', first: 'Good first event', count: (n: number) => `${n} ${n === 1 ? 'event' : 'events'}` };
+---
+{events.length === 0 ? (
+  <div class="bg-white rounded-2xl p-10 text-center ring-1 ring-black/10">
+    <UiIcon name="calendar" class="w-10 h-10 mx-auto text-red-dark" />
+    <p class="mt-3 font-semibold">{empty}</p>
+  </div>
+) : (
+  <div class="space-y-12">
+    {months.map((m) => (
+      <section class="event-month" aria-label={m.label}>
+        <h2 class="flex items-baseline gap-3 font-display font-black text-2xl sm:text-3xl">
+          {m.label}
+          <span class="text-sm font-semibold text-black-2">{t.count(m.events.length)}</span>
+          <span class="flex-1 h-0.5 bg-red/40 self-center" aria-hidden="true"></span>
+        </h2>
+        <ol class="mt-6 space-y-6">
+          {m.days.map((day) => (
+            <li id={dayIds ? `${dayIds}${day.key}` : undefined} class="event-day scroll-mt-24 grid grid-cols-[4rem_1fr] sm:grid-cols-[5.5rem_1fr] gap-3 sm:gap-6 items-start">
+              <div class="sm:sticky sm:top-24 rounded-xl overflow-hidden bg-white ring-1 ring-black/10 shadow-sm text-center" aria-hidden="true">
+                <div class="bg-red-dark text-white text-[0.7rem] sm:text-xs font-bold uppercase tracking-[0.16em] py-1">{day.weekday}</div>
+                <div class="font-display font-black text-3xl sm:text-5xl leading-none pt-2">{day.day}</div>
+                <div class="text-xs sm:text-sm font-semibold text-black-2 pb-2 pt-1">{day.month}</div>
+              </div>
+              <ul class="space-y-3 min-w-0">
+                {day.events.map((e) => {
+                  const s = EVENT_STYLE[typeOf(e)];
+                  const where = shortLocation(e, lang);
+                  const summary = eventSummary(e);
+                  return (
+                    <li class:list={['event group rounded-xl bg-white ring-1 ring-black/10 border-l-[6px] shadow-sm hover:shadow-lg transition-shadow p-4 sm:p-5', s.rail]} data-type={typeOf(e)} {...(attrs ? attrs(e) : {})}>
+                      <div class="flex gap-4">
+                        <span class:list={['hidden sm:flex w-11 h-11 shrink-0 rounded-full items-center justify-center', s.badge]} aria-hidden="true"><UiIcon name={s.icon} class="w-5 h-5" /></span>
+                        <div class="min-w-0 flex-1">
+                          <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span class="sr-only">{day.weekday} {day.day} {day.month}, </span>
+                            <span class="text-sm font-semibold text-black-1 tabular-nums">{formatTimeRange(e, lang)}</span>
+                            <span class:list={['text-[0.7rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm', s.chip]}>{typeLabel(e, lang)}</span>
+                            {isGoodFirst(e) && <span class="text-xs font-bold text-red-dark">★ {t.first}</span>}
+                          </p>
+                          <h3 class="mt-1.5 font-display font-extrabold text-xl sm:text-2xl leading-tight" lang="en">
+                            {e.url ? <a href={e.url} target="_blank" rel="noopener" class="hover:text-red-dark underline-offset-4 decoration-2 hover:underline">{e.title}</a> : e.title}
+                          </h3>
+                          {where && (
+                            <p class="mt-1.5 flex items-center gap-1.5 text-sm text-black-2">
+                              <UiIcon name={isVirtual(e) ? 'video' : 'pin'} class="w-4 h-4 shrink-0" />
+                              <span>{where}</span>
+                            </p>
+                          )}
+                          {summary && <p class="mt-2 text-black-1 leading-relaxed line-clamp-3 sm:line-clamp-none" lang="en">{summary}</p>}
+                          <div class="mt-4 flex flex-wrap items-center gap-2">
+                            {e.url && <a href={e.url} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-button bg-red-dark hover:bg-black-1 text-white text-xs font-semibold transition-colors">{t.rsvp} <Arrow external /></a>}
+                            <AddToCalendar event={e} lang={lang} />
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+  </div>
+)}

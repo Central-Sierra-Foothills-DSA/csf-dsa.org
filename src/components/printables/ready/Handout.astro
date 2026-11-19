@@ -1,0 +1,44 @@
+---
+// Half-page "What is democratic socialism?" handout. Sizes in cqw.
+// Text: glossary.json (definition) and member-guide.json (points).
+import { Image } from 'astro:assets';
+import QR from '../../QR.astro';
+import site from '../../../data/site.json';
+import glossary from '../../../data/glossary.json';
+import { guide, displayUrl } from '../../../lib/member-guide';
+import { printablesText } from '../../../lib/printables';
+import badgeWhite from '../../../assets/logos/csf-dsa-white.png';
+
+const t = printablesText.ready.handout;
+const definition = glossary.find((g) => g.term === 'Democratic socialism')?.definition;
+if (!definition) throw new Error('glossary.json needs a "Democratic socialism" entry for the handout');
+const learnUrl = 'https://csf-dsa.org/learn/';
+const instagram = displayUrl(site.social.instagram).replace(/^instagram\.com\//, '@');
+---
+<article class="@container w-full h-full bg-white text-black flex flex-col overflow-hidden">
+  <header class="bg-red text-white flex items-center gap-[3cqw] px-[6cqw] py-[3cqw]">
+    <Image loading="eager" src={badgeWhite} alt="" width={240} height={240} class="w-[10cqw] h-[10cqw]" />
+    <p class="font-display font-bold text-[3.6cqw] leading-[1.1]">Central Sierra<br />Foothills DSA</p>
+  </header>
+  <div class="flex-1 flex flex-col px-[6cqw] pt-[5cqw] pb-[4cqw]">
+    <h1 class="font-display font-black text-[8.6cqw] leading-[0.98] tracking-[-0.01em]">{t.title}</h1>
+    <div class="mt-[3cqw] h-[1.1cqw] w-[16cqw] bg-red"></div>
+    <p class="mt-[3.5cqw] text-[3.9cqw] leading-[1.38] font-semibold">{definition}</p>
+    <ul class="mt-[3.5cqw] space-y-[2.2cqw]">
+      {guide.democraticSocialism.points.map((p) => (
+        <li class="flex gap-[2.5cqw] text-[3.4cqw] leading-[1.38] text-black-1">
+          <span class="mt-[1.4cqw] w-[1.6cqw] h-[1.6cqw] shrink-0 rounded-full bg-red"></span><span>{p}</span>
+        </li>
+      ))}
+    </ul>
+    <div class="flex-1"></div>
+    <footer class="mt-[4cqw] pt-[4cqw] border-t-[0.25cqw] border-black-4 flex items-center gap-[4cqw]">
+      <QR url={learnUrl} class="w-[20cqw] h-[20cqw]" />
+      <div>
+        <p class="font-display font-extrabold text-[4.4cqw] leading-[1.05]">{t.cta}</p>
+        <p class="mt-[0.8cqw] font-bold text-[3cqw] text-red-dark">{displayUrl(learnUrl)}</p>
+        <p class="mt-[1.6cqw] text-[2.7cqw] text-black-2">{t.join}: <span class="font-semibold text-black">{displayUrl(site.links.joinChapterForm)}</span><br />Instagram <span class="font-semibold text-black">{instagram}</span></p>
+      </div>
+    </footer>
+  </div>
+</article>
