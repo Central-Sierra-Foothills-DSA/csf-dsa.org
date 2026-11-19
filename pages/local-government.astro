@@ -1,0 +1,213 @@
+---
+import Arrow from '../components/Arrow.astro';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Fold from '../components/Fold.astro';
+import UiIcon from '../components/UiIcon.astro';
+import EventList from '../components/EventList.astro';
+import data from '../data/local-government.json';
+import site from '../data/site.json';
+import { formatFullDate, upcomingEvents, typeOf } from '../lib/events';
+import { href } from '../lib/paths';
+
+interface Jurisdiction { name: string; type: string; county: string; body: string; homeUrl?: string | null; meetingsUrl?: string | null; schedule?: string | null; location?: string | null }
+interface Tool { label: string; url: string; what: string }
+
+const all = (data.jurisdictions as Jurisdiction[]).filter((j) => j.meetingsUrl);
+const counties = ['Placer', 'Nevada', 'El Dorado', 'Sierra'];
+// Each county: its board of supervisors first, then cities and towns A to Z.
+const byCounty = counties.map((c) => {
+  const items = all.filter((j) => j.county === c);
+  return {
+    county: c,
+    board: items.find((j) => j.type === 'county'),
+    local: items.filter((j) => j.type !== 'county').sort((a, b) => a.name.localeCompare(b.name)),
+    count: items.length,
+  };
+}).filter((g) => g.count);
+
+const tools = data.lookupTools as Tool[];
+// Statewide and federal lookups first, then each county's elections office.
+const statewide = tools.filter((t) => !/county/i.test(t.label));
+const countyTools = tools.filter((t) => /county/i.test(t.label));
+const toolIcon = (t: Tool) => (/voter|registration/i.test(t.label) ? 'check' : /legislator|congress/i.test(t.label) ? 'users' : 'building');
+
+const civic = upcomingEvents().filter((e) => typeOf(e) === 'civic').slice(0, 4);
+
+const stats = [
+  { n: all.length, label: 'councils and boards' },
+  { n: counties.length, label: 'counties' },
+  { n: civic.length, label: 'on our calendar soon' },
+];
+
+// General how-to-attend guidance, not chapter facts.
+const howTo = [
+  { icon: 'calendar', title: 'Find your meeting', body: 'Pick your city council or county board below. Each one links to its official schedule.' },
+  { icon: 'document', title: 'Read the agenda', body: 'Agendas go up on the official page before each meeting. Look for the items you care about.' },
+  { icon: 'megaphone', title: 'Speak up, or just listen', body: 'Most meetings set aside time for public comment. Showing up and watching counts too.' },
+] as const;
+
+// Phone tabs. A tab only appears if its section has something in it.
+const tabs = [
+  { id: 'councils', label: 'Councils' },
+  ...(civic.length ? [{ id: 'calendar', label: 'Our calendar' }] : []),
+  ...(tools.length ? [{ id: 'reps', label: 'Your reps' }] : []),
+];
+const tabCss = tabs
+  .map((t) => `.lg-tabs:has(input[value="${t.id}"]:checked) [data-panel]:not([data-panel="${t.id}"]) { display: none; }`)
+  .join(' ');
+
+const linkBtn = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-button font-semibold text-sm transition-colors';
+---
+<Base title="Local government" description="Where and when your city council and county board of supervisors meet in Placer, Nevada, El Dorado, and Sierra counties.">
+  <PageHeader eyebrow="Local government" title="Show up where decisions get made." lede="City councils and county boards decide a lot about daily life, and most meetings are nearly empty. Here's where to find yours.">
+    <dl class="mt-8 grid grid-cols-3 gap-2 sm:gap-3 max-w-2xl">
+      {stats.map((s) => (
+        <div class="rounded-lg bg-white/10 ring-1 ring-white/25 px-3 sm:px-4 py-3">
+          <dt class="sr-only">{s.label}</dt>
+          <dd class="font-display font-black text-2xl sm:text-4xl leading-none">{s.n}</dd>
+          <dd class="mt-1 text-xs sm:text-sm leading-snug text-white/85">{s.label}</dd>
+        </div>
+      ))}
+    </dl>
+  </PageHeader>
+
+  <!-- How to show up -->
+  <section class="py-12 sm:py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="hidden md:block"><SectionHeading eyebrow="First time?" title="How to show up." /></div>
+      <Fold id="how-to" label="First time? How to show up" hint="3 steps">
+      <ol class="tray md:mt-8 grid md:grid-cols-3 gap-4">
+        {howTo.map((s, i) => (
+          <li class="relative rounded-xl bg-mist p-6 overflow-hidden">
+            <span class="absolute -right-2 -top-4 font-display font-black text-8xl text-black/5 leading-none select-none" aria-hidden="true">{i + 1}</span>
+            <span class="relative w-12 h-12 rounded-full bg-red-dark text-white flex items-center justify-center"><UiIcon name={s.icon} class="w-6 h-6" /></span>
+            <h3 class="relative mt-4 font-display font-extrabold text-xl">{s.title}</h3>
+            <p class="relative mt-2 text-black-1 leading-relaxed">{s.body}</p>
+          </li>
+        ))}
+      </ol>
+      </Fold>
+    </div>
+  </section>
+
+  <style set:html={`@media (max-width: 767px) { ${tabCss} }`}></style>
+  <!-- On phones the next three sections are tabs (one shows at a time); from 768px up they all show. -->
+  <div class="lg-tabs">
+  <div class="md:hidden sticky top-16 z-20 bg-white border-b border-black/10 shadow-sm" role="radiogroup" aria-label="Show">
+    <div class="flex">
+      {tabs.map((t, i) => (
+        <label class="lg-tab flex-1">
+          <input type="radio" name="lg-tab" value={t.id} class="sr-only" checked={i === 0} />
+          <span class="block text-center px-2 py-3 text-sm font-display font-bold">{t.label}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+
+  {civic.length > 0 && (
+    <section data-panel="calendar" class="py-12 sm:py-16 bg-red-dark text-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div class="lg:col-span-5">
+          <SectionHeading eyebrow="We'll be there" title="Meetings on our calendar." tone="dark" lede="These are the ones where our campaigns are on the agenda. Come along, and bring a friend." />
+          <a href={href('/events/')} class={`${linkBtn} mt-6 bg-white text-red-dark hover:bg-black hover:text-white`}>All upcoming events <Arrow /></a>
+        </div>
+        <div class="lg:col-span-7 rounded-2xl bg-white text-black p-5 sm:p-6 shadow-xl">
+          <EventList events={civic} compact />
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Councils and boards, by county -->
+  <section id="meetings" data-panel="councils" class="py-12 sm:py-16 bg-mist">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SectionHeading eyebrow="Agendas and schedules" title="Find your council or board." lede="Each link goes to the official page for agendas and meeting dates. Schedules change, so always check the official page before you go." />
+
+      {byCounty.map((g, i) => (
+        <div class="mt-3 md:mt-14">
+          <div class="hidden md:flex items-end gap-4 border-b-4 border-black pb-3">
+            <span class="font-display font-black text-6xl leading-none outline-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="font-display font-black text-3xl leading-none flex-1">{g.county} County</h3>
+            <span class="text-sm font-semibold text-black-2">{g.count} {g.count === 1 ? 'listing' : 'listings'}</span>
+          </div>
+          <Fold id={`county-${g.county.toLowerCase().replace(/[^a-z]+/g, '-')}`} label={`${g.county} County`} hint={String(g.count)}>
+            <div class="md:mt-5 grid lg:grid-cols-3 gap-4">
+              {g.board && (
+                <article class="lg:row-span-2 rounded-2xl bg-black text-white p-6 flex flex-col">
+                  <p class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-2"><UiIcon name="building" class="w-4 h-4" /> County</p>
+                  <h4 class="mt-2 font-display font-black text-2xl leading-tight">{g.board.name}</h4>
+                  <p class="text-white/70">{g.board.body}</p>
+                  {g.board.schedule && <p class="mt-4 flex gap-2.5 text-sm leading-relaxed"><UiIcon name="calendar" class="w-4 h-4 mt-0.5 shrink-0 text-red-2" /><span>{g.board.schedule}</span></p>}
+                  {g.board.location && <p class="mt-2 flex gap-2.5 text-sm leading-relaxed text-white/80"><UiIcon name="pin" class="w-4 h-4 mt-0.5 shrink-0 text-red-2" /><span>{g.board.location}</span></p>}
+                  <a href={g.board.meetingsUrl!} target="_blank" rel="noopener" class={`${linkBtn} mt-auto self-start bg-red-dark hover:bg-red text-white`} style="margin-top:1.5rem">Agendas and meeting dates <Arrow external /></a>
+                </article>
+              )}
+              {g.local.map((j) => (
+                <article class="rounded-xl bg-white ring-1 ring-black/10 p-5 flex flex-col">
+                  <p class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-dark"><UiIcon name="home" class="w-4 h-4" /> {j.type === 'town' ? 'Town' : 'City'}</p>
+                  <h4 class="mt-1.5 font-display font-extrabold text-xl leading-tight">{j.name}</h4>
+                  <p class="text-sm text-black-2">{j.body}</p>
+                  {j.schedule && <p class="mt-3 flex gap-2.5 text-sm leading-relaxed"><UiIcon name="calendar" class="w-4 h-4 mt-0.5 shrink-0 text-red-dark" /><span>{j.schedule}</span></p>}
+                  {j.location && <p class="mt-1.5 flex gap-2.5 text-sm leading-relaxed text-black-2"><UiIcon name="pin" class="w-4 h-4 mt-0.5 shrink-0 text-red-dark" /><span>{j.location}</span></p>}
+                  <a href={j.meetingsUrl!} target="_blank" rel="noopener" class="mt-auto pt-4 font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2">Agendas and meeting dates <Arrow external /></a>
+                </article>
+              ))}
+            </div>
+          </Fold>
+        </div>
+      ))}
+      {data.checkedOn && <p class="mt-10 text-sm text-black-2">Links and schedules last checked {formatFullDate(`${data.checkedOn}T12:00:00-08:00`)}. Spot something out of date? Email <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">{site.contactEmail}</a>.</p>}
+    </div>
+  </section>
+
+  {tools.length > 0 && (
+    <section id="representatives" data-panel="reps" class="py-12 sm:py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Who represents you" title="Look up your districts and representatives." lede="District lines are confusing. These official tools find yours from your address." />
+        {[{ title: 'Statewide and federal', list: statewide }, { title: 'Your county elections office', list: countyTools }].filter((s) => s.list.length).map((s) => (
+          <>
+            <h3 class="mt-10 font-display font-extrabold text-xl">{s.title}</h3>
+            <ul class="tray mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {s.list.map((t) => (
+                <li>
+                  <a href={t.url} target="_blank" rel="noopener" class="group flex gap-4 h-full p-5 rounded-xl ring-1 ring-black/10 hover:ring-red-dark hover:bg-red-dark hover:text-white transition-colors">
+                    <span class="w-11 h-11 shrink-0 rounded-full bg-mist text-red-dark group-hover:bg-white flex items-center justify-center"><UiIcon name={toolIcon(t)} class="w-5 h-5" /></span>
+                    <span>
+                      <span class="block font-display font-bold text-lg leading-snug">{t.label} <Arrow external /></span>
+                      <span class="block mt-1 text-sm text-black-2 group-hover:text-white/90 leading-relaxed">{t.what}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ))}
+      </div>
+    </section>
+  )}
+  </div>
+
+  <section class="py-12 sm:py-16 bg-black text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="font-display font-black text-3xl sm:text-4xl">An empty room is a missed chance.</h2>
+      <p class="mt-4 text-lg text-white/80">Come to a meeting with us. You don't have to speak, and you don't have to be an expert.</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href={href('/events/')} class="px-6 py-3 bg-red-dark hover:bg-red rounded-button font-semibold transition-colors">See upcoming meetings</a>
+        <a href={href('/branches/')} class="px-6 py-3 ring-2 ring-white/40 hover:ring-white rounded-button font-semibold transition-colors">Find your branch</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style is:global>
+  @media (max-width: 767px) {
+    .lg-tab { cursor: pointer; color: var(--color-black-2); border-bottom: 3px solid transparent; }
+    .lg-tab:has(input:checked) { color: var(--color-red-dark); border-bottom-color: var(--color-red-dark); }
+    .lg-tab:has(input:focus-visible) { outline: 3px solid var(--color-red-dark); outline-offset: -3px; }
+  }
+</style>
+<style>
+  .outline-num { color: transparent; -webkit-text-stroke: 2px var(--color-red-dark); }
+</style>

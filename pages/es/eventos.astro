@@ -1,0 +1,35 @@
+---
+// Spanish events page. Mirrors src/pages/events.astro. Event titles and
+// descriptions come from the calendar and stay in English.
+import EventSchema from '../../components/EventSchema.astro';
+import ShareLinks from '../../components/ShareLinks.astro';
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import NextEvent from '../../components/NextEvent.astro';
+import EventsBrowser from '../../components/EventsBrowser.astro';
+import CommunityEvents from '../../components/CommunityEvents.astro';
+import EventsToolkit from '../../components/EventsToolkit.astro';
+import { upcomingEvents, eventsFetchedAt, formatShortDate } from '../../lib/events';
+import { esText } from '../../lib/i18n';
+
+const now = new Date();
+const upcoming = upcomingEvents(now);
+---
+<Base lang="es" title="Eventos" description="Próximas reuniones, convivios, acciones y capacitaciones de Central Sierra Foothills DSA, con vista de mes y enlaces para agregarlos a tu calendario.">
+  <PageHeader grid eyebrow="Eventos" title="Lo que viene." lede="Reuniones de rama, convivios, acciones y reuniones del gobierno local donde nuestras campañas están en la agenda. No tienes que ser miembro para venir.">
+    <NextEvent events={upcoming} lang="es" />
+  </PageHeader>
+
+  <section class="py-12 sm:py-16 bg-mist">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="mb-6 rounded-lg bg-white ring-1 ring-black/10 px-4 py-3 text-sm text-black-1">{esText.events.titlesNote} Las fechas, horas y tipos de evento están en español.</p>
+      <EventsBrowser events={upcoming} now={now} lang="es" empty={esText.events.empty} />
+      <div class="mt-12"><CommunityEvents now={now} lang="es" /></div>
+      <p class="mt-10 text-sm text-black-2">Las horas son del Pacífico. Esta lista se actualiza sola desde el calendario (última actualización: {formatShortDate(eventsFetchedAt, 'es')}).</p>
+    </div>
+  </section>
+
+  <EventsToolkit now={now} lang="es" />
+  <ShareLinks title="Próximos eventos" lang="es" />
+  <EventSchema events={upcoming} />
+</Base>

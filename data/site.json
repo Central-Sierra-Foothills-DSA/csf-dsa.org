@@ -1,0 +1,29 @@
+{
+  "orgName": "Central Sierra Foothills DSA",
+  "orgNameShort": "CSF DSA",
+  "tagline": "Building working‑class power in the Sierra foothills.",
+  "intro": "We're the Central Sierra Foothills chapter of the Democratic Socialists of America, organizing across Placer, Nevada, El Dorado, and Sierra counties. We build grassroots power to fight for a more just and democratic society in California's Sierra Nevada foothills.",
+  "counties": [
+    "Placer",
+    "Nevada",
+    "El Dorado",
+    "Sierra"
+  ],
+  "approxMembers": 200,
+  "contactEmail": "foothillsdsa@gmail.com",
+  "links": {
+    "joinChapterForm": "https://www.csf-dsa.org/join",
+    "fullCalendar": "https://www.csf-dsa.org/#section_13671",
+    "joinDsaNational": "https://act.dsausa.org/donate/membership/",
+    "dsaNational": "https://www.dsausa.org/",
+    "californiaDsa": "https://www.californiadsa.org/",
+    "github": "https://github.com/Central-Sierra-Foothills-DSA/csf-dsa.org",
+    "slackWorkspace": "https://dsacsf.slack.com"
+  },
+  "social": {
+    "instagram": "https://www.instagram.com/csf_dsa",
+    "facebook": "https://www.facebook.com/csfdsa",
+    "reddit": "https://www.reddit.com/r/CSF_DSA/"
+  },
+  "founded": "2020"
+}

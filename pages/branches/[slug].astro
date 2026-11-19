@@ -1,0 +1,278 @@
+---
+import Arrow from '../../components/Arrow.astro';
+import InviteFriend from '../../components/InviteFriend.astro';
+import EventSchema from '../../components/EventSchema.astro';
+import ShareLinks from '../../components/ShareLinks.astro';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import EventList from '../../components/EventList.astro';
+import BranchMap from '../../components/BranchMap.astro';
+import CampaignCard from '../../components/CampaignCard.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import UiIcon from '../../components/UiIcon.astro';
+import CalendarSubscribe from '../../components/CalendarSubscribe.astro';
+import site from '../../data/site.json';
+import { upcomingEvents, pastEvents, matches, typeLabel, typeOf, formatShortDate, shortLocation, EVENT_TYPES, TIMEZONE } from '../../lib/events';
+import { href } from '../../lib/paths';
+
+export async function getStaticPaths() {
+  const branches = await getCollection('branches');
+  return branches.map((branch) => ({ params: { slug: branch.id }, props: { branch } }));
+}
+
+const { branch } = Astro.props;
+const b = branch.data;
+// A forming branch is being organized but doesn't meet yet: no stats, an "I'm interested" button instead.
+const forming = b.status === 'forming';
+const { Content } = await render(branch);
+
+const matcher = { keywords: b.keywords, cities: b.cities };
+const upcoming = upcomingEvents().filter((e) => matches(e, matcher));
+const past = pastEvents().filter((e) => matches(e, matcher));
+
+// Activity stats: shows the branch is alive without saying who or how many attend.
+// Computed at build time; the site rebuilds daily, so they stay current.
+// City council and county board meetings match a branch by town but aren't the
+// branch getting together, so they're left out of these numbers.
+const own = (e: (typeof past)[number]) => typeOf(e) !== 'civic';
+const sixMonthsAgo = new Date();
+sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+const lastSix = past.filter((e) => own(e) && new Date(e.start) >= sixMonthsAgo);
+const lastMet = past.find(own);
+const upcomingOwn = upcoming.filter(own);
+const upcomingCivic = upcoming.filter((e) => !own(e)).slice(0, 3);
+const recent = past.filter(own).slice(0, 6);
+const breakdown = EVENT_TYPES
+  .map((t) => ({ t, n: lastSix.filter((e) => typeOf(e) === t.key).length }))
+  .map(({ t, n }) => ({ n, label: (n === 1 ? t.label : t.plural).toLowerCase() }))
+  .filter((t) => t.n > 0)
+  .sort((a, c) => c.n - a.n)
+  .slice(0, 3);
+const stats = [
+  lastSix.length > 0 && { n: String(lastSix.length), label: `${lastSix.length === 1 ? 'event' : 'events'} in the last 6 months` },
+  lastMet && { n: formatShortDate(lastMet.start), label: 'last got together' },
+  upcomingOwn.length > 0
+    ? { n: String(upcomingOwn.length), label: upcomingOwn.length === 1 ? 'branch event coming up' : 'branch events coming up' }
+    : { n: 'Next up', label: 'check the calendar', link: href('/events/') },
+].filter(Boolean) as { n: string; label: string; link?: string }[];
+
+const campaigns = (await getCollection('campaigns'))
+  .filter((c) => c.data.status === 'active' && c.data.branches.includes(branch.id))
+  .sort((a, c) => a.data.order - c.data.order);
+const mapsUrl = b.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}` : null;
+
+// Other branches, for the links at the bottom.
+const allBranches = (await getCollection('branches')).sort((a, c) => a.data.order - c.data.order);
+const activeCount = allBranches.filter((o) => o.data.status !== 'forming').length;
+const others = allBranches.map((o, i) => ({ o, n: i + 1 })).filter(({ o }) => o.id !== branch.id);
+
+const day = (iso: string, opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-US', { timeZone: TIMEZONE, ...opts }).format(new Date(iso));
+// Type badges, matching the archive page.
+const badge: Record<string, string> = {
+  meeting: 'bg-black text-white',
+  action: 'bg-red-dark text-white',
+  social: 'bg-red-4 text-red-dark',
+  civic: 'bg-black-4/60 text-black',
+  training: 'bg-white text-black ring-1 ring-black/20',
+  other: 'bg-mist text-black-2',
+};
+
+// The "when, where, online, questions" cards.
+type Detail = { icon: 'calendar' | 'pin' | 'video' | 'mail'; label: string; body: string; sub?: string; access?: string | null; link?: { href: string; text: string; external: boolean } };
+const contactHref = `mailto:${site.contactEmail}?subject=${encodeURIComponent(b.name + ' branch')}`;
+const details = [
+  { icon: 'calendar', label: 'When', body: b.meets },
+  { icon: 'pin', label: 'Where', body: b.venue, sub: b.address, access: forming ? undefined : (b.access ?? null), link: mapsUrl ? { href: mapsUrl, text: 'Open in maps', external: true } : undefined },
+  b.remote ? { icon: 'video', label: 'Online', body: b.remote } : null,
+  { icon: 'mail', label: 'Questions', body: 'Email the chapter and mention this branch.', link: { href: contactHref, text: site.contactEmail, external: false } },
+].filter(Boolean) as Detail[];
+
+const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4 decoration-2';
+---
+<Base title={`${b.name} branch`} description={`${b.name} branch of Central Sierra Foothills DSA. ${b.meets}`}>
+  <PageHeader eyebrow={forming ? 'Branch · Forming' : 'Branch'} title={b.name} lede={b.area} back={{ href: href('/branches/'), label: 'All branches' }}>
+    {forming ? (
+    <div class="mt-8 max-w-3xl rounded-xl bg-white/10 ring-1 ring-white/25 p-5 sm:p-6 sm:flex sm:items-center sm:gap-6">
+      <div class="flex-1">
+        <p><span class="inline-block px-2.5 py-0.5 rounded-full bg-white text-red-dark text-xs font-bold uppercase tracking-wide">Coming soon</span></p>
+        <p class="mt-3 text-lg leading-snug">This branch is forming. People are organizing, but it doesn’t meet regularly yet. Live nearby? We’d love to hear from you.</p>
+      </div>
+      <a href={contactHref} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-white text-red-dark hover:bg-black hover:text-white font-semibold rounded-button transition-colors"><UiIcon name="mail" /> I’m interested</a>
+    </div>
+    ) : (
+    <div class="mt-8">
+      <dl class="grid grid-cols-3 gap-2 sm:gap-3 max-w-3xl">
+        {stats.map((s) => (
+          <div class="rounded-lg bg-white/10 ring-1 ring-white/25 px-3 sm:px-4 py-3">
+            <dt class="sr-only">{s.label}</dt>
+            <dd class="font-display font-black text-xl sm:text-4xl leading-none">{s.n}</dd>
+            <dd class="mt-1 text-xs sm:text-sm leading-snug text-white/85">{s.link ? <a href={s.link} class="underline underline-offset-4 hover:text-white">{s.label} <Arrow /></a> : s.label}</dd>
+          </div>
+        ))}
+      </dl>
+      {breakdown.length > 0 && (
+        <p class="mt-3 text-sm text-white/85">
+          Lately: {breakdown.map((t, i) => <>{i > 0 && ' · '}<span class="font-semibold text-white">{t.n}</span> {t.label}</>)}
+          · <a href={href('/archive/#past-events')} class="underline underline-offset-4 hover:text-white">see the archive</a>
+        </p>
+      )}
+    </div>
+    )}
+  </PageHeader>
+
+  <!-- When, where, online, questions -->
+  <section class="bg-white border-b border-black/10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <dl class:list={['grid sm:grid-cols-2 gap-4', details.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3']}>
+        {details.map((d) => (
+          <div class="rounded-xl bg-mist p-5 flex flex-col">
+            <dt class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-dark">
+              <span class="w-8 h-8 rounded-full bg-red-dark text-white flex items-center justify-center"><UiIcon name={d.icon} class="w-4.5 h-4.5" /></span>
+              {d.label}
+            </dt>
+            <dd class="mt-3 font-semibold leading-snug">{d.body}</dd>
+            {d.sub && <dd class="mt-1 text-sm text-black-2">{d.sub}</dd>}
+            {d.access !== undefined && (
+              <dd class="mt-2 text-sm">
+                <span class="font-semibold">Access:</span>{' '}
+                {d.access ?? <>Questions about step-free entry, parking, or bringing kids? <a href={contactHref} class={linkClass}>Ask us</a>.</>}
+              </dd>
+            )}
+            {d.link && (
+              <dd class="mt-auto pt-3 text-sm">
+                <a href={d.link.href} target={d.link.external ? '_blank' : undefined} rel={d.link.external ? 'noopener' : undefined} class:list={[linkClass, 'break-all']}>{d.link.text}{d.link.external && <Fragment>{' '}<Arrow external /></Fragment>}</a>
+              </dd>
+            )}
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- About, and what's coming up -->
+  <section class="py-14 sm:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14">
+      <div class="lg:col-span-7">
+        <SectionHeading eyebrow="About the branch" title={`Organizing in ${b.name}.`} />
+        <div class="branch-prose mt-6 text-lg leading-relaxed text-black-1">
+          <Content />
+        </div>
+        <div class="mt-8 flex flex-wrap gap-3">
+          {forming
+            ? <a href={contactHref} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-button transition-colors"><UiIcon name="mail" /> I’m interested</a>
+            : <a href={href('/events/')} class="inline-flex items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-button transition-colors"><UiIcon name="calendar" /> Find the next meeting</a>}
+          <a href={href('/new-members/')} class="inline-flex items-center px-5 py-3 bg-mist hover:bg-black-4/60 font-semibold rounded-button transition-colors">New here? Start here</a>
+        </div>
+        {!forming && <div class="mt-8"><InviteFriend branch={b.name} event={upcomingOwn[0]} /></div>}
+      </div>
+      <aside class="lg:col-span-5">
+        <div class="rounded-2xl ring-1 ring-black/10 p-6">
+          <p class="flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase text-red-dark"><UiIcon name="clock" class="w-4 h-4" /> Next branch events</p>
+          <div class="mt-4">
+            <EventList events={upcomingOwn.slice(0, 3)} compact empty={forming ? 'No branch events yet. Chapter-wide meetings are on the calendar and are often held on Zoom.' : 'Nothing scheduled yet. Check the chapter calendar.'} />
+          </div>
+          {upcomingCivic.length > 0 && (
+            <div class="mt-6">
+              <p class="text-xs font-semibold tracking-[0.16em] uppercase text-black-2">Local government meetings</p>
+              <ul class="mt-2 space-y-2 text-sm">
+                {upcomingCivic.map((e) => (
+                  <li class="flex gap-3">
+                    <span class="w-14 shrink-0 font-semibold text-black-2">{formatShortDate(e.start)}</span>
+                    {e.url
+                      ? <a href={e.url} target="_blank" rel="noopener" class="hover:text-red-dark hover:underline underline-offset-4">{e.title}</a>
+                      : <span>{e.title}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <p class="mt-5 text-sm"><a href={href('/events/')} class={linkClass}>All chapter events <Arrow /></a></p>
+        </div>
+        {!forming && <div class="mt-5"><CalendarSubscribe feed={branch.id} stack /></div>}
+      </aside>
+    </div>
+  </section>
+
+  {campaigns.length > 0 && (
+    <section class="py-14 sm:py-20 bg-mist">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="In our area" title="Campaigns we're part of." />
+        <div class="mt-8 grid md:grid-cols-2 gap-5">
+          {campaigns.map((c) => <CampaignCard campaign={c} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {recent.length > 0 && (
+    <section class:list={['py-14 sm:py-20', campaigns.length > 0 ? 'bg-white' : 'bg-mist']}>
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <SectionHeading eyebrow="Recently" title="What we've been up to." />
+          <a href={href('/archive/#past-events')} class={linkClass}>Full archive <Arrow /></a>
+        </div>
+        <ul class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3">
+          {recent.map((e) => {
+            const type = typeOf(e);
+            const where = shortLocation(e);
+            return (
+              <li class="flex gap-4 rounded-xl bg-white ring-1 ring-black/10 p-4">
+                <span class="w-12 shrink-0 text-center" aria-hidden="true">
+                  <span class="block text-xs font-semibold uppercase text-red-dark">{day(e.start, { month: 'short' })}</span>
+                  <span class="block font-display font-black text-3xl leading-none">{day(e.start, { day: 'numeric' })}</span>
+                </span>
+                <span class="min-w-0">
+                  <span class="sr-only">{formatShortDate(e.start)}: </span>
+                  {e.url
+                    ? <a href={e.url} target="_blank" rel="noopener" class="font-semibold leading-snug hover:text-red-dark hover:underline underline-offset-4">{e.title}</a>
+                    : <span class="font-semibold leading-snug">{e.title}</span>}
+                  <span class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-black-2">
+                    <span class:list={['px-2 py-0.5 rounded-full text-xs font-bold', badge[type]]}>{typeLabel(e)}</span>
+                    {where && <span class="truncate min-w-0 max-w-full">{where}</span>}
+                  </span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- Map and the other branches -->
+  <section class="py-14 sm:py-20 bg-black text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+      <div class="lg:col-span-5">
+        <SectionHeading eyebrow="Across the chapter" title={forming ? `${activeCount} branches, and one on the way.` : `One of ${activeCount} branches.`} tone="dark" lede="Every branch is open to everyone. Go to whichever suits you." />
+        <ul class="mt-8 space-y-2">
+          {others.map(({ o, n }) => (
+            <li>
+              <a href={href(`/branches/${o.id}/`)} class="group flex items-center gap-3 p-3 rounded-lg bg-white/5 ring-1 ring-white/10 hover:bg-red-dark hover:ring-red-dark transition-colors">
+                <span class="w-8 h-8 shrink-0 rounded-full bg-white text-black font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{n}</span>
+                <span class="flex-1 min-w-0">
+                  <span class="block font-display font-bold">{o.data.name}{o.data.status === 'forming' && <span class="ml-2 align-middle px-2 py-0.5 rounded-full bg-white/15 text-xs font-bold uppercase tracking-wide">Coming soon</span>}</span>
+                  <span class="block text-sm text-white/65 group-hover:text-white/90">{o.data.area}</span>
+                </span>
+                <Arrow />
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-5"><a href={href('/branches/#closest')} class="font-semibold text-red-2 hover:text-white underline underline-offset-4">Look up the branch closest to your town <Arrow /></a></p>
+      </div>
+      <div class="lg:col-span-7 text-black">
+        <BranchMap highlight={branch.id} />
+      </div>
+    </div>
+  </section>
+  <ShareLinks title={`${b.name} branch`} />
+  {!forming && <EventSchema events={upcomingOwn} />}
+</Base>
+
+<style>
+  /* Branch descriptions come from Markdown; keep them in the page's type scale. */
+  .branch-prose :global(p + p) { margin-top: 1rem; }
+  .branch-prose :global(a) { color: var(--color-red-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+  .branch-prose :global(a:hover) { color: var(--color-red); }
+</style>

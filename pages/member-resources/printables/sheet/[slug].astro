@@ -1,0 +1,66 @@
+---
+// One sheet of the flyer library: a print sheet (1, 2, or 4 copies on letter
+// paper) or a social image. Covers both the fill-in flyers and the ready-made
+// printables. `npm run printables` saves each of these pages to
+// public/files/printables/. Not linked from the site.
+import Sheet from '../../../../layouts/Sheet.astro';
+import Flyer from '../../../../components/printables/Flyer.astro';
+import Social from '../../../../components/printables/Social.astro';
+import TableSign from '../../../../components/printables/ready/TableSign.astro';
+import Handout from '../../../../components/printables/ready/Handout.astro';
+import SignIn from '../../../../components/printables/ready/SignIn.astro';
+import Standards from '../../../../components/printables/ready/Standards.astro';
+import DsSocial from '../../../../components/printables/ready/DsSocial.astro';
+import QuoteCard from '../../../../components/printables/ready/QuoteCard.astro';
+import { getPrintables, getReadyMade, type Printable, type ReadyItem } from '../../../../lib/printables';
+
+export async function getStaticPaths() {
+  const flyers = (await getPrintables()).map((p) => ({ params: { slug: p.slug }, props: { flyer: p } }));
+  const ready = getReadyMade().map((r) => ({ params: { slug: r.slug }, props: { ready: r } }));
+  return [...flyers, ...ready];
+}
+
+const { flyer, ready } = Astro.props as { flyer?: Printable; ready?: ReadyItem };
+
+// Normalize both kinds to one shape.
+const kind = flyer ? flyer.format.kind : ready!.kind;
+const title = flyer ? `${flyer.design.title} · ${flyer.format.label}` : ready!.title;
+const sheet = flyer ? (flyer.format.kind === 'pdf' ? flyer.format.sheet : undefined) : ready!.sheet;
+const px = flyer ? (flyer.format.kind === 'png' ? flyer.format.px : undefined) : ready!.px;
+const cols = flyer?.format.kind === 'pdf' ? flyer.format.cols : (ready?.cols ?? 1);
+const rows = flyer?.format.kind === 'pdf' ? flyer.format.rows : (ready?.rows ?? 1);
+const fieldPt = flyer?.format.kind === 'pdf' ? flyer.format.fieldPt : undefined;
+const ReadyLayout = ready && {
+  'table-sign': TableSign, handout: Handout, 'sign-in': SignIn, standards: Standards, 'ds-social': DsSocial, quote: QuoteCard,
+}[ready.layout];
+---
+{kind === 'pdf' && sheet ? (
+  <Sheet title={title} pageSize={`${sheet.w}in ${sheet.h}in`}>
+    <div
+      class="sheet grid bg-white"
+      style={`width:${sheet.w}in;height:${sheet.h}in;grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr)`}
+      data-kind="pdf"
+      data-pt={fieldPt}
+    >
+      {Array.from({ length: cols * rows }, () => (
+        <div class="min-w-0 min-h-0">
+          {flyer && flyer.format.kind === 'pdf' && <Flyer design={flyer.design} fields={flyer.fields} tall={flyer.formatId === 'half'} />}
+          {ReadyLayout && <ReadyLayout />}
+        </div>
+      ))}
+      {cols > 1 && <div class="cut absolute inset-y-0 left-1/2 border-l border-dashed" aria-hidden="true"></div>}
+      {rows > 1 && <div class="cut absolute inset-x-0 top-1/2 border-t border-dashed" aria-hidden="true"></div>}
+    </div>
+  </Sheet>
+) : px && (
+  <Sheet title={title}>
+    <div class="sheet" style={`width:${px.w}px;height:${px.h}px`} data-kind="png">
+      {flyer && <Social design={flyer.design} compact={flyer.formatId === 'square'} tall={flyer.formatId === 'story'} />}
+      {ReadyLayout && <ReadyLayout index={ready?.index ?? 0} />}
+    </div>
+  </Sheet>
+)}
+
+<style>
+  .cut { border-color: var(--color-black-4); }
+</style>

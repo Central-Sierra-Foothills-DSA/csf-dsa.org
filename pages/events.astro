@@ -1,0 +1,36 @@
+---
+import EventSchema from '../components/EventSchema.astro';
+import ShareLinks from '../components/ShareLinks.astro';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import NextEvent from '../components/NextEvent.astro';
+import EventsBrowser from '../components/EventsBrowser.astro';
+import CommunityEvents from '../components/CommunityEvents.astro';
+import EventsToolkit from '../components/EventsToolkit.astro';
+import { upcomingEvents, eventsFetchedAt, formatShortDate } from '../lib/events';
+import { href } from '../lib/paths';
+
+const now = new Date();
+const upcoming = upcomingEvents(now);
+const linkClass = 'font-semibold text-red-dark hover:text-red underline underline-offset-4';
+---
+<Base title="Events" description="Upcoming meetings, socials, actions, and trainings from Central Sierra Foothills DSA, with a month view and add-to-calendar links.">
+  <PageHeader grid eyebrow="Events" title="What's coming up." lede="Branch meetings, socials, actions, and local government meetings where our campaigns are on the agenda. You don't have to be a member to show up.">
+    <NextEvent events={upcoming} />
+  </PageHeader>
+
+  <section class="py-12 sm:py-16 bg-mist">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <EventsBrowser events={upcoming} now={now} empty="Nothing on the calendar right now. Check back soon." />
+      <div class="mt-12"><CommunityEvents now={now} /></div>
+      <p class="mt-10 text-sm text-black-2">
+        Times are Pacific. This list updates from the calendar automatically (last synced {formatShortDate(eventsFetchedAt)}).
+        Looking for something that already happened? <a href={href('/archive/')} class={linkClass}>Browse the archive</a>.
+      </p>
+    </div>
+  </section>
+
+  <EventsToolkit now={now} />
+  <ShareLinks title="Upcoming events" />
+  <EventSchema events={upcoming} />
+</Base>
