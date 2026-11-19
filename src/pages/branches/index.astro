@@ -1,10 +1,12 @@
 ---
+import Arrow from '../../components/Arrow.astro';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import BranchMap from '../../components/BranchMap.astro';
 import BranchCard from '../../components/BranchCard.astro';
+import UiIcon from '../../components/UiIcon.astro';
 import site from '../../data/site.json';
 import towns from '../../data/towns.json';
 import { milesBetween } from '../../lib/geo';
@@ -22,49 +24,88 @@ const placed = towns.map((t) => {
   return { town: t, branch: ranked[0].b, miles: ranked[0].miles };
 });
 const near = (id: string) => placed.filter((p) => p.branch.id === id && p.miles <= FAR_MILES).sort((a, b) => a.town.name.localeCompare(b.town.name));
+const active = branches.filter((b) => b.data.status !== 'forming');
+const forming = branches.filter((b) => b.data.status === 'forming');
 const far = placed.filter((p) => p.miles > FAR_MILES).sort((a, b) => a.town.name.localeCompare(b.town.name));
 ---
-<Base title="Branches" description="Find the Central Sierra Foothills DSA branch closest to you: Grass Valley / Nevada City, Auburn, Placerville, or Roseville.">
-  <PageHeader eyebrow="Branches" title="Find your branch." lede="Our chapter stretches from Roseville to Lake Tahoe, so we organize locally. Each branch meets monthly and runs its own projects. Go to whichever suits you. Every branch is open to everyone." />
+<Base title="Branches" description="Find the Central Sierra Foothills DSA branch closest to you: Grass Valley / Nevada City, Auburn, Placerville, or Roseville. A Truckee / North Tahoe branch is forming.">
+  <PageHeader eyebrow="Branches" title="Find your branch." lede="Our chapter stretches from Roseville to Lake Tahoe, so we organize locally. Most branches meet monthly, and each runs its own projects. Go to whichever suits you. Every branch is open to everyone." />
 
-  <section class="py-12 sm:py-16 bg-white">
+  <section class="py-14 sm:py-20 bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <div class="lg:sticky lg:top-24"><BranchMap /></div>
-        <div class="grid gap-5">
+        <div class="tray grid sm:grid-cols-2 lg:grid-cols-1 gap-5">
           {branches.map((b, i) => <BranchCard branch={b} number={i + 1} />)}
         </div>
       </div>
     </div>
   </section>
 
-  <section id="closest" class="py-12 sm:py-16 bg-mist">
+  <section id="closest" class="py-14 sm:py-20 bg-mist">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <SectionHeading eyebrow="Closest branch" title="Look up your town." lede="Find your town below to see which branch meets nearest to you. This is only a suggestion based on distance." />
-      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {branches.map((b, i) => (
-          <div class="bg-white rounded-xl p-5 ring-1 ring-black/10">
-            <h3 class="font-display font-extrabold text-lg leading-tight flex items-center gap-2">
-              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red text-white text-xs font-black" aria-hidden="true">{i + 1}</span>
-              <a href={href(`/branches/${b.id}/`)} class="hover:text-red-dark">{b.data.name}</a>
-            </h3>
-            <ul class="mt-3 text-sm text-black-2 leading-relaxed columns-2 gap-4">
-              {near(b.id).map((p) => <li>{p.town.name}</li>)}
+      <div class="tray mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {active.map((b) => (
+          <div class="bg-white rounded-xl ring-1 ring-black/10 overflow-hidden flex flex-col">
+            <a href={href(`/branches/${b.id}/`)} class="group flex items-center gap-3 px-5 py-4 bg-red-dark text-white hover:bg-red-dark transition-colors">
+              <span class="w-8 h-8 shrink-0 rounded-full bg-white text-red-dark font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{branches.indexOf(b) + 1}</span>
+              <span class="font-display font-extrabold text-lg leading-tight flex-1">{b.data.name}</span>
+              <Arrow />
+            </a>
+            <ul class="p-4 flex flex-wrap gap-1.5">
+              {near(b.id).map((p) => <li class="px-2.5 py-1 rounded-full bg-mist text-sm">{p.town.name}</li>)}
             </ul>
           </div>
         ))}
       </div>
 
+      {forming.map((b) => (
+        <div class="mt-6 p-6 sm:p-8 rounded-xl border-2 border-dashed border-red-dark/60 bg-white sm:flex sm:items-center sm:gap-8">
+          <div class="flex-1">
+            <p class="flex flex-wrap items-center gap-2">
+              <span class="w-8 h-8 shrink-0 rounded-full bg-white text-red-dark border-2 border-dashed border-red-dark font-display font-black text-sm flex items-center justify-center" aria-hidden="true">{branches.indexOf(b) + 1}</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-red-dark text-white text-xs font-bold uppercase tracking-wide">Coming soon</span>
+            </p>
+            <h3 class="mt-3 font-display font-extrabold text-xl"><a href={href(`/branches/${b.id}/`)} class="hover:text-red-dark underline-offset-4 hover:underline">{b.data.name}</a> is forming.</h3>
+            <p class="mt-2 text-black-2 leading-relaxed">People are organizing a branch here, but it doesn't meet regularly yet. If you live nearby, get in touch and we'll connect you with them.</p>
+            {near(b.id).length > 0 && (
+              <ul class="mt-3 flex flex-wrap gap-1.5">
+                {near(b.id).map((p) => <li class="px-2.5 py-1 rounded-full bg-mist text-sm">{p.town.name}</li>)}
+              </ul>
+            )}
+          </div>
+          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent(`${b.data.name} branch`)}`} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-button transition-colors">
+            <UiIcon name="mail" /> I’m interested
+          </a>
+        </div>
+      ))}
+
       {far.length > 0 && (
-        <div class="mt-8 p-6 rounded-xl bg-white ring-1 ring-black/10">
-          <h3 class="font-display font-extrabold text-lg">A long way from any branch?</h3>
-          <p class="mt-2 text-black-2 leading-relaxed">
-            If you live in or near {far.map((p) => p.town.name).slice(0, -1).join(', ')}, or {far.at(-1)!.town.name}, every branch is a real drive.
-            Chapter-wide meetings are often held on Zoom, some branches offer a Zoom link, and we would love to help you start a branch closer to home.
-            Email <a href={`mailto:${site.contactEmail}`} class="font-semibold text-red-dark hover:text-red underline underline-offset-4">{site.contactEmail}</a>.
-          </p>
+        <div class="mt-6 p-6 sm:p-8 rounded-xl border-2 border-dashed border-red/50 bg-white sm:flex sm:items-center sm:gap-8">
+          <div class="flex-1">
+            <h3 class="font-display font-extrabold text-xl">A long way from any branch?</h3>
+            <p class="mt-2 text-black-2 leading-relaxed">
+              If you live in or near {far.map((p) => p.town.name).slice(0, -1).join(', ')}, or {far.at(-1)!.town.name}, every branch is a real drive.
+              Chapter-wide meetings are often held on Zoom, some branches offer a Zoom link, and we would love to help you start a branch closer to home.
+            </p>
+          </div>
+          <a href={`mailto:${site.contactEmail}?subject=${encodeURIComponent('Starting a branch')}`} class="mt-4 sm:mt-0 inline-flex shrink-0 items-center gap-2 px-5 py-3 bg-red-dark hover:bg-black-1 text-white font-semibold rounded-button transition-colors">
+            <UiIcon name="mail" /> Email us about it
+          </a>
         </div>
       )}
+    </div>
+  </section>
+
+  <section class="py-14 sm:py-16 bg-black text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="font-display font-black text-3xl sm:text-4xl">Every branch is open to everyone.</h2>
+      <p class="mt-4 text-lg text-white/80">Pick the one that suits you and come to a meeting. You don't need to be a member yet.</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href={href('/events/')} class="px-6 py-3 bg-red-dark hover:bg-black-1 rounded-button font-semibold transition-colors">See upcoming meetings</a>
+        <a href={href('/new-members/')} class="px-6 py-3 ring-2 ring-white/40 hover:ring-white rounded-button font-semibold transition-colors">New here? Start here</a>
+      </div>
     </div>
   </section>
 </Base>

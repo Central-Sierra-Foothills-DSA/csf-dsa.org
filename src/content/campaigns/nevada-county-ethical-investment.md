@@ -1,6 +1,7 @@
 ---
 title: "Nevada County Social and Ethical Investment Policy"
 summary: "We endorse the campaign for Nevada County to screen its investments and divest from weapons makers, private prisons, and human rights abusers."
+icon: money
 kind: endorsement
 status: active
 order: 2

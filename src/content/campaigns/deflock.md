@@ -1,6 +1,7 @@
 ---
 title: "Deflock: Fighting Mass Surveillance in Nevada County"
 summary: "Getting Flock Safety license plate readers out of our communities, one records request and city council meeting at a time."
+icon: eye
 kind: campaign
 status: active
 order: 1
